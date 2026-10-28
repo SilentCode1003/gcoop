@@ -1,0 +1,235 @@
+<script>
+$(document).ready(function () {
+
+    let usersById = {};
+
+    // ==========================
+    // Load Users
+    // ==========================
+    async function loadUsers() {
+
+        try {
+
+            const data = await queryUtility.Load("/users/load");
+
+            usersById = {};
+            $("#userTable").empty();
+
+            data.forEach(user => {
+
+                usersById[user.id] = user;
+
+                $("#userTable").append(`
+                    <tr>
+                        <td>${user.fullname}</td>
+                        <td>${user.role}</td>
+                        <td>${user.username}</td>
+                        <td>${formatDate(user.createdat)}</td>
+                        <td>${formatDate(user.updatedat)}</td>
+                        <td>
+                            <button
+                                class="btn btn-edit btn-sm btnEdit"
+                                data-id="${user.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+
+                            <button
+                                class="btn btn-danger btn-sm btnDelete"
+                                data-id="${user.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+
+            });
+
+        } catch (err) {
+
+            console.log(err);
+
+        }
+
+    }
+
+    // ==========================
+    // Load Roles
+    // ==========================
+    async function loadRoles(selected = "") {
+
+        const roles = await queryUtility.Load("/users/roles");
+
+        $("#Role").empty();
+
+        $("#Role").append(`<option value="">Select Role</option>`);
+
+        roles.forEach(role => {
+
+            $("#Role").append(`
+                <option value="${role.id}">
+                    ${role.name}
+                </option>
+            `);
+
+        });
+
+        $("#Role").val(selected);
+
+    }
+
+    // ==========================
+    // Add Button
+    // ==========================
+  $("#btnAdd").on("click", async function () {
+
+    // Clear form
+    $("#userId").val("");
+    $("#FullName").val("");
+    $("#Username").val("");
+    $("#Password").val("");
+
+    // Load roles
+    await loadRoles();
+
+    // Change modal title
+    $("#userModalLabel").text("Add User");
+
+    // Show modal
+    $("#userModal").modal("show");
+});
+
+    // ==========================
+    // Save Button
+    // ==========================
+    $("#btnSave").click(async function () {
+
+        const body = {
+
+            FullName: $("#FullName").val(),
+            Username: $("#Username").val(),
+            Password: $("#Password").val(),
+            Role: $("#Role").val()
+
+        };
+
+        const id = $("#userId").val();
+
+        try {
+
+            if (id == "") {
+
+                const save = await queryUtility.Save("/users/create", body);
+
+                Swal.fire(
+                    "Success",
+                    save.message,
+                    "success"
+                );
+
+            } else {
+
+                const update = await queryUtility.Update(
+                    "/users/update/" + id,
+                    body
+                );
+
+                Swal.fire(
+                    "Success",
+                    update.message,
+                    "success"
+                );
+
+            }
+
+            $("#userModal").modal("hide");
+
+            loadUsers();
+
+        } catch (err) {
+
+            Swal.fire(
+                "Error",
+                err.responseJSON.message,
+                "error"
+            );
+
+        }
+
+    });
+
+    // ==========================
+    // Edit
+    // ==========================
+    $("#userTable").on("click", ".btnEdit", async function () {
+
+        const id = $(this).data("id");
+
+        const user = usersById[id];
+
+        $("#userId").val(user.id);
+
+        $("#FullName").val(user.fullname);
+        $("#Username").val(user.username);
+        $("#Password").val("");
+
+        await loadRoles(user.roleid);
+
+        $("#userModalLabel").text("Edit User");
+
+        $("#userModal").modal("show");
+
+    });
+
+    // ==========================
+    // Delete
+    // ==========================
+    $("#userTable").on("click", ".btnDelete", function () {
+
+        const id = $(this).data("id");
+
+        Swal.fire({
+
+            title: "Delete User?",
+            text: "This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes"
+
+        }).then(async (result) => {
+
+            if (!result.isConfirmed)
+                return;
+
+            const del = await queryUtility.Delete("/users/delete/" + id);
+
+            Swal.fire(
+                "Deleted",
+                del.message,
+                "success"
+            );
+
+            loadUsers();
+
+        });
+
+    });
+
+    // ==========================
+    // Date Formatter
+    // ==========================
+    function formatDate(date) {
+
+        if (!date)
+            return "";
+
+        return new Date(date).toLocaleString();
+
+    }
+
+    // ==========================
+    // Initialize
+    // ==========================
+    loadUsers();
+
+});
+</script>

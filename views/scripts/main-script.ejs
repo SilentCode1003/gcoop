@@ -1,0 +1,86 @@
+<!-- Bootstrap core JavaScript -->
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript -->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages -->
+<script src="/javascripts/sb-admin-2.min.js"></script>
+
+<script>
+const Query = (url, type, data = null) => {
+    return new Promise((resolve, reject) => {
+
+        const ajaxOptions = {
+            url: url,
+            method: type,
+            dataType: "json",
+            success: function (result) {
+                resolve(result);
+            },
+            error: function (err) {
+                reject(err);
+                console.error("Error:", err);
+            }
+        };
+
+        if (["POST", "PUT", "PATCH", "DELETE"].includes(type) && data) {
+            ajaxOptions.data = JSON.stringify(data);
+            ajaxOptions.contentType = "application/json";
+        }
+
+        $.ajax(ajaxOptions);
+    });
+};
+
+const queryUtility = {
+    Load(url) {
+        return Query(url, "GET");
+    },
+    Save(url, data) {
+        return Query(url, "POST", data);
+    },
+    Update(url, data) {
+        return Query(url, "PUT", data);
+    },
+    Delete(url) {
+        return Query(url, "DELETE");
+    }
+};
+
+$(document).on("click", "#logoutModal .btn-primary", async function (e) {
+    e.preventDefault();
+
+    try {
+        await queryUtility.Save("/auth/logout");
+        window.location.href = "/auth";
+    } catch (err) {
+        console.error(err);
+
+        Swal.fire({
+            icon: "error",
+            title: "Logout Failed",
+            text: err.responseJSON?.message || "An error occurred while logging out."
+        });
+    }
+});
+$(function () {
+    if (localStorage.getItem("theme") === "light") {
+      $("body").addClass("light-mode");
+      $("#themeToggle i").removeClass("fa-moon").addClass("fa-sun");
+    }
+
+    $("#themeToggle").click(function () {
+      $("body").toggleClass("light-mode");
+
+      if ($("body").hasClass("light-mode")) {
+        localStorage.setItem("theme", "light");
+        $("#themeToggle i").removeClass("fa-moon").addClass("fa-sun");
+      } else {
+        localStorage.setItem("theme", "dark");
+        $("#themeToggle i").removeClass("fa-sun").addClass("fa-moon");
+      }
+    });
+  });
+</script>

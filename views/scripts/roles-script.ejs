@@ -1,0 +1,312 @@
+<script>
+$(document).ready(function () {
+
+    let rolesById = {};
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true
+    });
+
+    function esc(v) {
+        return String(v ?? "").replace(/[&<>"']/g, function (c) {
+            return {
+                "&":"&amp;",
+                "<":"&lt;",
+                ">":"&gt;",
+                '"':"&quot;",
+                "'":"&#39;"
+            }[c];
+        });
+    }
+
+    // ==========================
+    // LOAD ROLES
+    // ==========================
+    async function loadRoles() {
+
+        try {
+
+            const roles = await queryUtility.Load("/roles/load");
+
+            rolesById = {};
+
+            const $tbody = $("#roleTable").empty();
+
+            $.each(roles, function(i, role){
+
+                rolesById[role.id] = role;
+
+                $tbody.append(`
+                    <tr>
+                        <td>${esc(role.id)}</td>
+                        <td>${esc(role.name)}</td>
+                        <td>${formatDate(role.createdDate)}</td>
+                        <td>${formatDate(role.updatedDate)}</td>
+
+                        <td class="text-center">
+
+                            <button
+                                class="btn btn-secondary btn-sm btn-edit"
+                                data-id="${role.id}">
+                                <i class="fas fa-edit"></i>
+                                Edit
+                            </button>
+
+                            <button
+                                class="btn btn-danger btn-sm btn-delete"
+                                data-id="${role.id}">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+
+                        </td>
+                    </tr>
+                `);
+
+            });
+
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                $("#dataTable").DataTable().destroy();
+            }
+
+            $("#dataTable").DataTable({
+                responsive:true
+            });
+
+        } catch(err){
+
+            console.error(err);
+
+            Swal.fire(
+                "Error",
+                "Unable to load roles.",
+                "error"
+            );
+
+        }
+
+    }
+
+    // ==========================
+    // OPEN MODAL
+    // ==========================
+    function openModal(role=null){
+
+        $("#roleForm")[0].reset();
+
+        $("#roleId").val("");
+
+        if(role){
+
+            $("#modalTitle").text("Edit Role");
+
+            $("#roleId").val(role.id);
+            $("#roleName").val(role.name);
+
+        }
+        else{
+
+            $("#modalTitle").text("Add Role");
+
+        }
+
+        $("#roleModal").modal("show");
+
+    }
+
+    // ==========================
+    // GET FORM DATA
+    // ==========================
+    function getFormData(){
+
+        return{
+
+            Name:$("#roleName").val().trim()
+
+        };
+
+    }
+
+    // ==========================
+    // VALIDATE
+    // ==========================
+    function validate(data){
+
+        let valid=true;
+
+        $("#roleName").toggleClass("is-invalid", !data.Name);
+
+        if(!data.Name){
+            valid=false;
+        }
+
+        return valid;
+
+    }
+
+    // ==========================
+    // ADD BUTTON
+    // ==========================
+    $("#btnAdd").click(function(){
+
+        openModal();
+
+    });
+
+    // ==========================
+    // EDIT BUTTON
+    // ==========================
+    $("#roleTable").on("click",".btn-edit",function(){
+
+        const role=rolesById[$(this).data("id")];
+
+        if(role){
+
+            openModal(role);
+
+        }
+
+    });
+
+    // ==========================
+    // SAVE
+    // ==========================
+    $("#roleForm").submit(async function(e){
+
+        e.preventDefault();
+
+        const id=$("#roleId").val();
+
+        const body=getFormData();
+
+        if(!validate(body)){
+
+            return;
+
+        }
+
+        try{
+
+            if(id===""){
+
+                await queryUtility.Save(
+                    "/roles/create",
+                    body
+                );
+
+                Toast.fire({
+                    icon:"success",
+                    title:"Role added successfully."
+                });
+
+            }
+            else{
+
+                await queryUtility.Update(
+                    "/roles/update/"+id,
+                    body
+                );
+
+                Toast.fire({
+                    icon:"success",
+                    title:"Role updated successfully."
+                });
+
+            }
+
+            $("#roleModal").modal("hide");
+
+            loadRoles();
+
+        }
+        catch(err){
+
+            console.error(err);
+
+            Swal.fire(
+                "Error",
+                "Unable to save role.",
+                "error"
+            );
+
+        }
+
+    });
+
+    // ==========================
+    // DELETE
+    // ==========================
+    $("#roleTable").on("click",".btn-delete",async function(){
+
+        const id=$(this).data("id");
+
+        const result=await Swal.fire({
+
+            title:"Delete Role?",
+            text:"This action cannot be undone.",
+            icon:"warning",
+            showCancelButton:true,
+            confirmButtonText:"Delete"
+
+        });
+
+        if(!result.isConfirmed){
+
+            return;
+
+        }
+
+        try{
+
+            await queryUtility.Delete(
+                "/roles/delete/"+id
+            );
+
+            Toast.fire({
+
+                icon:"success",
+                title:"Role deleted."
+
+            });
+
+            loadRoles();
+
+        }
+        catch(err){
+
+            console.error(err);
+
+            Swal.fire(
+                "Error",
+                "Unable to delete role.",
+                "error"
+            );
+
+        }
+
+    });
+
+    // ==========================
+    // FORMAT DATE
+    // ==========================
+    function formatDate(date){
+
+        if(!date) return "";
+
+        const d=new Date(date);
+
+        return d.toLocaleDateString()+" "+d.toLocaleTimeString();
+
+    }
+
+    // ==========================
+    // INITIALIZE
+    // ==========================
+    loadRoles();
+
+});
+</script>

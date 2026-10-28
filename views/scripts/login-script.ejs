@@ -1,0 +1,84 @@
+<script>
+$(document).ready(function () {
+
+    $("#loginForm").on("submit", async function (e) {
+        e.preventDefault();
+
+        const body = {
+            Username: $("#username").val().trim(),
+            Password: $("#password").val()
+        };
+
+        // Validation
+        if (!body.Username) {
+            Swal.fire({
+                icon: "warning",
+                title: "Username Required",
+                text: "Please enter your username."
+            });
+            return;
+        }
+
+        if (!body.Password) {
+            Swal.fire({
+                icon: "warning",
+                title: "Password Required",
+                text: "Please enter your password."
+            });
+            return;
+        }
+
+        try {
+
+            $("#loginBtn")
+                .prop("disabled", true)
+                .html('<i class="fas fa-spinner fa-spin"></i> Signing In...');
+
+            const login = await queryUtility.Save("/auth/login", body);
+
+            if (login.success) {
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Login Successful",
+                    text: login.message || "Welcome!",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    window.location.href = "/";
+                }, 1200);
+
+            } else {
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Login Failed",
+                    text: login.message || "Invalid username or password."
+                });
+
+            }
+
+        } catch (err) {
+
+            console.error(err);
+
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.responseJSON?.message || "Unable to connect to the server."
+            });
+
+        } finally {
+
+            $("#loginBtn")
+                .prop("disabled", false)
+                .html("Login");
+
+        }
+
+    });
+
+});
+</script>

@@ -1,0 +1,43 @@
+<script>
+
+$(document).ready(function () {
+
+    loadDashboard();
+
+    $("#btnRefresh").click(function () {
+        loadDashboard();
+    });
+
+});
+
+async function loadDashboard() {
+
+    const dashboard = await queryUtility.Load("/dashboard/load");
+
+    console.log(dashboard);
+
+    $("#totalMembers").text(dashboard.totalMembers);
+    $("#totalUsers").text(dashboard.totalUsers);
+    $("#totalLoanRates").text(dashboard.totalLoanRates);
+    $("#totalDenomination").text(dashboard.totalDenomination);
+
+    $("#recentMembers").empty();
+
+    dashboard.members.forEach(member => {
+
+        $("#recentMembers").append(`
+            <tr>
+
+                <td>${member.employeeid}</td>
+                <td>${member.fullname}</td>
+                <td>${member.contact}</td>
+                <td>${member.registerdate}</td>
+
+            </tr>
+        `);
+
+    });
+
+}
+
+</script>

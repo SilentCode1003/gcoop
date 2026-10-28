@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("../components/header.ejs")%>
+
+        <style>
+            /* Background image layer, sits at the lowest z-index */
+            .bg-layer {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                background-image: url('/images/5l.jpg');
+                /* <-- change to your image path */
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                pointer-events: none;
+            }
+
+            /* Make sure the page wrappers don't paint over the background */
+            body#page-top,
+            #wrapper,
+            #content-wrapper,
+            #content {
+                background: transparent !important;
+            }
+        </style>
+</head>
+
+<body id="page-top">
+
+    <!-- Background image (lowest layer) -->
+    <div class="bg-layer"></div>
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Begin Page Content -->
+                <%- include(body) %>
+                    <!-- /.container-fluid -->
+
+            </div>
+
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <%- include("../scripts/main-script.ejs")%>
+        <!-- Page-specific script -->
+        <% if (typeof pageScript !=="undefined" ) { %>
+            <%- include(pageScript) %>
+                <% } %>
+
+</body>
+
+</html>
