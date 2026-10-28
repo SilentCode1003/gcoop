@@ -3,25 +3,12 @@ const router = express.Router();
 const { Query } = require("../database/config/db.js");
 
 
-function validateRole(body) {
+function validateRoles(body) {
+ const roleName = (body.Name ?? "").trim();
+ 
+ if (!roleName) return { error : "Invalid Password, please try again"}
 
-    if (!body.Name || body.Name.trim() === "") {
-        return {
-            error: {
-                details: [
-                    {
-                        message: "Role name is required."
-                    }
-                ]
-            }
-        };
-    }
-
-    return {
-        error: null,
-        value: body
-    };
-
+  return {value :{roleName}}
 }
 
 router.get("/", (req, res) => {
@@ -32,188 +19,51 @@ router.get("/", (req, res) => {
     });
 });
 
-/* ===========================
-   Load Roles
-=========================== */
-
-router.get("/load", async (req, res) => {
-
-    try {
-
-        const sql = `
-            SELECT
-                mr_id AS id,
-                mr_name AS name,
-                mr_create_at AS createdDate,
-                mr_update_at AS updatedDate
-            FROM master_roles
-            ORDER BY mr_name ASC
-        `;
-
-        const data = await Query(sql);
-
-        res.json(data);
-
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({
-            success: false,
-            message: "Unable to load roles."
-        });
-    }
-
+/// Load Roles
+router.get("/loadRole",async function(req,res){
+    const roles = await Query("SELECT mr_id as id, mr_name as name, mr_create_at as createdDate, mr_update_at as updatedDate FROM master_roles ORDER BY mr_id ASC")
+    console.log(roles)
+    res.json(roles)
 });
 
-router.post("/create", async (req, res) => {
-
-    const { error, value } = validateRole(req.body);
-
-    if (error) {
-        return res.status(400).json({
-            success: false,
-            message: error.details[0].message
-        });
-    }
-
-    try {
-
-        await Query(
-            `
-            INSERT INTO master_roles
-            (
-                mr_name,
-                mr_create_at
-            )
-            VALUES
-            (?,?)
-            `,
-            [
-                value.Name,
-                new Date()
-            ]
-        );
-
-        res.json({
-            success: true,
-            message: "Role created successfully."
-        });
-
-    } catch (err) {
-
-        console.log(err);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to create role."
-        });
-
-    }
-
+// Create Member
+router.post("/createRole",async function (req, res) {
+  const { error, value } = validateRoles(req.body);
+  if (error) {
+    return res.status(400).json({ success: false, message: error });
+  }
+ const createRole = await Query("Insert into master_roles (mr_name, mr_create_at) values (?,?)", [value.roleName, new Date()]);
+  res
+    .status(201)
+    .json({ success: true, message: "Role created.", data: createRole});
 });
 
-router.put("/update/:id", async (req, res) => {
+// Update Role
+ router.put("/updateRole/:id",async function (req, res) {
+   const id = parseInt(req.params.id, 10);
 
-    const id = parseInt(req.params.id);
+   const { error, value } = validateRoles(req.body, id);
+   const updateRole = await Query("Update master_roles set mr_name = ?, mr_update_at = ? where mr_id = ?", [value.roleName, new Date(), id]) ;
+   if (error) {
+     return res.status(400).json({ success: false, message: error });
+   }
+   res.json({ success: true, message: "Role updated.", data: updateRole });
+ });
 
-    const { error, value } = validateRole(req.body);
+// Delete Role
+router.delete("/deleteRole/:id", async function (req, res) {
+  const id = parseInt(req.params.id, 10);
 
-    if (error) {
-        return res.status(400).json({
-            success: false,
-            message: error.details[0].message
-        });
-    }
+  if (id.length === 0) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Role not found." });
+  }
 
-    try {
+  const deleteMember = await Query("Delete from master_roles where mr_id = ?", [id]);
+ 
 
-        const exist = await Query(
-            "SELECT * FROM master_roles WHERE mr_id = ?",
-            [id]
-        );
-
-        if (exist.length == 0) {
-
-            return res.status(404).json({
-                success: false,
-                message: "Role not found."
-            });
-
-        }
-
-        await Query(
-            `
-            UPDATE master_roles
-            SET
-                mr_name=?,
-                mr_update_at=?
-            WHERE mr_id=?
-            `,
-            [
-                value.Name,
-                new Date(),
-                id
-            ]
-        );
-
-        res.json({
-            success: true,
-            message: "Role updated successfully."
-        });
-
-    } catch (err) {
-
-        console.log(err);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to update role."
-        });
-
-    }
-
-});
-
-router.delete("/delete/:id", async (req, res) => {
-
-    const id = parseInt(req.params.id);
-
-    try {
-
-        const exist = await Query(
-            "SELECT * FROM master_roles WHERE mr_id=?",
-            [id]
-        );
-
-        if (exist.length == 0) {
-
-            return res.status(404).json({
-                success: false,
-                message: "Role not found."
-            });
-
-        }
-
-        await Query(
-            "DELETE FROM master_roles WHERE mr_id=?",
-            [id]
-        );
-
-        res.json({
-            success: true,
-            message: "Role deleted successfully."
-        });
-
-    } catch (err) {
-
-        console.log(err);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to delete role."
-        });
-
-    }
-
+  res.json({ success: true, message: "Role deleted.", data : deleteMember});
 });
 
 module.exports = router;

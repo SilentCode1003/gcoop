@@ -28,7 +28,7 @@ router.get("/load", async function (req, res) {
         u.mu_create_at AS createdat,
         u.mu_update_at AS updatedat
       FROM master_users u
-      LEFT JOIN master_role r
+      LEFT JOIN master_roles r
         ON u.mu_role = r.mr_id
       ORDER BY u.mu_id DESC
     `);
@@ -58,7 +58,7 @@ router.get("/roles", async function (req, res) {
       SELECT
         mr_id AS id,
         mr_name AS name
-      FROM master_role
+      FROM master_roles
       ORDER BY mr_name
     `);
 

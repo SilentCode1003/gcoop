@@ -7,6 +7,7 @@ router.get("/", function (req, res) {
     res.render("layout/main-layout", {
         body: "../pages/dashboard-page.ejs",
         title: "Dashboard",
+        pageStyle: "/stylesheets/dashboard.css",
         pageScript: "../scripts/dashboard-script.ejs",
     });
 });
@@ -45,9 +46,9 @@ router.get("/load", async function (req, res) {
                 mm_employee_id AS employeeid,
                 mm_fullname AS fullname,
                 mm_contact_no AS contact,
-                mm_createddate AS registerdate
+                mm_register_date AS registerdate
             FROM master_members
-            ORDER BY mm_createddate DESC
+            ORDER BY mm_register_date DESC
             LIMIT 5
         `);
 

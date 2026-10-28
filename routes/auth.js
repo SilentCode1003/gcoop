@@ -15,20 +15,6 @@ function validateCredentials(body, ignoreId = null) {
   return {value :{username, password}}
 }
 
-// For Registration
-// function validateRegistree(body, ignoreId = null) {
-//   const username = (body.Username ?? "").trim();
-//   const password = (body.Password ?? "").trim();
-//   const role = (body.Role ?? "").trim();
-
-
-//   if (!username) return { error: "Invalid username, please try again." };
-//   if (!password) return { error : "Invalid Password, please try again"}
-//   if (!roleId) return { error : "Invalid Role, please try again"}
-
-//   return {value :{ role, username, password}}
-// }
-
 /* GET home page. */
 router.get("/", function (req, res, next) {
   res.render("layout/sub-layout", {
@@ -82,17 +68,5 @@ router.post("/logout", async function (req, res) {
   })
 
 })
-
-// router.post("/register",async function (req, res) {
-//   const { error, value } = validateRegistree(req.body);
-//   console.log(value)
-//   if (error) {
-//     return res.status(400).json({ success: false, message: error });
-//   }
-//  const createUser = await Query("Insert into users (u_roleId, u_userName, u_hashPassword, u_createdDate, u_updatedDate) values (?,?,?,?,?)", [value.roleId, value.username, EncryptString(value.password), new Date(), new Date()]);
-//   res
-//     .status(201)
-//     .json({ success: true, message: "Student created.", data: createUser });
-// });
 
 module.exports = router;
