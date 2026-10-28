@@ -1,0 +1,183 @@
+/* ==========================
+   SIDEBAR
+========================== */
+
+.sidebar{
+    background: var(--sidebar) !important;
+    width: 250px !important;
+    min-height: 100vh;
+    transition: background .3s;
+}
+
+/* ==========================
+   SIDEBAR BRAND
+========================== */
+
+.sidebar .sidebar-brand{
+    height: 80px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.sidebar .sidebar-brand-icon{
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sidebar .sidebar-brand-icon img,
+.sidebar-logo{
+    width: 45px !important;
+    height: 45px !important;
+    max-width: 45px !important;
+    max-height: 45px !important;
+    object-fit: contain;
+    display: block;
+}
+
+.sidebar .sidebar-brand-text{
+    margin-left: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    line-height: 1.2;
+}
+
+/* ==========================
+   SIDEBAR HEADING
+========================== */
+
+.sidebar-heading{
+    color: var(--text) !important;
+    opacity: .75;
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* ==========================
+   SIDEBAR LINKS
+========================== */
+
+.sidebar .nav-item{
+    margin: 3px 8px;
+}
+
+.sidebar .nav-item .nav-link{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    color: var(--text) !important;
+    transition: .3s;
+}
+
+.sidebar .nav-item .nav-link span{
+    color: var(--text) !important;
+    font-weight: 500;
+}
+
+.sidebar .nav-item .nav-link i{
+    width: 20px;
+    text-align: center;
+    color: var(--text) !important;
+    transition: .3s;
+}
+
+.sidebar .nav-item .nav-link img{
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* ==========================
+   HOVER
+========================== */
+
+.sidebar .nav-item .nav-link:hover{
+    background: var(--primary);
+    color: #fff !important;
+}
+
+.sidebar .nav-item .nav-link:hover span,
+.sidebar .nav-item .nav-link:hover i{
+    color: #fff !important;
+}
+
+.sidebar .nav-item .nav-link:hover img{
+    filter: brightness(0) invert(1);
+}
+
+/* ==========================
+   ACTIVE
+========================== */
+
+.sidebar .nav-item.active .nav-link{
+    background: var(--primary);
+    color: #fff !important;
+}
+
+.sidebar .nav-item.active .nav-link span,
+.sidebar .nav-item.active .nav-link i{
+    color: #fff !important;
+}
+
+.sidebar .nav-item.active .nav-link img{
+    filter: brightness(0) invert(1);
+}
+
+/* ==========================
+   DIVIDER
+========================== */
+
+.sidebar-divider{
+    border-color: var(--border) !important;
+}
+
+/* ==========================
+   SIDEBAR TOGGLE
+========================== */
+
+#sidebarToggle{
+    background: var(--primary);
+    border: none;
+}
+
+#sidebarToggle:hover{
+    background: var(--primary-hover);
+}
+
+/* ==========================
+   SIDEBAR FOOTER
+========================== */
+
+.sidebar-card{
+    background: transparent;
+    border: none;
+    text-align: center;
+    padding: 20px;
+}
+
+.sidebar-card p{
+    color: var(--text);
+}
+
+.sidebar-card .btn{
+    border-radius: 20px;
+}
+
+.sidebar-card-illustration{
+    width: 70px !important;
+    height: 70px !important;
+    object-fit: contain;
+    display: block;
+    margin: 10px auto;
+}

@@ -27,7 +27,7 @@ $(document).ready(function () {
     // ===========================
     async function loadMembers() {
         try {
-            const members = await queryUtility.Load("/members/load");
+            const members = await queryUtility.Load("/members/loadMember");
 
             const $tbody = $("#memberTable").empty();
             membersById = {};
@@ -144,7 +144,7 @@ function getFormData() {
         if (!result.isConfirmed) return;
 
         try {
-            await queryUtility.Delete("/members/delete/" + id);
+            await queryUtility.Delete("/members/deleteMember/" + id);
 
             Toast.fire({ icon: "success", title: "Member deleted." });
             loadMembers();
@@ -172,9 +172,9 @@ function getFormData() {
     try {
 
         if (id === "") {
-            await queryUtility.Save("/members/create", body);
+            await queryUtility.Save("/members/createMember", body);
         } else {
-            await queryUtility.Update("/members/update/" + id, body);
+            await queryUtility.Update("/members/updateMember/" + id, body);
         }
 
         $("#memberModal").modal("hide");

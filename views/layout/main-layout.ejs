@@ -3,6 +3,14 @@
 
 <head>
     <%- include("../components/header.ejs") %>
+
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="/stylesheets/style.css">
+
+    <!-- Page-specific CSS -->
+    <% if (typeof pageStyle !== "undefined" && pageStyle) { %>
+        <link rel="stylesheet" href="<%= pageStyle %>">
+    <% } %>
 </head>
 
 <body id="page-top">
@@ -29,17 +37,17 @@
                 <!-- End Page Content -->
 
             </div>
-            <!-- End of Main Content -->
+            <!-- End Main Content -->
 
             <!-- Footer -->
             <%- include("../components/footer.ejs") %>
-            <!-- End of Footer -->
+            <!-- End Footer -->
 
         </div>
-        <!-- End of Content Wrapper -->
+        <!-- End Content Wrapper -->
 
     </div>
-    <!-- End of Page Wrapper -->
+    <!-- End Page Wrapper -->
 
     <!-- Scroll to Top Button -->
     <a class="scroll-to-top rounded" href="#page-top">
@@ -47,8 +55,12 @@
     </a>
 
     <!-- Logout Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
-        aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal fade"
+         id="logoutModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="logoutModalLabel"
+         aria-hidden="true">
 
         <div class="modal-dialog" role="document">
 
@@ -72,7 +84,9 @@
 
                 <div class="modal-footer">
 
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">
+                    <button class="btn btn-secondary"
+                            type="button"
+                            data-dismiss="modal">
                         Cancel
                     </button>
 

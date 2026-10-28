@@ -1,0 +1,312 @@
+<script>
+$(document).ready(function () {
+
+    let routesById = {};
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true
+    });
+
+    function esc(v) {
+        return String(v ?? "").replace(/[&<>"']/g, function (c) {
+            return {
+                "&":"&amp;",
+                "<":"&lt;",
+                ">":"&gt;",
+                '"':"&quot;",
+                "'":"&#39;"
+            }[c];
+        });
+    }
+
+    // ==========================
+    // LOAD ROLES
+    // ==========================
+    async function loadRoutes() {
+
+        try {
+
+            const routes = await queryUtility.Load("/routes/load");
+
+            routesById = {};
+
+            const $tbody = $("#routesTable").empty();
+
+            $.each(routes, function(i, routes){
+
+                routesById[role.id] = role;
+
+                $tbody.append(`
+                    <tr>
+                        <td>${esc(routes.id)}</td>
+                        <td>${esc(routes.name)}</td>
+                        <td>${formatDate(routes.createdDate)}</td>
+                        <td>${formatDate(routes.updatedDate)}</td>
+
+                        <td class="text-center">
+
+                            <button
+                                class="btn btn-secondary btn-sm btn-edit"
+                                data-id="${route.id}">
+                                <i class="fas fa-edit"></i>
+                                Edit
+                            </button>
+
+                            <button
+                                class="btn btn-danger btn-sm btn-delete"
+                                data-id="${route.id}">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+
+                        </td>
+                    </tr>
+                `);
+
+            });
+
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                $("#dataTable").DataTable().destroy();
+            }
+
+            $("#dataTable").DataTable({
+                responsive:true
+            });
+
+        } catch(err){
+
+            console.error(err);
+
+            Swal.fire(
+                "Error",
+                "Unable to load roles.",
+                "error"
+            );
+
+        }
+
+    }
+
+    // ==========================
+    // OPEN MODAL
+    // ==========================
+    function openModal(role=null){
+
+        $("#roleForm")[0].reset();
+
+        $("#roleId").val("");
+
+        if(role){
+
+            $("#modalTitle").text("Edit Role");
+
+            $("#roleId").val(role.id);
+            $("#roleName").val(role.name);
+
+        }
+        else{
+
+            $("#modalTitle").text("Add Routes");
+
+        }
+
+        $("#routesModal").modal("show");
+
+    }
+
+    // ==========================
+    // GET FORM DATA
+    // ==========================
+    function getFormData(){
+
+        return{
+
+            Name:$("#routesName").val().trim()
+
+        };
+
+    }
+
+    // ==========================
+    // VALIDATE
+    // ==========================
+    function validate(data){
+
+        let valid=true;
+
+        $("#routesName").toggleClass("is-invalid", !data.Name);
+
+        if(!data.Name){
+            valid=false;
+        }
+
+        return valid;
+
+    }
+
+    // ==========================
+    // ADD BUTTON
+    // ==========================
+    $("#btnAdd").click(function(){
+
+        openModal();
+
+    });
+
+    // ==========================
+    // EDIT BUTTON
+    // ==========================
+    $("#routesTable").on("click",".btn-edit",function(){
+
+        const routes=routesById[$(this).data("id")];
+
+        if(routes){
+
+            openModal(routes);
+
+        }
+
+    });
+
+    // ==========================
+    // SAVE
+    // ==========================
+    $("#routesForm").submit(async function(e){
+
+        e.preventDefault();
+
+        const id=$("#routesId").val();
+
+        const body=getFormData();
+
+        if(!validate(body)){
+
+            return;
+
+        }
+
+        try{
+
+            if(id===""){
+
+                await queryUtility.Save(
+                    "/routes/create",
+                    body
+                );
+
+                Toast.fire({
+                    icon:"success",
+                    title:"Route added successfully."
+                });
+
+            }
+            else{
+
+                await queryUtility.Update(
+                    "/routes/update/"+id,
+                    body
+                );
+
+                Toast.fire({
+                    icon:"success",
+                    title:"Route updated successfully."
+                });
+
+            }
+
+            $("#routesModal").modal("hide");
+
+            loadRoutes();
+
+        }
+        catch(err){
+
+            console.error(err);
+
+            Swal.fire(
+                "Error",
+                "Unable to save route.",
+                "error"
+            );
+
+        }
+
+    });
+
+    // ==========================
+    // DELETE
+    // ==========================
+    $("#routesTable").on("click",".btn-delete",async function(){
+
+        const id=$(this).data("id");
+
+        const result=await Swal.fire({
+
+            title:"Delete Route?",
+            text:"This action cannot be undone.",
+            icon:"warning",
+            showCancelButton:true,
+            confirmButtonText:"Delete"
+
+        });
+
+        if(!result.isConfirmed){
+
+            return;
+
+        }
+
+        try{
+
+            await queryUtility.Delete(
+                "/routes/delete/"+id
+            );
+
+            Toast.fire({
+
+                icon:"success",
+                title:"Route deleted."
+
+            });
+
+            loadRoles();
+
+        }
+        catch(err){
+
+            console.error(err);
+
+            Swal.fire(
+                "Error",
+                "Unable to delete role.",
+                "error"
+            );
+
+        }
+
+    });
+
+    // ==========================
+    // FORMAT DATE
+    // ==========================
+    function formatDate(date){
+
+        if(!date) return "";
+
+        const d=new Date(date);
+
+        return d.toLocaleDateString()+" "+d.toLocaleTimeString();
+
+    }
+
+    // ==========================
+    // INITIALIZE
+    // ==========================
+    loadRoutes();
+
+});
+</script>

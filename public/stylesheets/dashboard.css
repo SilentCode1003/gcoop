@@ -1,0 +1,159 @@
+/* ==========================
+   DASHBOARD TITLE
+========================== */
+
+.dashboard-title{
+    color:var(--text);
+    font-size:2rem;
+    font-weight:600;
+    margin-bottom:25px;
+}
+
+/* ==========================
+   SUMMARY CARDS
+========================== */
+
+.dashboard-card{
+    border-radius:12px;
+    transition:.3s;
+}
+
+.dashboard-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 10px 20px rgba(0,0,0,.15);
+}
+
+.dashboard-card .card-body{
+    padding:25px;
+}
+
+.dashboard-card h6{
+    font-size:14px;
+    font-weight:700;
+    text-transform:uppercase;
+    margin-bottom:10px;
+}
+
+.dashboard-card h2,
+.dashboard-card h3,
+.dashboard-card h4,
+.dashboard-card span{
+    color:var(--text);
+    font-weight:700;
+}
+
+.dashboard-card i{
+    font-size:48px;
+    color:#7c7c95;
+}
+
+/* ==========================
+   DASHBOARD CARD COLORS
+========================== */
+
+.border-left-danger{
+    border-left:5px solid #dc3545!important;
+}
+
+.border-left-primary{
+    border-left:5px solid #2563eb!important;
+}
+
+.border-left-success{
+    border-left:5px solid #22c55e!important;
+}
+
+.border-left-warning{
+    border-left:5px solid #f59e0b!important;
+}
+
+.text-danger{
+    color:#dc3545!important;
+}
+
+.text-primary{
+    color:#2563eb!important;
+}
+
+.text-success{
+    color:#22c55e!important;
+}
+
+.text-warning{
+    color:#f59e0b!important;
+}
+
+/* ==========================
+   RECENT MEMBERS
+========================== */
+
+.dashboard-table{
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.dashboard-table table{
+    margin-bottom:0;
+}
+
+.dashboard-table th,
+.dashboard-table td{
+    text-align:center;
+    vertical-align:middle;
+}
+
+/* ==========================
+   REFRESH BUTTON
+========================== */
+
+.btn-refresh,
+#btnRefresh{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+}
+
+.btn-refresh:hover,
+#btnRefresh:hover{
+    background:var(--primary-hover);
+    color:#fff;
+}
+
+/* ==========================
+   CHART CARD
+========================== */
+
+.chart-card{
+    border-radius:10px;
+}
+
+.chart-card .card-body{
+    padding:20px;
+}
+
+/* ==========================
+   PAGE
+========================== */
+
+.container-fluid{
+    color:var(--text);
+}
+
+.page-title,
+.h3{
+    color:var(--text)!important;
+}
+
+/* ==========================
+   TRANSITIONS
+========================== */
+
+.dashboard-card,
+.dashboard-table,
+.chart-card{
+    transition:
+        background .3s ease,
+        color .3s ease,
+        border-color .3s ease,
+        box-shadow .3s ease;
+}

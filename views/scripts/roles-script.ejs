@@ -30,7 +30,7 @@ $(document).ready(function () {
 
         try {
 
-            const roles = await queryUtility.Load("/roles/load");
+            const roles = await queryUtility.Load("/roles/loadRole");
 
             rolesById = {};
 
@@ -194,7 +194,7 @@ $(document).ready(function () {
             if(id===""){
 
                 await queryUtility.Save(
-                    "/roles/create",
+                    "/roles/createRole",
                     body
                 );
 
@@ -207,7 +207,7 @@ $(document).ready(function () {
             else{
 
                 await queryUtility.Update(
-                    "/roles/update/"+id,
+                    "/roles/updateRole/"+id,
                     body
                 );
 
@@ -263,7 +263,7 @@ $(document).ready(function () {
         try{
 
             await queryUtility.Delete(
-                "/roles/delete/"+id
+                "/roles/deleteRole/"+id
             );
 
             Toast.fire({
