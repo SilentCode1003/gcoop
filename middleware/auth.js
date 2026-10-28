@@ -13,7 +13,7 @@ const auth = async (req, res, next) => {
     if (!userId) return deny();
 
     const users = await Query(
-      "SELECT u_id, u_roleId, u_userName FROM user WHERE u_id = ? LIMIT 1",
+      "SELECT mu_id, mu_role, mu_username FROM master_users WHERE mu_id = ? LIMIT 1",
       [userId]
     );
     const user = users[0];

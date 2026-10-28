@@ -3,48 +3,42 @@ var router = express.Router();
 const {Query} = require("./../database/config/db.js")
 const {EncryptString, DecryptString} = require("./../database/cryptography.js")
 
-function validateCredentials(body) {
-    const username = (body.username ?? "").trim();
-    const password = (body.Password ?? "").trim();
+// For Login
+function validateCredentials(body, ignoreId = null) {
+  const username = (body.Username ?? "").trim();
+  const password = (body.Password ?? "").trim();
 
-    if (!username) return { error: "Invalid Username, Please try again." };
-    if (!password) return { error: "Invalid Password, Please try again." };
-    return {
-        value: {
-            username,
-           password
-        }
-         };
-}
-function validateRegistree(body) {
-    const username = (body.username ?? "").trim();
-    const password = (body.Password ?? "").trim();
-    const roleId = (body.roleId ?? "").trim();
 
-    if (!username) return { error: "Invalid Username, Please try again." };
-    if (!password) return { error: "Invalid Password, Please try again." };
-    if (!roleId) return { error: "Invalid roleId, Please try again." };
-    return {
-        value: {
-            username,
-            password,
-            roleId
-        }
-         };
+  if (!username) return { error: "Invalid username, please try again." };
+  if (!password) return { error : "Invalid Password, please try again"}
+
+  return {value :{username, password}}
 }
 
+// For Registration
+// function validateRegistree(body, ignoreId = null) {
+//   const username = (body.Username ?? "").trim();
+//   const password = (body.Password ?? "").trim();
+//   const role = (body.Role ?? "").trim();
+
+
+//   if (!username) return { error: "Invalid username, please try again." };
+//   if (!password) return { error : "Invalid Password, please try again"}
+//   if (!roleId) return { error : "Invalid Role, please try again"}
+
+//   return {value :{ role, username, password}}
+// }
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
   res.render("layout/sub-layout", {
     body: "../pages/login-page.ejs",
-    title: "Error",
+    title: "5L | COOP",
     pageScript: "../scripts/login-script.ejs",
   });
 });
 
-/* POST create a student. */
-  router.post("/login", async function (req, res) {
+router.post("/login", async function (req, res) {
   try {
     const { error, value } = validateCredentials(req.body);
     if (error) {
@@ -52,7 +46,7 @@ router.get("/", function (req, res, next) {
     }
 
     const [user] = await Query(
-      "SELECT u_id, u_roleId, u_userName FROM user WHERE u_userName = ? AND u_hashPassword = ?",
+      "SELECT mu_id, mu_role, mu_username FROM master_users WHERE mu_username = ? AND mu_password = ?",
       [value.username, EncryptString(value.password)]
     );
 
@@ -63,9 +57,9 @@ router.get("/", function (req, res, next) {
     req.session.regenerate((err) => {
       if (err) return res.status(500).json({ success: false, message: "Session error" });
 
-      req.session.userId = user.u_id;
-      req.session.roleId = user.u_roleId;
-      req.session.username = user.u_userName;
+      req.session.userId = user.mu_id;
+      req.session.role = user.mu_role;
+      req.session.username = user.mu_username;
 
       req.session.save((err) => {
         if (err) return res.status(500).json({ success: false, message: "Session error" });
@@ -78,24 +72,27 @@ router.get("/", function (req, res, next) {
   }
 });
 
-  router.post("/logout", async function (req,res){
-    req.session.destroy((err) => {
-        if (err){
-            console.error('Cannot destroy session')
-        }
-        res.sendStatus(204)
-    })
+router.post("/logout", async function (req, res) {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Cannot destroy session')
+    }
+
+    res.sendStatus(204)
   })
-  router.post("/register", async function (req, res) {
-      const { error, value } = validateRegistree(req.body);
-      console.log(value);
-      if (error) {
-        return res.status(400).json({ success: false, message: error });
-      }
-    const createData = await Query("Insert into user (u_roleId, u_userName, u_hashPassword, u_createdDate, u_updatedDate) values (?,?,?,?,?)",[value.roleId, value.username, EncryptString(value.password), new Date(), new Date(), ]);
-      res
-        .status(201)
-        .json({ success: true, message: "Section created.", data: createData });
-    });
+
+})
+
+// router.post("/register",async function (req, res) {
+//   const { error, value } = validateRegistree(req.body);
+//   console.log(value)
+//   if (error) {
+//     return res.status(400).json({ success: false, message: error });
+//   }
+//  const createUser = await Query("Insert into users (u_roleId, u_userName, u_hashPassword, u_createdDate, u_updatedDate) values (?,?,?,?,?)", [value.roleId, value.username, EncryptString(value.password), new Date(), new Date()]);
+//   res
+//     .status(201)
+//     .json({ success: true, message: "Student created.", data: createUser });
+// });
 
 module.exports = router;

@@ -3,24 +3,26 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const {testConnection} = require("./database/config/db")
+const {initSession} = require("./middleware/session")
+const{auth} = require("./middleware/auth")
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var dashboardRouter = require('./routes/dashboard');
 var membersRouter = require('./routes/members');
 var rolesRouter = require('./routes/roles');
+var authRouter = require('./routes/auth')
+
 
 
 var app = express();
-const { testConnection } = require("./database/config/db");
-
-testConnection()
-    .then(() => console.log("✅ Database Connected"))
-    .catch(err => console.error("❌ Database Error:", err));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+testConnection();
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -28,6 +30,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+initSession(app);
+app.use("/auth", authRouter);
+app.use(auth)
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/dashboard', dashboardRouter);
