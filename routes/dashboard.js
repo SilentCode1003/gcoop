@@ -7,7 +7,7 @@ router.get("/", function (req, res) {
     res.render("layout/main-layout", {
         body: "../pages/dashboard-page.ejs",
         title: "Dashboard",
-        pageStyle: "../stylesheets/dashboard.css",
+        pageStyle: "dashboard.css",
         pageScript: "../scripts/dashboard-script.ejs",
     });
 });
