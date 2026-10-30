@@ -30,7 +30,7 @@ router.get("/", function (req, res) {
   });
 });
 
-// Load Members
+// Load Member
 router.get("/loadMember",async function(req,res){
     const data = await Query("SELECT mm_id AS id, mm_employee_id AS employeeId, mm_fullname AS fullName, mm_address AS address, mm_contact_no AS contact, mm_register_date AS registeredDate, mm_register_by AS registeredBy FROM master_members ORDER BY mm_fullname ASC")
     console.log(data)
@@ -43,10 +43,10 @@ router.post("/createMember",async function (req, res) {
   if (error) {
     return res.status(400).json({ success: false, message: error });
   }
- const createMember = await Query("Insert into master_members (mm_employee_id, mm_fullname, mm_address, mm_contact_no, mm_register_date, mm_register_by) values (?,?,?,?,?,?)", [value.employeeId, value.fullName, value.address, value.contact, new Date(), value.registerBy]);
+ const createMembers = await Query("Insert into master_members (mm_employee_id, mm_fullname, mm_address, mm_contact_no, mm_register_date, mm_register_by) values (?,?,?,?,?,?)", [value.employeeId, value.fullName, value.address, value.contact, new Date(), value.registerBy]);
   res
     .status(201)
-    .json({ success: true, message: "Member created.", data: createMember});
+    .json({ success: true, message: "Member created.", data: createMembers});
 });
 
 // Update Member
@@ -71,10 +71,10 @@ router.delete("/deleteMember/:id", async function (req, res) {
       .json({ success: false, message: "Student not found." });
   }
 
-  const deleteMember = await Query("Delete from master_members where mm_id = ?", [id]);
+  const deleteMembers = await Query("Delete from master_members where mm_id = ?", [id]);
  
 
-  res.json({ success: true, message: "Member deleted.", data : deleteMember});
+  res.json({ success: true, message: "Member deleted.", data : deleteMembers});
 });
 
 module.exports = router;

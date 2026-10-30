@@ -7,15 +7,16 @@ const {testConnection} = require("./database/config/db")
 const {initSession} = require("./middleware/session")
 const{auth} = require("./middleware/auth")
 
-
+var authRouter = require('./routes/auth')
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var dashboardRouter = require('./routes/dashboard');
 var membersRouter = require('./routes/members');
+var usersRouter = require('./routes/users');
 var rolesRouter = require('./routes/roles');
-var authRouter = require('./routes/auth')
-
-
+var routesRouter = require('./routes/routes');
+var permissionsRouter = require('./routes/permissions')
+var loanRatesRouter = require('./routes/loan-rates')
+var denominationRouter = require('./routes/denominations')
 
 var app = express();
 
@@ -34,10 +35,14 @@ initSession(app);
 app.use("/auth", authRouter);
 app.use(auth)
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/members', membersRouter);
+app.use('/users', usersRouter);
 app.use('/roles', rolesRouter);
+app.use('/routes', routesRouter);
+app.use('./permissions', permissionsRouter)
+app.use('./loanRates', loanRatesRouter)
+app.use('./denomination', denominationRouter)
 
 
 // catch 404 and forward to error handler

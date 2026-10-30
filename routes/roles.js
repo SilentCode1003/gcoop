@@ -26,7 +26,7 @@ router.get("/loadRole",async function(req,res){
     res.json(roles)
 });
 
-// Create Member
+// Create Roles
 router.post("/createRole",async function (req, res) {
   const { error, value } = validateRoles(req.body);
   if (error) {
@@ -38,7 +38,7 @@ router.post("/createRole",async function (req, res) {
     .json({ success: true, message: "Role created.", data: createRole});
 });
 
-// Update Role
+// Update Roles
  router.put("/updateRole/:id",async function (req, res) {
    const id = parseInt(req.params.id, 10);
 
@@ -50,7 +50,7 @@ router.post("/createRole",async function (req, res) {
    res.json({ success: true, message: "Role updated.", data: updateRole });
  });
 
-// Delete Role
+// Delete Roles
 router.delete("/deleteRole/:id", async function (req, res) {
   const id = parseInt(req.params.id, 10);
 
@@ -60,10 +60,10 @@ router.delete("/deleteRole/:id", async function (req, res) {
       .json({ success: false, message: "Role not found." });
   }
 
-  const deleteMember = await Query("Delete from master_roles where mr_id = ?", [id]);
+  const deleteRole = await Query("Delete from master_roles where mr_id = ?", [id]);
  
 
-  res.json({ success: true, message: "Role deleted.", data : deleteMember});
+  res.json({ success: true, message: "Role deleted.", data : deleteRole});
 });
 
 module.exports = router;

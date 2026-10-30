@@ -20,6 +20,7 @@ router.get("/", function (req, res, next) {
   res.render("layout/sub-layout", {
     body: "../pages/login-page.ejs",
     title: "5L | COOP",
+    pageStyle: "../stylesheets/login.css",
     pageScript: "../scripts/login-script.ejs",
   });
 });
