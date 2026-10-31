@@ -3,21 +3,18 @@ var router = express.Router();
 const { Query } = require("../database/config/db");
 const {EncryptString, DecryptString} = require("./../database/cryptography.js")
 
-function validateUsers(body, ignoreId = null) {
-  const fullname = (body.FullName ?? "").trim();
-  const role = (body.Role ?? "").trim();
-  const username = (body.Username ?? "").trim();
-  const password = (body.Password ?? "").trim();
+function validateUsers(body, { requirePassword = true } = {}) {
+  const fullName = String(body.FullName ?? "").trim();
+  const role = String(body.Role ?? "").trim();
+  const username = String(body.Username ?? "").trim();
+  const password = String(body.Password ?? "").trim();
 
- 
-
-  if (!fullname) return { error: "Full name is required." };
+  if (!fullName) return { error: "Full name is required." };
   if (!role) return { error: "Role is required." };
   if (!username) return { error: "Username is required." };
-  if (!password) return { error: "Password is required." };
-  
-return { value: { fullname, role, username, password }};
+  if (requirePassword && !password) return { error: "Password is required." };
 
+  return { value: { fullName, role, username, password } };
 }
 
 // User Page
@@ -50,23 +47,44 @@ router.post("/createUser",async function (req, res) {
   if (error) {
     return res.status(400).json({ success: false, message: error });
   }
- const createUsers = await Query("Insert into master_users (mu_fullname, mu_role, mu_username, mu_password, mu_create_at) values (?,?,?,?,?)", [value.fullname, value.role, value.username, EncryptString(value.password), new Date]);
+ const createUsers = await Query("Insert into master_users (mu_fullname, mu_role, mu_username, mu_password, mu_create_at) values (?,?,?,?,?)", [value.fullName, value.role, value.username, EncryptString(value.password), new Date]);
   res
     .status(201)
     .json({ success: true, message: "User created.", data: createUsers});
 });
 
 // Update User
- router.put("/updateUser/:id",async function (req, res) {
-   const id = parseInt(req.params.id, 10);
+ router.put("/updateUser/:id", async function (req, res) {
+  try {
+    const id = parseInt(req.params.id, 10);
 
-   const { error, value } = validateUsers(req.body, id);
-   const updateUsers = await Query("Update master_users set mu_fullname = ?, mu_role = ?, mu_username = ?, mu_password = ?, mu_update_at = ? where mu_id = ?", [value.fullname, value.role, value.username, EncryptString(value.password), new Date(), id]) ;
-   if (error) {
-     return res.status(400).json({ success: false, message: error });
-   }
-   res.json({ success: true, message: "User updated.", data: updateUsers });
- });
+    // password is optional when updating
+    const { error, value } = validateUsers(req.body, { requirePassword: false });
+    if (error) {
+      return res.status(400).json({ success: false, message: error });
+    }
+
+    let result;
+    if (value.password) {
+      // password was typed -> update it too
+      result = await Query(
+        "UPDATE master_users SET mu_fullname = ?, mu_role = ?, mu_username = ?, mu_password = ?, mu_update_at = ? WHERE mu_id = ?",
+        [value.fullName, value.role, value.username, EncryptString(value.password), new Date(), id],
+      );
+    } else {
+      // password left blank -> keep the existing one
+      result = await Query(
+        "UPDATE master_users SET mu_fullname = ?, mu_role = ?, mu_username = ?, mu_update_at = ? WHERE mu_id = ?",
+        [value.fullName, value.role, value.username, new Date(), id],
+      );
+    }
+
+    res.json({ success: true, message: "User updated.", data: result });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
 
 // Delete User
 router.delete("/deleteUser/:id", async function (req, res) {
