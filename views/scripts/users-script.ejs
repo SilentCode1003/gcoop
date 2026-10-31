@@ -10,7 +10,7 @@ $(document).ready(function () {
 
         try {
 
-            const data = await queryUtility.Load("/users/load");
+            const data = await queryUtility.Load("/users/loadUser");
 
             usersById = {};
             $("#userTable").empty();
@@ -33,11 +33,10 @@ $(document).ready(function () {
                                 <i class="fas fa-edit"></i>
                             </button>
 
-                            <button
-                                class="btn btn-danger btn-sm btnDelete"
-                                data-id="${user.id}">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <button type="button"
+                               class="btn btn-danger btn-delete btn-sm"
+                               data-id="${user.id}">
+                               <i class="fas fa-trash"></i>
                         </td>
                     </tr>
                 `);
@@ -57,7 +56,7 @@ $(document).ready(function () {
     // ==========================
     async function loadRoles(selected = "") {
 
-        const roles = await queryUtility.Load("/users/roles");
+        const roles = await queryUtility.Load("/users/insertRole");
 
         $("#Role").empty();
 
@@ -118,7 +117,7 @@ $(document).ready(function () {
 
             if (id == "") {
 
-                const save = await queryUtility.Save("/users/create", body);
+                const save = await queryUtility.Save("/users/createUser", body);
 
                 Swal.fire(
                     "Success",
@@ -129,7 +128,7 @@ $(document).ready(function () {
             } else {
 
                 const update = await queryUtility.Update(
-                    "/users/update/" + id,
+                    "/users/updateUser/" + id,
                     body
                 );
 
@@ -200,7 +199,7 @@ $(document).ready(function () {
             if (!result.isConfirmed)
                 return;
 
-            const del = await queryUtility.Delete("/users/delete/" + id);
+            const del = await queryUtility.Delete("/users/deleteUser/" + id);
 
             Swal.fire(
                 "Deleted",

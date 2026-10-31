@@ -1,11 +1,14 @@
 <div class="container-fluid">
-  <div class="card shadow mb-4">
+  <div class="card shadow mb-4 dashboard-table">
     <div
       class="card-header py-3 d-flex justify-content-between align-items-center"
     >
-      <h5 class="m-0 font-weight-bold text-white">Routes</h5>
+      <h6 class="m-0 font-weight-bold text-white">
+        <i class="fas fa-route mr-2"></i>
+        Routes
+      </h6>
 
-      <button type="button" class="btn btn-primary btn-sm" id="btnAdd">
+      <button type="button" class="btn btn-add" id="btnAdd">
         <i class="fas fa-plus mr-1"></i>
         Add Route
       </button>
@@ -13,22 +16,18 @@
 
     <div class="card-body">
       <div class="table-responsive">
-        <table
-          class="table table-bordered table-hover"
-          id="dataTable"
-          width="100%"
-        >
+        <table class="table table-hover mb-0" id="dataTable" width="100%">
           <thead>
             <tr>
               <th width="80">ID</th>
               <th>Route Name</th>
               <th width="180">Created Date</th>
               <th width="180">Updated Date</th>
-              <th width="160">Action</th>
+              <th width="160" class="text-center">Action</th>
             </tr>
           </thead>
 
-          <tbody id="routesTable"></tbody>
+          <tbody id="routeTable"></tbody>
         </table>
       </div>
     </div>
@@ -37,13 +36,14 @@
 
 <!-- ===========================
      ROUTE MODAL
-============================ -->
+=========================== -->
 
 <div
   class="modal fade"
   id="routesModal"
   tabindex="-1"
   role="dialog"
+  aria-labelledby="modalTitle"
   aria-hidden="true"
 >
   <div class="modal-dialog">
@@ -58,7 +58,7 @@
         </div>
 
         <div class="modal-body">
-          <input type="hidden" id="routeId" />
+          <input type="hidden" id="routesId" />
 
           <div class="form-group">
             <label for="routeName"> Route Name </label>
@@ -80,6 +80,7 @@
           </button>
 
           <button type="submit" class="btn btn-primary" id="btnSave">
+            <i class="fas fa-save mr-1"></i>
             Save
           </button>
         </div>

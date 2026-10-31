@@ -63,7 +63,7 @@ router.post("/createRoute",async function (req, res) {
        .json({ success: false, message: "Route not found." });
    }
  
-   const deleteRoutes = await Query("Delete from master_routes where mu_id = ?", [id]);
+   const deleteRoutes = await Query("Delete from master_routes where mr_id = ?", [id]);
   
  
    res.json({ success: true, message: "Route deleted.", data : deleteRoutes});

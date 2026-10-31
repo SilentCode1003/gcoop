@@ -1,0 +1,253 @@
+<script>
+  $(document).ready(function () {
+    let loanRatesById = {};
+
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+    });
+
+    function esc(v) {
+      return String(v ?? "").replace(/[&<>"']/g, function (c) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c];
+      });
+    }
+
+    // ==========================
+    // LOAD
+    // ==========================
+    async function loadloanRate() {
+      const loanRates = await queryUtility.Load("/loan-rates/loadloanRate");
+
+      $("#loan-rateTable").empty();
+
+      loanRatesById = {};
+
+      loanRates.forEach((loanrate) => {
+        loanRatesById[loanrate.id] = loanrate;
+        $("#loan-rateTable").append(`
+                    <tr>
+
+                        <td>${esc(loanrate.id)}</td>
+                        <td>${esc(loanrate.name)}</td>
+                        <td>${esc(loanrate.rate)}%</td>
+                        <td>${formatDate(loanrate.createdDate)}</td>
+                        <td>${formatDate(loanrate.updatedDate)}</td>
+
+                        <td class="text-center">
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary btn-sm btn-edit"
+                                data-id="${loanrate.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm btn-delete"
+                                data-id="${loanrate.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+
+                        </td>
+
+                    </tr>
+                `);
+      });
+    }
+
+    // ==========================
+    // OPEN MODAL
+    // ==========================
+    function openModal(loan = null) {
+      $("#loan-rateForm")[0].reset();
+
+      $("#loan-rateId").val("");
+
+      if (loan) {
+        $("#modalTitle").text("Edit Loan Rate");
+
+        $("#loan-rateId").val(loan.id);
+        $("#loanName").val(loan.name);
+        $("#loanRate").val(loan.rate);
+      } else {
+        $("#modalTitle").text("Add Loan Rate");
+      }
+
+      $("#loanRateModal").modal("show");
+    }
+
+    // ==========================
+    // FORM DATA
+    // ==========================
+    function getFormData() {
+      return {
+        Name: $("#loanName").val().trim(),
+        Rate: ($("#loanRate").val()),
+      };
+    }
+
+    // ==========================
+    // VALIDATE
+    // ==========================
+    function validate(data) {
+      let valid = true;
+
+      $("#loanName").removeClass("is-invalid");
+      $("#loanRate").removeClass("is-invalid");
+
+      if (!data.Name) {
+        $("#loanName").addClass("is-invalid");
+        valid = false;
+      }
+
+      if (isNaN(data.Rate)) {
+        $("#loanRate").addClass("is-invalid");
+        valid = false;
+      }
+
+      return valid;
+    }
+
+    // ==========================
+    // ADD
+    // ==========================
+    $("#btnAdd").click(function () {
+      openModal();
+    });
+
+    // ==========================
+    // EDIT
+    // ==========================
+    $("#loan-rateTable").on("click", ".btn-edit", function () {
+      const id = $(this).data("id");
+
+      if (loanRatesById[id]) {
+        openModal(loanRatesById[id]);
+      }
+    });
+
+    // ==========================
+    // SAVE
+    // ==========================
+    $("#loan-rateForm").on("submit", async function (e) {
+      e.preventDefault();
+
+      const id = $("#loan-rateId").val();
+      const isEdit = id !== "";
+      const payload = getFormData();
+      if (!validate(payload)) return;
+
+      const confirm = await Swal.fire({
+        title: isEdit ? "Save changes?" : "Add this Loan rate?",
+        text: isEdit
+          ? `Update ${payload.Name}'s record?`
+          : `Add ${payload.Name} to the list?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: isEdit ? "Yes, save" : "Yes, add",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#4e73df",
+        cancelButtonColor: "#858796",
+      });
+      if (!confirm.isConfirmed) return;
+
+      Swal.fire({
+        title: "Saving...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        if (isEdit) {
+          await queryUtility.Update(
+            `/loan-rates/updateloanRate/${encodeURIComponent(id)}`,
+            payload,
+          );
+        } else {
+          await queryUtility.Save("/loan-rates/createloanRate", payload);
+        }
+
+        $("#loanRateModal").modal("hide");
+        await loadloanRate();
+        Swal.close();
+        Toast.fire({
+          icon: "success",
+          title: isEdit
+            ? "Loan rate updated successfully"
+            : "Loan rate added successfully",
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: isEdit ? "Update failed" : "Create failed",
+          text: errorMessage(err, "Something went wrong. Please try again."),
+          confirmButtonColor: "#4e73df",
+        });
+      }
+    });
+
+
+    // ==========================
+    // DELETE
+    // ==========================
+    $("#loan-rateTable").on("click", ".btn-delete", async function () {
+      const id = $(this).data("id");
+
+      const result = await Swal.fire({
+        title: "Delete Loan Rate?",
+        text: "This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Delete",
+      });
+
+      if (!result.isConfirmed) return;
+
+      try {
+        await queryUtility.Delete("/loan-rates/deleteloanRate/" + id);
+
+        Toast.fire({
+          icon: "success",
+          title: "Loan Rate deleted successfully.",
+        });
+
+        loadloanRate();
+      } catch (err) {
+        console.error(err);
+
+        Swal.fire(
+          "Error",
+          err.responseJSON?.message || "Unable to delete loan rate.",
+          "error",
+        );
+      }
+    });
+
+    // ==========================
+    // FORMAT DATE
+    // ==========================
+    function formatDate(date) {
+      if (!date) return "";
+
+      const d = new Date(date);
+
+      return d.toLocaleDateString() + " " + d.toLocaleTimeString();
+    }
+
+    // ==========================
+    // INITIALIZE
+    // ==========================
+    loadloanRate();
+  });
+</script>

@@ -1,312 +1,231 @@
 <script>
-$(document).ready(function () {
-
+  $(document).ready(function () {
     let routesById = {};
 
     const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
     });
 
     function esc(v) {
-        return String(v ?? "").replace(/[&<>"']/g, function (c) {
-            return {
-                "&":"&amp;",
-                "<":"&lt;",
-                ">":"&gt;",
-                '"':"&quot;",
-                "'":"&#39;"
-            }[c];
-        });
+      return String(v ?? "").replace(/[&<>"']/g, function (c) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c];
+      });
     }
 
-    // ==========================
-    // LOAD ROLES
-    // ==========================
+    // ---------- LOAD ----------
     async function loadRoutes() {
+      const routes = await queryUtility.Load("/routes/loadRoute");
+      const $tbody = $("#routeTable").empty();
+      routesById = {};
 
-        try {
-
-            const routes = await queryUtility.Load("/routes/load");
-
-            routesById = {};
-
-            const $tbody = $("#routesTable").empty();
-
-            $.each(routes, function(i, routes){
-
-                routesById[role.id] = role;
-
-                $tbody.append(`
+      for (const route of routes) {
+        routesById[route.id] = route;
+        $tbody.append(`
                     <tr>
-                        <td>${esc(routes.id)}</td>
-                        <td>${esc(routes.name)}</td>
-                        <td>${formatDate(routes.createdDate)}</td>
-                        <td>${formatDate(routes.updatedDate)}</td>
-
-                        <td class="text-center">
-
-                            <button
-                                class="btn btn-secondary btn-sm btn-edit"
-                                data-id="${route.id}">
+                        <td>${esc(route.id)}</td>
+                        <td>${esc(route.name)}</td>
+                        <td>${formatDate(route.createdDate)}</td>
+                        <td>${formatDate(route.updatedDate)}</td>
+                        <td>
+                          <div class="d-flex justify-content-center align-items-center action-buttons">
+                           <button type="button"
+                                class="btn btn-secondary btn-sm mb-1 btn-edit"
+                                data-id="${esc(route.id)}">
                                 <i class="fas fa-edit"></i>
-                                Edit
                             </button>
-
-                            <button
-                                class="btn btn-danger btn-sm btn-delete"
-                                data-id="${route.id}">
+                            <button type="button"
+                                class="btn btn-danger btn-sm mb-1 btn-delete"
+                                data-id="${esc(route.id)}">
                                 <i class="fas fa-trash"></i>
-                                Delete
                             </button>
+                            </div>
 
                         </td>
                     </tr>
                 `);
-
-            });
-
-            if ($.fn.DataTable.isDataTable("#dataTable")) {
-                $("#dataTable").DataTable().destroy();
-            }
-
-            $("#dataTable").DataTable({
-                responsive:true
-            });
-
-        } catch(err){
-
-            console.error(err);
-
-            Swal.fire(
-                "Error",
-                "Unable to load roles.",
-                "error"
-            );
-
-        }
-
+      }
     }
-
     // ==========================
     // OPEN MODAL
     // ==========================
-    function openModal(role=null){
+    function openModal(route = null) {
+      $("#routesForm")[0].reset();
 
-        $("#roleForm")[0].reset();
+      $("#routesId").val("");
 
-        $("#roleId").val("");
+      if (route) {
+        $("#modalTitle").text("Edit Route");
 
-        if(role){
+        $("#routesId").val(route.id);
+        $("#routeName").val(route.name);
+      } else {
+        $("#modalTitle").text("Add Route");
+      }
 
-            $("#modalTitle").text("Edit Role");
-
-            $("#roleId").val(role.id);
-            $("#roleName").val(role.name);
-
-        }
-        else{
-
-            $("#modalTitle").text("Add Routes");
-
-        }
-
-        $("#routesModal").modal("show");
-
+      $("#routesModal").modal("show");
     }
 
     // ==========================
     // GET FORM DATA
     // ==========================
-    function getFormData(){
-
-        return{
-
-            Name:$("#routesName").val().trim()
-
-        };
-
+    function getFormData() {
+      return {
+        name: $("#routeName").val().trim(),
+      };
     }
 
     // ==========================
     // VALIDATE
     // ==========================
-    function validate(data){
+    function validate(data) {
+      let valid = true;
 
-        let valid=true;
+      $("#routeName").toggleClass("is-invalid", !data.name);
 
-        $("#routesName").toggleClass("is-invalid", !data.Name);
+      if (!data.name) {
+        valid = false;
+      }
 
-        if(!data.Name){
-            valid=false;
-        }
-
-        return valid;
-
+      return valid;
     }
 
     // ==========================
     // ADD BUTTON
     // ==========================
-    $("#btnAdd").click(function(){
-
-        openModal();
-
+    $("#btnAdd").click(function () {
+      openModal();
     });
 
     // ==========================
     // EDIT BUTTON
     // ==========================
-    $("#routesTable").on("click",".btn-edit",function(){
+    $("#routeTable").on("click", ".btn-edit", function () {
+      const route = routesById[$(this).data("id")];
 
-        const routes=routesById[$(this).data("id")];
-
-        if(routes){
-
-            openModal(routes);
-
-        }
-
+      if (route) {
+        openModal(route);
+      }
     });
 
     // ==========================
     // SAVE
     // ==========================
-    $("#routesForm").submit(async function(e){
+    $("#routesForm").on("submit", async function (e) {
+      e.preventDefault();
 
-        e.preventDefault();
+      const id = $("#routesId").val();
+      const isEdit = id !== "";
+      const payload = getFormData();
+      if (!validate(payload)) return;
 
-        const id=$("#routesId").val();
+      const confirm = await Swal.fire({
+        title: isEdit ? "Save changes?" : "Add this Route?",
+        text: isEdit
+          ? `Update ${payload.name}'s record?`
+          : `Add ${payload.name} to the list?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: isEdit ? "Yes, save" : "Yes, add",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#4e73df",
+        cancelButtonColor: "#858796",
+      });
+      if (!confirm.isConfirmed) return;
 
-        const body=getFormData();
+      Swal.fire({
+        title: "Saving...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
 
-        if(!validate(body)){
-
-            return;
-
+      try {
+        if (isEdit) {
+          await queryUtility.Update(
+            `/routes/updateRoute/${encodeURIComponent(id)}`,
+            payload,
+          );
+        } else {
+          await queryUtility.Save("/routes/createRoute", payload);
         }
 
-        try{
-
-            if(id===""){
-
-                await queryUtility.Save(
-                    "/routes/create",
-                    body
-                );
-
-                Toast.fire({
-                    icon:"success",
-                    title:"Route added successfully."
-                });
-
-            }
-            else{
-
-                await queryUtility.Update(
-                    "/routes/update/"+id,
-                    body
-                );
-
-                Toast.fire({
-                    icon:"success",
-                    title:"Route updated successfully."
-                });
-
-            }
-
-            $("#routesModal").modal("hide");
-
-            loadRoutes();
-
-        }
-        catch(err){
-
-            console.error(err);
-
-            Swal.fire(
-                "Error",
-                "Unable to save route.",
-                "error"
-            );
-
-        }
-
+        $("#routesModal").modal("hide");
+        await loadRoutes();
+        Swal.close();
+        Toast.fire({
+          icon: "success",
+          title: isEdit
+            ? "Route updated successfully"
+            : "Route added successfully",
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: isEdit ? "Update failed" : "Create failed",
+          text: errorMessage(err, "Something went wrong. Please try again."),
+          confirmButtonColor: "#4e73df",
+        });
+      }
     });
 
     // ==========================
     // DELETE
     // ==========================
-    $("#routesTable").on("click",".btn-delete",async function(){
+    $("#routeTable").on("click", ".btn-delete", async function () {
+      const id = $(this).data("id");
 
-        const id=$(this).data("id");
+      const result = await Swal.fire({
+        title: "Delete Route?",
+        text: "This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#991b1b",
+        confirmButtonText: "Delete",
+      });
 
-        const result=await Swal.fire({
+      if (!result.isConfirmed) {
+        return;
+      }
 
-            title:"Delete Route?",
-            text:"This action cannot be undone.",
-            icon:"warning",
-            showCancelButton:true,
-            confirmButtonText:"Delete"
+      try {
+        await queryUtility.Delete("/routes/deleteRoute/" + id);
 
+        Toast.fire({
+          icon: "success",
+          title: "Route deleted.",
         });
 
-        if(!result.isConfirmed){
+        loadRoutes();
+      } catch (err) {
+        console.error(err);
 
-            return;
-
-        }
-
-        try{
-
-            await queryUtility.Delete(
-                "/routes/delete/"+id
-            );
-
-            Toast.fire({
-
-                icon:"success",
-                title:"Route deleted."
-
-            });
-
-            loadRoles();
-
-        }
-        catch(err){
-
-            console.error(err);
-
-            Swal.fire(
-                "Error",
-                "Unable to delete role.",
-                "error"
-            );
-
-        }
-
+        Swal.fire("Error", "Unable to delete route.", "error");
+      }
     });
 
     // ==========================
     // FORMAT DATE
     // ==========================
-    function formatDate(date){
+    function formatDate(date) {
+      if (!date) return "";
 
-        if(!date) return "";
+      const d = new Date(date);
 
-        const d=new Date(date);
-
-        return d.toLocaleDateString()+" "+d.toLocaleTimeString();
-
+      return d.toLocaleDateString() + " " + d.toLocaleTimeString();
     }
 
     // ==========================
     // INITIALIZE
     // ==========================
     loadRoutes();
-
-});
+  });
 </script>

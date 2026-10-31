@@ -1,0 +1,250 @@
+<script>
+  $(document).ready(function () {
+    let denominationsById = {};
+
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+    });
+
+    function esc(v) {
+      return String(v ?? "").replace(/[&<>"']/g, function (c) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c];
+      });
+    }
+
+    // ==========================
+    // LOAD DENOMINATIONS
+    // ==========================
+   async function loadDenominations() {
+      const denominations = await queryUtility.Load("/denominations/loadDenomination");
+
+      $("#denominationTable").empty();
+
+      denominationsById = {};
+
+      denominations.forEach((denomination) => {
+        denominationsById[denomination.id] = denomination;
+
+          $("#denominationTable").append(`
+                    <tr>
+
+                        <td>${esc(denomination.id)}</td>
+                        <td>${esc(denomination.name)}</td>
+                        <td>${esc(denomination.value)}</td>
+                        <td>${formatDate(denomination.createdDate)}</td>
+                        <td>${formatDate(denomination.updatedDate)}</td>
+
+                        <td class="text-center">
+
+                            <button
+                                class="btn btn-secondary btn-sm btn-edit"
+                                data-id="${denomination.id}">
+
+                                <i class="fas fa-edit"></i>
+
+                            </button>
+
+                            <button
+                                class="btn btn-danger btn-sm btn-delete"
+                                data-id="${denomination.id}">
+
+                                <i class="fas fa-trash"></i>
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+                `);
+        });
+
+    }
+
+    // ==========================
+    // OPEN MODAL
+    // ==========================
+    function openModal(denomination = null) {
+      $("#denominationForm")[0].reset();
+
+      $("#denominationId").val("");
+
+      if (denomination) {
+        $("#modalTitle").text("Edit Denomination");
+
+        $("#denominationId").val(denomination.id);
+        $("#denominationName").val(denomination.name);
+        $("#denominationValue").val(denomination.value);
+      } else {
+        $("#modalTitle").text("Add Denomination");
+      }
+
+      $("#denominationModal").modal("show");
+    }
+
+    // ==========================
+    // GET FORM DATA
+    // ==========================
+    function getFormData() {
+      return {
+        Name: $("#denominationName").val().trim(),
+        Value: $("#denominationValue").val(),
+      };
+    }
+
+    // ==========================
+    // VALIDATE
+    // ==========================
+    function validate(data) {
+      let valid = true;
+
+      $("#denominationName").toggleClass("is-invalid", !data.Name);
+
+      $("#denominationValue").toggleClass(
+        "is-invalid",
+        data.Value === "" || data.Value === null,
+      );
+
+      if (!data.Name) valid = false;
+
+      if (data.Value === "" || data.Value === null) valid = false;
+
+      return valid;
+    }
+
+    // ==========================
+    // ADD
+    // ==========================
+    $("#btnAdd").click(function () {
+      openModal();
+    });
+
+    // ==========================
+    // EDIT
+    // ==========================
+    $("#denominationTable").on("click", ".btn-edit", function () {
+      const denomination = denominationsById[$(this).data("id")];
+
+      if (denomination) {
+        openModal(denomination);
+      }
+    });
+
+    // ==========================
+    // SAVE
+    // ==========================
+    $("#denominationForm").on("submit", async function (e) {
+      e.preventDefault();
+
+      const id = $("#denominationId").val();
+      const isEdit = id !== "";
+      const payload = getFormData();
+      if (!validate(payload)) return;
+
+      const confirm = await Swal.fire({
+        title: isEdit ? "Save changes?" : "Add this denomination?",
+        text: isEdit
+          ? `Update ${payload.Name}'s record?`
+          : `Add ${payload.Name} to the list?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: isEdit ? "Yes, save" : "Yes, add",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#4e73df",
+        cancelButtonColor: "#858796",
+      });
+      if (!confirm.isConfirmed) return;
+
+      Swal.fire({
+        title: "Saving...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        if (isEdit) {
+          await queryUtility.Update(
+            `/denominations/updateDenomination/${encodeURIComponent(id)}`,
+            payload,
+          );
+        } else {
+          await queryUtility.Save("/denominations/createDenomination", payload);
+        }
+
+        $("#denominationModal").modal("hide");
+        await loadDenominations();
+        Swal.close();
+        Toast.fire({
+          icon: "success",
+          title: isEdit
+            ? "Denomination updated successfully"
+            : "Denomination added successfully",
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: isEdit ? "Update failed" : "Create failed",
+          text: errorMessage(err, "Something went wrong. Please try again."),
+          confirmButtonColor: "#4e73df",
+        });
+      }
+    });
+
+    // ==========================
+    // DELETE
+    // ==========================
+    $("#denominationTable").on("click", ".btn-delete", async function () {
+      const id = $(this).data("id");
+
+      const result = await Swal.fire({
+        title: "Delete Denomination?",
+        text: "This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Delete",
+      });
+
+      if (!result.isConfirmed) return;
+
+      try {
+        await queryUtility.Delete("/denominations/deleteDenomination/" + id);
+
+        Toast.fire({
+          icon: "success",
+          title: "Denomination deleted.",
+        });
+
+        loadDenominations();
+      } catch (err) {
+        console.error(err);
+
+        Swal.fire("Error", "Unable to delete denomination.", "error");
+      }
+    });
+
+    // ==========================
+    // FORMAT DATE
+    // ==========================
+    function formatDate(date) {
+      if (!date) return "";
+
+      const d = new Date(date);
+
+      return d.toLocaleDateString() + " " + d.toLocaleTimeString();
+    }
+
+    // ==========================
+    // INITIALIZE
+    // ==========================
+    loadDenominations();
+  });
+</script>

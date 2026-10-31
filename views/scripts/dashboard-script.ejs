@@ -1,43 +1,121 @@
 <script>
+$(function () {
 
-$(document).ready(function () {
-
+    // Load dashboard on page load
     loadDashboard();
 
-    $("#btnRefresh").click(function () {
-        loadDashboard();
+    // Refresh Dashboard
+    $("#btnRefresh").on("click", async function () {
+
+        const $btn = $(this);
+        const isDark = $("body").hasClass("dark");
+
+        $btn.prop("disabled", true);
+
+        Swal.fire({
+            title: "Refreshing...",
+            text: "Please wait...",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            background: isDark ? "#1f1f1f" : "#ffffff",
+            color: isDark ? "#ffffff" : "#222222",
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+
+            await loadDashboard();
+
+            Swal.close();
+
+            Swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "success",
+                title: "Dashboard Updated",
+                timer: 1500,
+                showConfirmButton: false,
+                background: $("body").hasClass("dark") ? "#1f1f1f" : "#ffffff",
+                color: $("body").hasClass("dark") ? "#ffffff" : "#222222"
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            Swal.fire({
+                icon: "error",
+                title: "Refresh Failed",
+                text: "Unable to refresh the dashboard.",
+                background: $("body").hasClass("dark") ? "#1f1f1f" : "#ffffff",
+                color: $("body").hasClass("dark") ? "#ffffff" : "#222222"
+            });
+
+        } finally {
+
+            $btn.prop("disabled", false);
+
+        }
+
     });
 
 });
 
+// ==========================
+// LOAD DASHBOARD
+// ==========================
+
 async function loadDashboard() {
 
-    const dashboard = await queryUtility.Load("/dashboard/load");
+    try {
 
-    console.log(dashboard);
+        const dashboard = await queryUtility.Load("/dashboard/load");
 
-    $("#totalMembers").text(dashboard.totalMembers);
-    $("#totalUsers").text(dashboard.totalUsers);
-    $("#totalLoanRates").text(dashboard.totalLoanRates);
-    $("#totalDenomination").text(dashboard.totalDenomination);
+        $("#totalMembers").text(dashboard.totalMembers || 0);
+        $("#totalUsers").text(dashboard.totalUsers || 0);
+        $("#totalLoanRates").text(dashboard.totalLoanRates || 0);
+        $("#totalDenomination").text(dashboard.totalDenomination || 0);
 
-    $("#recentMembers").empty();
+        $("#recentMembers").empty();
 
-    dashboard.members.forEach(member => {
+        if (dashboard.members && dashboard.members.length > 0) {
 
-        $("#recentMembers").append(`
-            <tr>
+            dashboard.members.forEach(member => {
 
-                <td>${member.employeeid}</td>
-                <td>${member.fullname}</td>
-                <td>${member.contact}</td>
-                <td>${member.registerdate}</td>
+                $("#recentMembers").append(`
+                    <tr>
+                        <td>${member.employeeid}</td>
+                        <td>${member.fullname}</td>
+                        <td>${member.contact}</td>
+                        <td>${member.registerdate}</td>
+                    </tr>
+                `);
 
-            </tr>
-        `);
+            });
 
-    });
+        } else {
+
+            $("#recentMembers").html(`
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        No members found.
+                    </td>
+                </tr>
+            `);
+
+        }
+
+        return dashboard;
+
+    } catch (error) {
+
+        console.error(error);
+        throw error;
+
+    }
 
 }
-
 </script>

@@ -3,31 +3,29 @@
 ========================== */
 
 :root{
-    --bg-color:#ffffff;
     --card-color:#ffffff;
-    --text-color:#222;
-    --text-secondary:#666;
+    --text-color:#222222;
+    --text-secondary:#666666;
     --label-color:#991b1b;
     --input-bg:#ffffff;
-    --input-border:#ddd;
+    --input-border:#dddddd;
     --button:#991b1b;
     --button-hover:#7f1d1d;
 }
 
 body.dark{
-    --bg-color:#0f0f0f;
     --card-color:#1f1f1f;
     --text-color:#ffffff;
     --text-secondary:#cfcfcf;
     --label-color:#ffffff;
     --input-bg:#2b2b2b;
-    --input-border:#555;
+    --input-border:#555555;
     --button:#b30000;
     --button-hover:#d10000;
 }
 
 /* ==========================
-   GLOBAL
+   RESET
 ========================== */
 
 *{
@@ -45,10 +43,25 @@ body{
 
 body{
     min-height:100vh;
-    background:url("/images/background.jpg") no-repeat center center fixed;
-    background-size:cover;
+    overflow:hidden;
     color:var(--text-color);
-    transition:all .3s ease;
+}
+
+/* ==========================
+   BACKGROUND
+========================== */
+
+.bg-layer{
+    position:fixed;
+    inset:0;
+    background:url("/images/background.jpg") center center/cover no-repeat;
+    z-index:-1;
+}
+
+/* Keep background the same in both themes */
+
+body.dark .bg-layer{
+    filter:none;
 }
 
 /* ==========================
@@ -60,14 +73,30 @@ body{
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
-    width:330px;
+
+    width:340px;
+    padding:40px;
+
     background:var(--card-color);
     color:var(--text-color);
-    padding:40px;
+
+    border:1px solid var(--input-border);
     border-radius:15px;
-    box-shadow:0 10px 30px rgba(0,0,0,.25);
-    transition:.3s;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.30);
+
+    z-index:100;
+
+    transition:
+        background-color .3s ease,
+        color .3s ease,
+        border-color .3s ease,
+        box-shadow .3s ease;
 }
+
+/* ==========================
+   HEADER
+========================== */
 
 .login-header{
     text-align:center;
@@ -75,7 +104,7 @@ body{
 }
 
 .login-header h2{
-    color:#991b1b;
+    color:var(--label-color);
     margin-bottom:8px;
 }
 
@@ -102,16 +131,24 @@ body{
 .input-group input{
     width:100%;
     padding:12px;
-    border:1px solid var(--input-border);
-    border-radius:7px;
-    outline:none;
+
     background:var(--input-bg);
     color:var(--text-color);
-    transition:.3s;
+
+    border:1px solid var(--input-border);
+    border-radius:7px;
+
+    outline:none;
+
+    transition:all .3s ease;
+}
+
+.input-group input::placeholder{
+    color:var(--text-secondary);
 }
 
 .input-group input:focus{
-    border-color:#dc2626;
+    border-color:var(--button);
 }
 
 /* ==========================
@@ -132,13 +169,12 @@ body{
     right:15px;
     transform:translateY(-50%);
     cursor:pointer;
-    color:#777;
-    font-size:16px;
+    color:var(--text-secondary);
     transition:.3s;
 }
 
 .password-wrapper span:hover{
-    color:#991b1b;
+    color:var(--button);
 }
 
 /* ==========================
@@ -158,74 +194,67 @@ body{
     align-items:center;
     gap:6px;
     color:var(--label-color);
-    font-weight:500;
-}
-
-.options input[type="checkbox"]{
-    cursor:pointer;
 }
 
 .options a{
-    color:#991b1b;
+    color:var(--button);
     text-decoration:none;
-    font-weight:500;
 }
 
 .options a:hover{
-    color:#7f1d1d;
-    text-decoration:underline;
+    color:var(--button-hover);
 }
 
 /* ==========================
-   LOGIN BUTTON
+   BUTTON
 ========================== */
 
 .login-btn{
     width:100%;
     padding:13px;
-    background:var(--button);
-    color:#fff;
+
     border:none;
     border-radius:7px;
+
+    background:var(--button);
+    color:#fff;
+
     font-size:16px;
     font-weight:bold;
+
     cursor:pointer;
+
     transition:all .3s ease;
 }
 
 .login-btn:hover{
     background:var(--button-hover);
-    transform:translateY(-3px);
-    box-shadow:0 10px 20px rgba(153,27,27,.4);
-}
-
-.login-btn:active{
-    transform:scale(.96);
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(153,27,27,.35);
 }
 
 /* ==========================
-   SIGN UP
+   SIGNUP
 ========================== */
 
 .signup{
+    margin-top:20px;
     text-align:center;
-    margin-top:22px;
-    font-size:14px;
     color:var(--text-secondary);
 }
 
 .signup a{
-    color:#991b1b;
+    color:var(--button);
     text-decoration:none;
     font-weight:bold;
 }
 
 .signup a:hover{
-    text-decoration:underline;
+    color:var(--button-hover);
 }
 
 /* ==========================
-   THEME TOGGLE BUTTON
+   THEME BUTTON
 ========================== */
 
 .theme-toggle{
@@ -238,21 +267,31 @@ body{
 .theme-toggle button{
     width:50px;
     height:50px;
+
     border:none;
     border-radius:50%;
-    background:#991b1b;
+
+    background:var(--button);
     color:#fff;
-    cursor:pointer;
+
     font-size:18px;
-    transition:.3s;
+
+    cursor:pointer;
+
+    transition:all .3s ease;
 }
 
 .theme-toggle button:hover{
+    background:var(--button-hover);
     transform:rotate(180deg);
 }
 
+.theme-toggle button i{
+    pointer-events:none;
+}
+
 /* ==========================
-   AUTOFILL FIX
+   AUTOFILL
 ========================== */
 
 input:-webkit-autofill,
@@ -260,7 +299,23 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus{
     -webkit-box-shadow:0 0 0 1000px var(--input-bg) inset !important;
     -webkit-text-fill-color:var(--text-color)!important;
-    transition:background-color 5000s ease-in-out 0s;
+}
+
+/* ==========================
+   TRANSITIONS
+========================== */
+
+.login-container,
+.login-header h2,
+.login-header p,
+.input-group label,
+.input-group input,
+.password-wrapper span,
+.options label,
+.options a,
+.signup,
+.signup a{
+    transition:all .3s ease;
 }
 
 /* ==========================

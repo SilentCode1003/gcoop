@@ -1,0 +1,67 @@
+/* ==========================
+   MEMBERS PAGE TITLE
+========================== */
+
+.members-title{
+    color: var(--primary) !important;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+}
+
+/* ==========================
+   MEMBERS TABLE
+========================== */
+
+.members-table{
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.members-table .card-header{
+    background: var(--primary) !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 16px 22px !important;
+}
+
+.members-table .card-header h6{
+    color: #fff !important;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.members-table .card-body{
+    background: var(--card) !important;
+    padding: 25px;
+}
+
+.members-table table{
+    margin-bottom:0;
+}
+
+.members-table th,
+.members-table td{
+    text-align:center;
+    vertical-align:middle;
+}
+
+/* ==========================
+   ADD MEMBER BUTTON
+========================== */
+
+.btn-add-member{
+    background: var(--primary) !important;
+    color:#fff !important;
+    border:none !important;
+    border-radius:6px;
+    padding:8px 18px;
+}
+
+.btn-add-member:hover{
+    background: var(--primary-hover) !important;
+}

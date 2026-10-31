@@ -1,0 +1,287 @@
+<script>
+  $(document).ready(function () {
+    let permissionsById = {};
+
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+    });
+
+    function esc(v) {
+      return String(v ?? "").replace(/[&<>"']/g, function (c) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c];
+      });
+    }
+
+    /* ==========================
+       LOAD PERMISSIONS
+    ========================== */
+
+    async function loadPermissions() {
+      const permissions = await queryUtility.Load(
+        "/permissions/loadPermission",
+      );
+
+      $("#permissionTable").empty();
+
+      permissionsById = {};
+
+      permissions.forEach((permission) => {
+        permissionsById[permission.id] = permission;
+
+        $("#permissionTable").append(`
+                <tr>
+                    <td>${esc(permission.id)}</td>
+                    <td>${esc(permission.roleId)}</td>
+                    <td>${esc(permission.routeId)}</td>
+                    <td>${esc(permission.permission)}</td>
+                    <td>${formatDate(permission.createdDate)}</td>
+                    <td>${formatDate(permission.updatedDate)}</td>
+
+                    <td>
+
+                       <button type="button"
+                                class="btn btn-secondary btn-sm mb-1 btn-edit"
+                                data-id="${esc(permission.id)}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button"
+                                class="btn btn-danger btn-sm mb-1 btn-delete"
+                                data-id="${esc(permission.id)}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+
+                    </td>
+                </tr>
+            `);
+      });
+    }
+
+    /* ==========================
+       LOAD ROLES
+    ========================== */
+
+    async function loadRole(selected = "") {
+      const roles = await queryUtility.Load("/permissions/insertRole");
+
+      $("#roleId").empty();
+
+      $("#roleId").append(`<option value="">Select Role</option>`);
+
+      roles.forEach((role) => {
+        $("#roleId").append(`
+                <option value="${role.id}">
+                    ${role.name}
+                </option>
+            `);
+      });
+
+      $("#roleId").val(selected);
+    }
+
+    /* ==========================
+       LOAD ROUTES
+    ========================== */
+
+    async function loadRoute(selected = "") {
+      const routes = await queryUtility.Load("/permissions/insertRoute");
+
+      $("#routeId").empty();
+
+      $("#routeId").append(`<option value="">Select Route</option>`);
+
+      routes.forEach((route) => {
+        $("#routeId").append(`
+                <option value="${route.id}">
+                    ${route.name}
+                </option>
+            `);
+      });
+
+      $("#routeId").val(selected);
+    }
+
+    /* ==========================
+       OPEN MODAL
+    ========================== */
+
+    async function openModal(permission = null) {
+      $("#permissionForm")[0].reset();
+
+      $("#permissionId").val("");
+
+      await loadRole(permission ? permission.roleId : "");
+
+      await loadRoute(permission ? permission.routeId : "");
+
+      if (permission) {
+        $("#modalTitle").text("Edit Permission");
+
+        $("#permissionId").val(permission.id);
+
+        $("#permission").val(permission.permission);
+      } else {
+        $("#modalTitle").text("Add Permission");
+      }
+
+      $("#permissionModal").modal("show");
+    }
+
+    /* ==========================
+       GET DATA
+    ========================== */
+
+    function getFormData() {
+      return {
+        RoleId: $("#roleId").val(),
+        RouteId: $("#routeId").val(),
+        Permission: $("#permission").val(),
+      };
+    }
+
+    /* ==========================
+       VALIDATE
+    ========================== */
+
+    function validate(data) {
+      let valid = true;
+
+      $("#roleId").toggleClass("is-invalid", !data.RoleId);
+      $("#routeId").toggleClass("is-invalid", !data.RouteId);
+      $("#permission").toggleClass("is-invalid", !data.Permission);
+
+      if (!data.RoleId) valid = false;
+      if (!data.RouteId) valid = false;
+      if (!data.Permission) valid = false;
+
+      return valid;
+    }
+
+    /* ==========================
+       ADD
+    ========================== */
+
+    $("#btnAdd").click(function () {
+      openModal();
+    });
+
+    /* ==========================
+       EDIT
+    ========================== */
+
+    $("#permissionTable").on("click", ".btn-edit", function () {
+      openModal(permissionsById[$(this).data("id")]);
+    });
+
+    /* ==========================
+       SAVE
+    ========================== */
+
+    $("#permissionForm").on("submit", async function (e) {
+      e.preventDefault();
+
+      const id = $("#permissionId").val();
+      const isEdit = id !== "";
+      const payload = getFormData();
+      if (!validate(payload)) return;
+
+      const confirm = await Swal.fire({
+        title: isEdit ? "Save changes?" : "Add this permission?",
+        text: isEdit
+          ? `Update ${payload.roleId}'s record?`
+          : `Add ${payload.roleId} to the list?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: isEdit ? "Yes, save" : "Yes, add",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#4e73df",
+        cancelButtonColor: "#858796",
+      });
+      if (!confirm.isConfirmed) return;
+
+      Swal.fire({
+        title: "Saving...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        if (isEdit) {
+          await queryUtility.Update(
+            `/permissions/updatePermission/${encodeURIComponent(id)}`,
+            payload,
+          );
+        } else {
+          await queryUtility.Save("/permissions/createPermission", payload);
+        }
+
+        $("#permissionModal").modal("hide");
+        await loadPermissions();
+        Swal.close();
+        Toast.fire({
+          icon: "success",
+          title: isEdit
+            ? "Permission updated successfully"
+            : " Permission added successfully",
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: isEdit ? "Update failed" : "Create failed",
+          text: errorMessage(err, "Something went wrong. Please try again."),
+          confirmButtonColor: "#4e73df",
+        });
+      }
+    });
+
+    /* ==========================
+       DELETE
+    ========================== */
+
+    $("#permissionTable").on("click", ".btn-delete", async function () {
+      const id = $(this).data("id");
+
+      const result = await Swal.fire({
+        title: "Delete Permission?",
+        text: "This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Delete",
+      });
+
+      if (!result.isConfirmed) return;
+
+      try {
+        await queryUtility.Delete("/permissions/deletePermission/" + id);
+
+        Toast.fire({
+          icon: "success",
+          title: "Permission deleted successfully.",
+        });
+
+        loadPermissions();
+      } catch (err) {
+        console.error(err);
+
+        Swal.fire("Error", "Unable to delete permission.", "error");
+      }
+    });
+
+    function formatDate(date) {
+      if (!date) return "";
+
+      return new Date(date).toLocaleString();
+    }
+
+    loadPermissions();
+  });
+</script>

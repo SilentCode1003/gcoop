@@ -4,9 +4,9 @@ const { Query } = require("./../database/config/db.js");
 
 function validatePermission(body, ignoreId = null) {
 
-  const roleId = (body.roleId ?? "").trim();
-  const routeId = (body.routeId ?? "").trim();
-  const permission = (body.permission ?? "").trim();
+  const roleId = (body.RoleId ?? "").trim();
+  const routeId = (body.RouteId ?? "").trim();
+  const permission = (body.Permission ?? "").trim();
 
 
   if (!roleId) return { error: "Role is required." };
@@ -54,7 +54,7 @@ router.post("/createPermission",async function (req, res) {
   if (error) {
     return res.status(400).json({ success: false, message: error });
   }
- const createPermission = await Query("Insert into master_role_permissions (mrp_role_id, mrp_route_id, mrp_permission, mrp_create_at ) values (?,?,?)", [value.roleId, value.routeId, value,permission, new Date]);
+ const createPermission = await Query("Insert into master_role_permission (mrp_role_id, mrp_route_id, mrp_permission, mrp_create_at ) values (?,?,?,?)", [value.roleId, value.routeId, value.permission, new Date]);
   res
     .status(201)
     .json({ success: true, message: "Permission created.", data: createPermission});
@@ -65,7 +65,7 @@ router.post("/createPermission",async function (req, res) {
    const id = parseInt(req.params.id, 10);
 
    const { error, value } = validatePermission(req.body, id);
-   const updatePermissions = await Query("Update master_role_permissions set mrp_role_id = ?, mrp_route_id = ?, mrp_permission = ?, mrp_update_at = ? where mr_id = ?", [value.roleId, value.routeId, value.permission, new Date(), id]) ;
+   const updatePermissions = await Query("Update master_role_permission set mrp_role_id = ?, mrp_route_id = ?, mrp_permission = ?, mrp_update_at = ? where mrp_id = ?", [value.roleId, value.routeId, value.permission, new Date(), id]) ;
    if (error) {
      return res.status(400).json({ success: false, message: error });
    }
@@ -82,7 +82,7 @@ router.post("/createPermission",async function (req, res) {
        .json({ success: false, message: "Permission not found." });
    }
  
-   const deletePermissions = await Query("Delete from master_role_permissions where mrp_id = ?", [id]);
+   const deletePermissions = await Query("Delete from master_role_permission where mrp_id = ?", [id]);
   
  
    res.json({ success: true, message: "Route deleted.", data : deletePermissions });

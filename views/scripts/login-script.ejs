@@ -1,76 +1,57 @@
 <script>
   $(document).ready(function () {
+
     function getAcc() {
-      return {
-        Username: $("#username").val().trim(),
-        Password: $("#password").val().trim(),
-      };
+        return {
+            Username: $("#username").val().trim(),
+            Password: $("#password").val().trim(),
+        };
     }
 
     $("#loginForm").on("submit", async function (e) {
-      e.preventDefault();
-      const payload = getAcc();
-      console.log("Sending:", payload);
-      try {
-        const login = await queryUtility.Save("/auth/login", payload);
+        e.preventDefault();
 
-        console.log("Response:", login.success);
+        const payload = getAcc();
 
-        if (login.success) {
-          window.location.href = "/dashboard";
-        } else {
-          alert(login.message);
+        try {
+
+            const login = await queryUtility.Save("/auth/login", payload);
+
+            if (login.success) {
+                window.location.href = "/dashboard";
+            } else {
+                alert(login.message);
+            }
+
+        } catch (err) {
+
+            if (err.responseJSON && err.responseJSON.message) {
+                alert(err.responseJSON.message);
+            } else {
+                alert("An error occurred while communicating with the server.");
+            }
+
         }
-      } catch (err) {
-        console.error("Error:", err);
 
-        if (err.responseJSON && err.responseJSON.message) {
-          alert(err.responseJSON.message);
-        } else {
-          alert("An error occurred while communicating with the server.");
-        }
-      }
     });
-  });
-
-  $(document).ready(function () {
 
     $("#togglePassword").click(function () {
 
-        const password = $("#password");
+        const input = $("#password");
 
-        if (password.attr("type") === "password") {
-            password.attr("type", "text");
+        if (input.attr("type") === "password") {
+
+            input.attr("type","text");
             $(this).html('<i class="fas fa-eye-slash"></i>');
+
         } else {
-            password.attr("type", "password");
+
+            input.attr("type","password");
             $(this).html('<i class="fas fa-eye"></i>');
+
         }
 
     });
 
 });
-$(document).ready(function () {
-
-    if(localStorage.getItem("theme") === "dark"){
-        $("body").addClass("dark");
-        $("#themeBtn").html('<i class="fas fa-sun"></i>');
-    }
-
-    $("#themeBtn").click(function(){
-
-        $("body").toggleClass("dark");
-
-        if($("body").hasClass("dark")){
-            localStorage.setItem("theme","dark");
-            $(this).html('<i class="fas fa-sun"></i>');
-        }else{
-            localStorage.setItem("theme","light");
-            $(this).html('<i class="fas fa-moon"></i>');
-        }
-
-    });
-
-});
-
 </script>

@@ -3,14 +3,6 @@
 
 <head>
     <%- include("../components/header.ejs") %>
-
-    <!-- Global CSS -->
-    <link rel="stylesheet" href="/stylesheets/style.css">
-
-    <!-- Page-specific CSS -->
-    <% if (typeof pageStyle !== "undefined" && pageStyle) { %>
-        <link rel="stylesheet" href="<%= pageStyle %>">
-    <% } %>
 </head>
 
 <body id="page-top">
@@ -20,7 +12,6 @@
 
         <!-- Sidebar -->
         <%- include("../components/sidebar.ejs") %>
-        <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
@@ -30,18 +21,15 @@
 
                 <!-- Topbar -->
                 <%- include("../components/topbar.ejs") %>
-                <!-- End of Topbar -->
 
-                <!-- Begin Page Content -->
+                <!-- Page Content -->
                 <%- include(body) %>
-                <!-- End Page Content -->
 
             </div>
             <!-- End Main Content -->
 
             <!-- Footer -->
             <%- include("../components/footer.ejs") %>
-            <!-- End Footer -->
 
         </div>
         <!-- End Content Wrapper -->
@@ -49,7 +37,7 @@
     </div>
     <!-- End Page Wrapper -->
 
-    <!-- Scroll to Top Button -->
+    <!-- Scroll to Top -->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
@@ -63,11 +51,9 @@
          aria-hidden="true">
 
         <div class="modal-dialog" role="document">
-
             <div class="modal-content">
 
                 <div class="modal-header">
-
                     <h5 class="modal-title" id="logoutModalLabel">
                         Ready to Leave?
                     </h5>
@@ -75,7 +61,6 @@
                     <button class="close" type="button" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
-
                 </div>
 
                 <div class="modal-body">
@@ -83,7 +68,6 @@
                 </div>
 
                 <div class="modal-footer">
-
                     <button class="btn btn-secondary"
                             type="button"
                             data-dismiss="modal">
@@ -93,11 +77,9 @@
                     <a class="btn btn-primary" href="/auth/logout">
                         Logout
                     </a>
-
                 </div>
 
             </div>
-
         </div>
 
     </div>

@@ -1,0 +1,134 @@
+/* ==========================
+   TOPBAR
+========================== */
+
+.topbar{
+    background: var(--topbar) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+/* ==========================
+   ALL TEXT
+========================== */
+
+.topbar,
+.topbar a,
+.topbar span,
+.topbar p,
+.topbar div,
+.topbar small,
+.topbar strong,
+.topbar i,
+.topbar .nav-link,
+.topbar .dropdown-toggle,
+.topbar .navbar-nav .nav-link{
+    color: var(--text) !important;
+}
+
+/* ==========================
+   USER
+========================== */
+
+#userDropdown,
+#userDropdown span,
+#userDropdown small,
+#userDropdown i{
+    color: var(--text) !important;
+}
+
+#userDropdown:hover,
+#userDropdown:hover span,
+#userDropdown:hover i{
+    color: var(--primary) !important;
+}
+
+/* ==========================
+   ICONS
+========================== */
+
+.topbar .fa,
+.topbar .fas,
+.topbar .far,
+.topbar .fab{
+    color: var(--text) !important;
+}
+
+.topbar .nav-link:hover .fa,
+.topbar .nav-link:hover .fas,
+.topbar .nav-link:hover .far,
+.topbar .nav-link:hover .fab{
+    color: var(--primary) !important;
+}
+
+/* ==========================
+   SEARCH
+========================== */
+
+.navbar-search .form-control{
+    background: var(--card) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.navbar-search .form-control::placeholder{
+    color:#999 !important;
+}
+
+.navbar-search .btn{
+    background: var(--primary) !important;
+    border: none !important;
+}
+
+.navbar-search .btn:hover{
+    background: var(--primary-hover) !important;
+}
+
+/* ==========================
+   DROPDOWN
+========================== */
+
+.topbar .dropdown-menu{
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.topbar .dropdown-header{
+    background: var(--primary) !important;
+    color: #fff !important;
+}
+
+.topbar .dropdown-item{
+    color: var(--text) !important;
+}
+
+.topbar .dropdown-item i{
+    color: inherit !important;
+}
+
+.topbar .dropdown-item:hover{
+    background: var(--primary) !important;
+    color:#fff !important;
+}
+
+/* ==========================
+   REMOVE SB ADMIN COLORS
+========================== */
+
+.text-gray-100,
+.text-gray-200,
+.text-gray-300,
+.text-gray-400,
+.text-gray-500,
+.text-gray-600,
+.text-gray-700,
+.text-gray-800,
+.text-gray-900{
+    color: var(--text) !important;
+}
+
+.border-left-primary,
+.border-left-success,
+.border-left-danger,
+.border-left-warning{
+    border-left-width: 5px !important;
+}

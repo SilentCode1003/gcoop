@@ -6,7 +6,10 @@
     background: var(--sidebar) !important;
     width: 250px !important;
     min-height: 100vh;
-    transition: background .3s;
+
+    transition: background .3s ease,
+                color .3s ease,
+                border-color .3s ease;
 }
 
 /* ==========================
@@ -77,7 +80,8 @@
     padding: 12px 15px;
     border-radius: 8px;
     color: var(--text) !important;
-    transition: .3s;
+    text-decoration: none;
+    transition: all .3s ease;
 }
 
 .sidebar .nav-item .nav-link span{
@@ -88,6 +92,7 @@
 .sidebar .nav-item .nav-link i{
     width: 20px;
     text-align: center;
+    font-size: 16px;
     color: var(--text) !important;
     transition: .3s;
 }
@@ -96,6 +101,7 @@
     width: 20px;
     height: 20px;
     object-fit: contain;
+    transition: .3s;
 }
 
 /* ==========================
@@ -103,7 +109,7 @@
 ========================== */
 
 .sidebar .nav-item .nav-link:hover{
-    background: var(--primary);
+    background: var(--primary) !important;
     color: #fff !important;
 }
 
@@ -121,7 +127,7 @@
 ========================== */
 
 .sidebar .nav-item.active .nav-link{
-    background: var(--primary);
+    background: var(--primary) !important;
     color: #fff !important;
 }
 
@@ -147,12 +153,13 @@
 ========================== */
 
 #sidebarToggle{
-    background: var(--primary);
-    border: none;
+    background: var(--primary) !important;
+    border: none !important;
+    color: #fff !important;
 }
 
 #sidebarToggle:hover{
-    background: var(--primary-hover);
+    background: var(--primary-hover) !important;
 }
 
 /* ==========================
@@ -160,14 +167,14 @@
 ========================== */
 
 .sidebar-card{
-    background: transparent;
-    border: none;
+    background: transparent !important;
+    border: none !important;
     text-align: center;
     padding: 20px;
 }
 
 .sidebar-card p{
-    color: var(--text);
+    color: var(--text) !important;
 }
 
 .sidebar-card .btn{
@@ -180,4 +187,54 @@
     object-fit: contain;
     display: block;
     margin: 10px auto;
+}
+
+/* ==========================
+   COLLAPSED SIDEBAR
+========================== */
+
+.sidebar.toggled{
+    width: 90px !important;
+}
+
+.sidebar.toggled .sidebar-brand-text,
+.sidebar.toggled .sidebar-heading,
+.sidebar.toggled .sidebar-card,
+.sidebar.toggled .nav-link span{
+    display: none;
+}
+
+.sidebar.toggled .nav-link{
+    justify-content: center;
+    padding: 12px;
+}
+
+.sidebar.toggled .nav-link i,
+.sidebar.toggled .nav-link img{
+    margin: 0;
+}
+
+/* ==========================
+   SCROLLBAR
+========================== */
+
+.sidebar::-webkit-scrollbar{
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track{
+    background: var(--sidebar);
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+/* ==========================
+   REMOVE SB ADMIN ARROW
+========================== */
+
+.sidebar .nav-link[data-toggle="collapse"]::after{
+    display: none !important;
 }

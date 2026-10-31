@@ -1,0 +1,74 @@
+/* ==========================
+   SWEETALERT2 THEME
+========================== */
+
+.swal2-popup{
+    background: var(--card) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+}
+
+.swal2-popup *,
+.swal2-title,
+.swal2-html-container,
+.swal2-content,
+.swal2-footer{
+    color: var(--text) !important;
+}
+
+.swal2-toast{
+    background: var(--card) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.swal2-toast *,
+.swal2-toast .swal2-title,
+.swal2-toast .swal2-html-container{
+    color: var(--text) !important;
+}
+
+.swal2-input,
+.swal2-textarea,
+.swal2-select{
+    background: var(--table) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.swal2-input::placeholder{
+    color:#999 !important;
+}
+
+.swal2-confirm{
+    background: var(--primary) !important;
+    color:#fff !important;
+    border:none !important;
+}
+
+.swal2-confirm:hover{
+    background: var(--primary-hover) !important;
+}
+
+.swal2-cancel{
+    background:#6c757d !important;
+    color:#fff !important;
+    border:none !important;
+}
+
+.swal2-close{
+    color: var(--text) !important;
+}
+
+.swal2-footer{
+    border-top:1px solid var(--border) !important;
+}
+
+.swal2-icon{
+    margin:1.5em auto .8em !important;
+}
+
+.swal2-timer-progress-bar{
+    background: var(--primary) !important;
+}

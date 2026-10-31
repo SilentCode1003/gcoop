@@ -13,12 +13,11 @@
     // AJAX Utility
     // ==========================
 
-    const Query = (url, type, data = null) => {
+    function Query(url, type, data = null) {
 
-        return new Promise((resolve, reject) => {
+        return new Promise(function (resolve, reject) {
 
             $.ajax({
-
                 url: url,
                 method: type,
                 dataType: "json",
@@ -34,20 +33,13 @@
                         ? JSON.stringify(data)
                         : undefined,
 
-                success: function (result) {
-                    resolve(result);
-                },
-
-                error: function (err) {
-                    console.error(err);
-                    reject(err);
-                }
-
+                success: resolve,
+                error: reject
             });
 
         });
 
-    };
+    }
 
     const queryUtility = {
 
@@ -95,46 +87,49 @@
     });
 
     // ==========================
-    // Dark / Light Mode
+    // Theme
     // ==========================
+    $(function () {
 
-    $(document).ready(function () {
+        const html = $("html");
+        const body = $("body");
+        const btn = $("#themeBtn");
+        const icon = $("#themeBtn i");
 
-        // Load saved theme
-        if (localStorage.getItem("theme") === "dark") {
+        const theme = localStorage.getItem("theme") || "light";
 
-            $("body").addClass("dark");
+        function applyTheme(theme) {
 
-            $("#themeBtn i")
-                .removeClass("fa-moon")
-                .addClass("fa-sun");
+            if (theme === "dark") {
+                html.addClass("dark");
+                body.addClass("dark");
+                icon.removeClass("fa-moon").addClass("fa-sun");
+            } else {
+                html.removeClass("dark");
+                body.removeClass("dark");
+                icon.removeClass("fa-sun").addClass("fa-moon");
+            }
 
         }
 
+        // Apply saved theme
+        applyTheme(theme);
+
+        // Exit if no theme button exists
+        if (!btn.length) return;
+
         // Toggle Theme
-        $("#themeBtn").click(function () {
+        btn.off("click").on("click", function () {
 
-            $("body").toggleClass("dark");
+            const dark = !html.hasClass("dark");
 
-            if ($("body").hasClass("dark")) {
+            applyTheme(dark ? "dark" : "light");
 
-                localStorage.setItem("theme", "dark");
-
-                $("#themeBtn i")
-                    .removeClass("fa-moon")
-                    .addClass("fa-sun");
-
-            } else {
-
-                localStorage.setItem("theme", "light");
-
-                $("#themeBtn i")
-                    .removeClass("fa-sun")
-                    .addClass("fa-moon");
-
-            }
+            localStorage.setItem("theme", dark ? "dark" : "light");
 
         });
 
     });
+
+
 </script>

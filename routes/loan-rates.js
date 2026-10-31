@@ -4,8 +4,8 @@ const { Query } = require("./../database/config/db.js");
 
 function validateloanRates(body, ignoreId = null) {
 
-  const name = (body.name ?? "").trim();
-  const loanRate = (body.rate ?? "").trim();
+  const name = (body.Name ?? "").trim();
+  const loanRate = (body.Rate ?? "").trim();
 
   if (!name) return { error: "Name is required." };
   if (!loanRate) return { error: "Rate is required." };
@@ -48,7 +48,7 @@ router.post("/createloanRate",async function (req, res) {
    const id = parseInt(req.params.id, 10);
 
    const { error, value } = validateloanRates(req.body, id);
-   const updateloanRates = await Query("Update master_loan_rates set mlr_name = ?, mlr_loan_rate = ?, mlr_update_at = ? where mlr_id = ?", [value.name, value.rate, new Date(), id]) ;
+   const updateloanRates = await Query("Update master_loan_rates set mlr_name = ?, mlr_loan_rate = ?, mlr_update_at = ? where mlr_id = ?", [value.name, value.loanRate, new Date(), id]) ;
    if (error) {
      return res.status(400).json({ success: false, message: error });
    }

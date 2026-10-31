@@ -40,15 +40,15 @@ app.use('/members', membersRouter);
 app.use('/users', usersRouter);
 app.use('/roles', rolesRouter);
 app.use('/routes', routesRouter);
-app.use('./permissions', permissionsRouter)
-app.use('./loanRates', loanRatesRouter)
-app.use('./denomination', denominationRouter)
+app.use('/permissions', permissionsRouter)
+app.use('/loan-rates', loanRatesRouter)
+app.use('/denominations', denominationRouter)
 
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+// // catch 404 and forward to error handler
+// app.use(function(req, res, next) {
+//   next(createError(404));
+// });
 
 // error handler
 app.use(function(err, req, res, next) {

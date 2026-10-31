@@ -4,8 +4,8 @@ const { Query } = require("./../database/config/db.js");
 
 function validateDenominations(body, ignoreId = null) {
 
-  const name = (body.name ?? "").trim();
-  const value = (body.value ?? "").trim();
+  const name = (body.Name ?? "").trim();
+  const value = (body.Value ?? "").trim();
 
   if (!name) return { error: "Name is required." };
   if (!value) return { error: "Value is required." };
@@ -25,13 +25,13 @@ router.get("/", function (req, res, next) {
 
 // Load Loan Rate
 router.get("/loadDenomination",async function(req,res){
-    const data = await Query("SELECT md_id as id, md_name as name, ,d_value as value , md_create_at as createdDate, md_update_at as updatedDate from master_denomination")
+    const data = await Query("SELECT md_id as id, md_name as name, md_value as value , md_create_at as createdDate, md_update_at as updatedDate from master_denomination")
     console.log(data)
     res.json(data)
 });
 
 // Create Denomination
-router.post("/createRoute",async function (req, res) {
+router.post("/createDenomination",async function (req, res) {
   const { error, value } = validateDenominations(req.body);
   if (error) {
     return res.status(400).json({ success: false, message: error });
@@ -64,7 +64,7 @@ router.post("/createRoute",async function (req, res) {
        .json({ success: false, message: "Denomination not found." });
    }
  
-   const deleteDenominations = await Query("Delete from master_loan_rates where md_id = ?", [id]);
+   const deleteDenominations = await Query("Delete from master_denomination where md_id = ?", [id]);
   
  
    res.json({ success: true, message: "Denomination deleted.", data : deleteDenominations });

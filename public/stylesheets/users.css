@@ -1,0 +1,39 @@
+.users-title{
+    color: var(--primary);
+    font-size:32px;
+    font-weight:700;
+    text-transform:uppercase;
+}
+
+.users-table{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+}
+
+.users-table .card-header{
+    background:var(--primary);
+    color:#fff;
+    padding:16px 22px;
+}
+
+.users-table .card-header h6{
+    color:#fff;
+    margin:0;
+}
+
+.users-table .card-body{
+    background:var(--card);
+    padding:25px;
+}
+
+.btn-add-user{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+}
+
+.btn-add-user:hover{
+    background:var(--primary-hover);
+}

@@ -1,159 +1,309 @@
 /* ==========================
-   DASHBOARD TITLE
-========================== */
-
-.dashboard-title{
-    color:var(--text);
-    font-size:2rem;
-    font-weight:600;
-    margin-bottom:25px;
-}
-
-/* ==========================
-   SUMMARY CARDS
+   DASHBOARD CARDS
 ========================== */
 
 .dashboard-card{
-    border-radius:12px;
-    transition:.3s;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+
+    background: var(--card) !important;
+    border: none !important;
+    border-radius: 14px !important;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,.12) !important;
+
+    transition: .35s ease;
 }
 
-.dashboard-card:hover{
-    transform:translateY(-4px);
-    box-shadow:0 10px 20px rgba(0,0,0,.15);
+/* Left color strip */
+
+.dashboard-card::after{
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
 }
+
+/* Card Colors */
+
+.dashboard-card.card-danger::after{
+    background:#ef4444;
+}
+
+.dashboard-card.card-primary::after{
+    background:#3b82f6;
+}
+
+.dashboard-card.card-success::after{
+    background:#10b981;
+}
+
+.dashboard-card.card-warning::after{
+    background:#f59e0b;
+}
+
+/* Left Color Bar */
+.dashboard-card::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:6px;
+    height:100%;
+    border-radius:14px 0 0 14px;
+}
+
+/* Color Variants */
+.dashboard-card.border-left-danger::after{
+    background:#ef4444;
+}
+
+.dashboard-card.border-left-primary::after{
+    background:#3b82f6;
+}
+
+.dashboard-card.border-left-success::after{
+    background:#10b981;
+}
+
+.dashboard-card.border-left-warning::after{
+    background:#f59e0b;
+}
+
+/* ==========================
+   STAGGER ANIMATION
+========================== */
+
+.col-xl-3:nth-child(1) .dashboard-card{
+    animation-delay:.1s;
+}
+
+.col-xl-3:nth-child(2) .dashboard-card{
+    animation-delay:.2s;
+}
+
+.col-xl-3:nth-child(3) .dashboard-card{
+    animation-delay:.3s;
+}
+
+.col-xl-3:nth-child(4) .dashboard-card{
+    animation-delay:.4s;
+}
+
+/* ==========================
+   SHINE EFFECT
+========================== */
+
+.dashboard-card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-150%;
+    width:60%;
+    height:100%;
+
+    background:linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,.15),
+        transparent
+    );
+
+    transform:skewX(-25deg);
+    transition:left .8s ease;
+    pointer-events:none;
+    z-index:1;
+}
+
+.dashboard-card:hover::before{
+    left:150%;
+}
+
+/* ==========================
+   HOVER
+========================== */
+
+.dashboard-card:hover{
+    transform:translateY(-8px) scale(1.02);
+    box-shadow:0 18px 35px rgba(0,0,0,.28) !important;
+}
+
+.dashboard-card:active{
+    transform:translateY(-3px) scale(.98);
+}
+
+/* ==========================
+   CARD BODY
+========================== */
 
 .dashboard-card .card-body{
     padding:25px;
+    position:relative;
+    z-index:2;
 }
 
-.dashboard-card h6{
-    font-size:14px;
-    font-weight:700;
-    text-transform:uppercase;
-    margin-bottom:10px;
+/* ==========================
+   TITLE
+========================== */
+
+.dashboard-card .text-xs{
+    transition:letter-spacing .3s ease;
 }
 
-.dashboard-card h2,
-.dashboard-card h3,
-.dashboard-card h4,
-.dashboard-card span{
-    color:var(--text);
-    font-weight:700;
+.dashboard-card:hover .text-xs{
+    letter-spacing:1px;
 }
+
+/* ==========================
+   NUMBER
+========================== */
+
+.dashboard-card h2{
+    color:var(--text) !important;
+    transition:transform .3s ease;
+}
+
+.dashboard-card:hover h2{
+    transform:scale(1.08);
+}
+
+/* ==========================
+   ICON
+========================== */
 
 .dashboard-card i{
-    font-size:48px;
-    color:#7c7c95;
+    font-size:50px;
+    transition:
+        transform .35s ease,
+        filter .35s ease;
+}
+
+.dashboard-card:hover i{
+    transform:scale(1.15) rotate(8deg);
+    filter:drop-shadow(0 0 6px rgba(255,255,255,.25));
 }
 
 /* ==========================
-   DASHBOARD CARD COLORS
+   ICON COLORS
 ========================== */
 
-.border-left-danger{
-    border-left:5px solid #dc3545!important;
+.border-left-danger i{
+    color:#ef4444 !important;
 }
 
-.border-left-primary{
-    border-left:5px solid #2563eb!important;
+.border-left-primary i{
+    color:#3b82f6 !important;
 }
 
-.border-left-success{
-    border-left:5px solid #22c55e!important;
+.border-left-success i{
+    color:#10b981 !important;
 }
 
-.border-left-warning{
-    border-left:5px solid #f59e0b!important;
-}
-
-.text-danger{
-    color:#dc3545!important;
-}
-
-.text-primary{
-    color:#2563eb!important;
-}
-
-.text-success{
-    color:#22c55e!important;
-}
-
-.text-warning{
-    color:#f59e0b!important;
+.border-left-warning i{
+    color:#f59e0b !important;
 }
 
 /* ==========================
-   RECENT MEMBERS
+   CARD LOAD ANIMATION
 ========================== */
 
-.dashboard-table{
-    border-radius:10px;
-    overflow:hidden;
-}
-
-.dashboard-table table{
-    margin-bottom:0;
-}
-
-.dashboard-table th,
-.dashboard-table td{
-    text-align:center;
-    vertical-align:middle;
+@keyframes cardFade{
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
 }
 
 /* ==========================
    REFRESH BUTTON
 ========================== */
 
-.btn-refresh,
-#btnRefresh{
-    background:var(--primary);
-    color:#fff;
-    border:none;
+#btnRefresh,
+.btn-refresh{
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    background:linear-gradient(135deg,#c1121f,#991b1b) !important;
+    color:#fff !important;
+
+    border:none !important;
+    border-radius:10px !important;
+
+    padding:10px 22px !important;
+    font-size:15px !important;
+    font-weight:700 !important;
+
+    cursor:pointer !important;
+    text-decoration:none !important;
+
+    box-shadow:0 6px 18px rgba(153,27,27,.35) !important;
+
+    transition:all .3s ease !important;
 }
 
-.btn-refresh:hover,
-#btnRefresh:hover{
-    background:var(--primary-hover);
-    color:#fff;
+#btnRefresh:hover,
+.btn-refresh:hover{
+    background:linear-gradient(135deg,#dc2626,#991b1b) !important;
+    transform:translateY(-2px);
+    box-shadow:0 10px 25px rgba(153,27,27,.45) !important;
+}
+
+#btnRefresh:active,
+.btn-refresh:active{
+    transform:scale(.96);
+}
+
+#btnRefresh:focus,
+.btn-refresh:focus{
+    outline:none;
+    box-shadow:
+        0 0 0 4px rgba(153,27,27,.20),
+        0 10px 25px rgba(153,27,27,.45) !important;
+}
+
+#btnRefresh i,
+.btn-refresh i{
+    color:#fff !important;
+    font-size:15px;
+    transition:transform .4s ease;
+}
+
+#btnRefresh:hover i,
+.btn-refresh:hover i{
+    transform:rotate(180deg);
 }
 
 /* ==========================
-   CHART CARD
+   DASHBOARD PAGE TITLE
 ========================== */
 
-.chart-card{
-    border-radius:10px;
+.dashboard-title{
+    color:#991b1b !important;
+    font-size:22px !important;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    margin:0;
+    display:flex;
+    align-items:center;
 }
 
-.chart-card .card-body{
-    padding:20px;
+.dashboard-title i{
+    color:#991b1b !important;
+    margin-right:10px;
+    font-size:20px;
 }
 
-/* ==========================
-   PAGE
-========================== */
-
-.container-fluid{
-    color:var(--text);
-}
-
-.page-title,
-.h3{
-    color:var(--text)!important;
-}
-
-/* ==========================
-   TRANSITIONS
-========================== */
-
-.dashboard-card,
-.dashboard-table,
-.chart-card{
-    transition:
-        background .3s ease,
-        color .3s ease,
-        border-color .3s ease,
-        box-shadow .3s ease;
+html.dark .dashboard-title,
+html.dark .dashboard-title i{
+    color:#fff !important;
 }

@@ -1,23 +1,28 @@
 <div class="container-fluid">
-    <div class="card shadow mb-4">
 
-        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h5 class="m-0 font-weight-bold text-white">
+    <!-- Members Card -->
+    <div class="card members-card shadow mb-4">
+
+        <div class="card-header members-header d-flex justify-content-between align-items-center">
+
+            <h5 class="m-0 font-weight-bold">
+                <i class="fas fa-users mr-2"></i>
                 Members
             </h5>
 
-            <button
-                type="button"
-                id="btnAdd"
-                class="btn btn-add-member">
-                <i class="fas fa-plus"></i>
+            <button type="button" id="btnAdd" class="btn btn-add-member">
+                <i class="fas fa-plus mr-1"></i>
                 Add Member
             </button>
+
         </div>
 
         <div class="card-body">
+
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%">
+
+                <table class="table table-hover mb-0" id="dataTable">
+
                     <thead>
                         <tr>
                             <th>Employee ID</th>
@@ -26,80 +31,116 @@
                             <th>Contact</th>
                             <th>Registered Date</th>
                             <th>Registered By</th>
-                            <th style="width:160px;">Action</th>
+                            <th width="160">Action</th>
                         </tr>
                     </thead>
+
                     <tbody id="memberTable"></tbody>
+
                 </table>
+
             </div>
+
         </div>
 
     </div>
+
 </div>
 
-<!-- Member Modal -->
-<div
-  class="modal fade"
-  id="memberModal"
-  tabindex="-1"
-  role="dialog"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <form id="memberForm" novalidate>
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">Add Member</h5>
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span>&times;</span>
-          </button>
+<!-- ==========================
+     MEMBER MODAL
+========================== -->
+
+<div class="modal fade"
+     id="memberModal"
+     tabindex="-1"
+     aria-labelledby="modalTitle"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <form id="memberForm" novalidate>
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title" id="modalTitle">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Add Member
+                    </h5>
+
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+
+                        <span aria-hidden="true">&times;</span>
+
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="memberId">
+
+                    <div class="form-row">
+
+                        <div class="form-group col-md-6">
+                            <label for="employeeId">Employee ID</label>
+                            <input type="text" class="form-control" id="employeeId">
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" class="form-control" id="fullName">
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea class="form-control" id="address" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group col-md-6">
+                            <label for="contact">Contact No.</label>
+                            <input type="text" class="form-control" id="contact">
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="registeredBy">Registered By</label>
+                            <input type="text" class="form-control" id="registeredBy">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-cancel"
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-save"
+                            id="btnSave">
+                        <i class="fas fa-save mr-1"></i>
+                        Save
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
 
-        <div class="modal-body">
-          <input type="hidden" id="memberId" />
-
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="employeeId">Employee ID</label>
-              <input type="text" class="form-control" id="employeeId" />
-            </div>
-            <div class="form-group col-md-6">
-              <label for="fullName">Full Name</label>
-              <input type="text" class="form-control" id="fullName" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="address">Address</label>
-            <textarea class="form-control" id="address" rows="3"></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="contact">Contact No.</label>
-              <input type="text" class="form-control" id="contact" />
-            </div>
-            <div class="form-group col-md-6">
-              <label for="registeredBy">Registered By</label>
-              <input type="text" class="form-control" id="registeredBy" />
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-primary" id="btnSave">
-            Save
-          </button>
-        </div>
-      </form>
     </div>
-  </div>
+
 </div>

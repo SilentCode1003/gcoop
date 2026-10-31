@@ -14,7 +14,7 @@
     --primary-hover:#7f1d1d;
 }
 
-body.dark{
+html.dark{
     --bg:#0f0f0f;
     --topbar:#000000;
     --card:#1f1f1f;
@@ -41,12 +41,15 @@ body,
 }
 
 body{
+    background: var(--bg) !important;
+    color: var(--text) !important;
     transition:
         background .3s ease,
         color .3s ease;
 }
+
 /* ==========================
-   TOPBAR
+   TOPBAR  (added)
 ========================== */
 
 .topbar{
@@ -61,7 +64,7 @@ body{
 }
 
 /* ==========================
-   PAGE TITLES
+   PAGE TITLES  (added)
 ========================== */
 
 h1,
@@ -81,70 +84,91 @@ small{
 ========================== */
 
 .card{
-    background:var(--card)!important;
-    color:var(--text)!important;
-    border:1px solid var(--border)!important;
-    border-radius:10px;
-    overflow:hidden;
+    background: var(--card) !important;
 }
 
-.card-header{
-    background:var(--primary)!important;
-    color:#fff!important;
 
-    padding:15px 20px;
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+/* Keep colored left border */
+.dashboard-card.border-left-danger{
+    border-left:5px solid #e74a3b!important;
 }
 
-.card-header h6{
-    margin:0;
-    color:#fff!important;
-    font-size:18px;
-    font-weight:600;
+.dashboard-card.border-left-primary{
+    border-left:5px solid #4e73df!important;
 }
 
-.card-body{
-    background:var(--card)!important;
-    color:var(--text)!important;
+.dashboard-card.border-left-success{
+    border-left:5px solid #1cc88a!important;
+}
+
+.dashboard-card.border-left-warning{
+    border-left:5px solid #f6c23e!important;
 }
 
 /* Dashboard colored borders */
 
-.members-card{
-    border-left:5px solid #e74a3b!important;
-}
-
-.users-card{
-    border-left:5px solid #4e73df!important;
-}
-
-.loan-card{
-    border-left:5px solid #1cc88a!important;
-}
-
-.denomination-card{
-    border-left:5px solid #f6c23e!important;
-}
+.members-card{ border-left:5px solid #e74a3b!important; }
+.users-card{ border-left:5px solid #4e73df!important; }
+.loan-card{ border-left:5px solid #1cc88a!important; }
+.denomination-card{ border-left:5px solid #f6c23e!important; }
 
 /* SB Admin Cards */
 
-.border-left-danger{
-    border-left:5px solid #e74a3b!important;
+.border-left-danger{ border-left:5px solid #e74a3b!important; }
+.border-left-primary{ border-left:5px solid #4e73df!important; }
+.border-left-success{ border-left:5px solid #1cc88a!important; }
+.border-left-warning{ border-left:5px solid #f6c23e!important; }
+
+/* added: neutralize the colored side borders above
+   (higher specificity, so the rules above stay in the file) */
+
+html body .card,
+html body .card[class*="border-left"],
+html body .card[class*="-card"],
+html body .members-card,
+html body .users-card,
+html body .loan-card,
+html body .denomination-card,
+html body .border-left-danger,
+html body .border-left-primary,
+html body .border-left-success,
+html body .border-left-warning{
+    border:1px solid var(--border)!important;
+    border-left:1px solid var(--border)!important;
 }
 
-.border-left-primary{
-    border-left:5px solid #4e73df!important;
+/* ==========================
+   DASHBOARD / SB ADMIN UTILITIES  (added)
+========================== */
+
+.bg-white,
+.bg-light,
+.card-footer,
+.list-group-item{
+    background:var(--card)!important;
+    color:var(--text)!important;
+    border-color:var(--border)!important;
 }
 
-.border-left-success{
-    border-left:5px solid #1cc88a!important;
+.text-gray-900,
+.text-gray-800,
+.text-gray-700,
+.text-gray-600,
+.text-dark,
+.text-body,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.card .h3,
+.card .h4,
+.card .h5,
+.card .h6{
+    color:var(--text)!important;
 }
 
-.border-left-warning{
-    border-left:5px solid #f6c23e!important;
+.text-gray-500,
+.text-gray-400,
+.text-gray-300,
+.text-muted{
+    color:#999!important;
 }
 
 /* ==========================
@@ -195,6 +219,20 @@ small{
 }
 
 /* ==========================
+   SEARCH BAR  (added)
+========================== */
+
+.navbar-search .form-control{
+    background:var(--card)!important;
+    color:var(--text)!important;
+    border:1px solid var(--border)!important;
+}
+
+.navbar-search .form-control::placeholder{
+    color:#999;
+}
+
+/* ==========================
    BUTTONS
 ========================== */
 
@@ -212,15 +250,7 @@ small{
     border:none!important;
 }
 
-/* Add Member */
-
-/* ==========================
-   ADD MEMBER BUTTON
-========================== */
-
-/* ==========================
-   ADD MEMBER BUTTON
-========================== */
+/* ADD MEMBER BUTTON */
 
 #btnAdd,
 .btn-add-member{
@@ -276,11 +306,6 @@ small{
     border:1px solid var(--border)!important;
 }
 
-.modal-header{
-    background:var(--primary)!important;
-    color:#fff!important;
-}
-
 .modal-footer{
     border-top:1px solid var(--border)!important;
 }
@@ -320,20 +345,6 @@ small{
 }
 
 /* ==========================
-   SEARCH BAR
-========================== */
-
-.navbar-search .form-control{
-    background:var(--card)!important;
-    color:var(--text)!important;
-    border:1px solid var(--border)!important;
-}
-
-.navbar-search .form-control::placeholder{
-    color:#999;
-}
-
-/* ==========================
    BADGES
 ========================== */
 
@@ -346,20 +357,9 @@ small{
    ALERTS
 ========================== */
 
-.alert-success{
-    background:#198754;
-    color:#fff;
-}
-
-.alert-danger{
-    background:#dc3545;
-    color:#fff;
-}
-
-.alert-warning{
-    background:#ffc107;
-    color:#212529;
-}
+.alert-success{ background:#198754; color:#fff; }
+.alert-danger{ background:#dc3545; color:#fff; }
+.alert-warning{ background:#ffc107; color:#212529; }
 
 /* ==========================
    SCROLLBAR
@@ -382,7 +382,6 @@ small{
    TRANSITIONS
 ========================== */
 
-body,
 #wrapper,
 #content-wrapper,
 #content,
@@ -402,4 +401,215 @@ body,
         border-color .3s ease,
         box-shadow .3s ease,
         transform .3s ease;
+}
+
+/* ==========================
+   MODAL THEME
+========================== */
+
+.modal-content{
+    background: var(--card) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+}
+
+.modal-header{
+    background: var(--primary) !important;
+    color: #fff !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.modal-header .modal-title{
+    color: #fff !important;
+    font-weight: 700;
+}
+
+.modal-header .close,
+.modal-header .close span{
+    color: #fff !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}
+
+.modal-body{
+    background: var(--card) !important;
+    color: var(--text) !important;
+}
+
+.modal-body *{
+    color: var(--text) !important;
+}
+
+.modal-footer{
+    background: var(--card) !important;
+    border-top: 1px solid var(--border) !important;
+}
+
+.modal label{
+    color: var(--text) !important;
+    font-weight: 600;
+}
+
+.modal .form-control,
+.modal .custom-select{
+    background: var(--table) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.modal .form-control::placeholder{
+    color: #999 !important;
+}
+
+.modal .form-control:focus,
+.modal .custom-select:focus{
+    background: var(--table) !important;
+    color: var(--text) !important;
+    border-color: var(--primary) !important;
+    box-shadow: none !important;
+}
+
+/* ==========================
+   SWEETALERT2 THEME
+========================== */
+
+.swal2-popup,
+.swal2-toast{
+    background: var(--card) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.swal2-title,
+.swal2-html-container,
+.swal2-content{
+    color: var(--text) !important;
+}
+
+.swal2-popup *,
+.swal2-toast *{
+    color: inherit !important;
+}
+
+.swal2-input,
+.swal2-select,
+.swal2-textarea{
+    background: var(--table) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.swal2-confirm{
+    background: var(--primary) !important;
+    border: none !important;
+}
+
+.swal2-cancel{
+    background: #6c757d !important;
+    border: none !important;
+}
+
+.swal2-close{
+    color: var(--text) !important;
+}
+
+/* Edit Button */
+/* Action column */
+td:last-child,
+th:last-child{
+    width: 120px;
+    min-width: 120px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Button container */
+.d-flex.gap-2{
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* Same size buttons */
+.btn-edit,
+.btn-delete{
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+}
+
+.btn-edit{
+    background: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #fff !important;
+}
+
+.btn-edit:hover{
+    background: #5a6268 !important;
+    border-color: #5a6268 !important;
+}
+
+.action-buttons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-buttons .btn{
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    margin: 0 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-buttons .btn i{
+    line-height: 1;
+    font-size: 14px;
+}
+
+/* Add Button */
+#btnAdd,
+.btn-add{
+    background-color: #000 !important;
+    border-color: #000 !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+
+#btnAdd:hover,
+.btn-add:hover{
+    background-color: #222 !important;
+    border-color: #222 !important;
+    color: #fff !important;
+}
+
+#btnAdd:focus,
+#btnAdd:active,
+.btn-add:focus,
+.btn-add:active{
+    background-color: #000 !important;
+    border-color: #000 !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+
+/* ==========================
+   NO LOAD FLASH  (added)
+   Turns transitions off only while the page loads.
+   Needs the small <head> script (see notes) that adds
+   class "no-transition" to <html> and removes it after load.
+========================== */
+
+html.no-transition,
+html.no-transition *,
+html.no-transition *::before,
+html.no-transition *::after{
+    transition:none!important;
 }

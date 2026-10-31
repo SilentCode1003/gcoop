@@ -1,312 +1,205 @@
 <script>
-$(document).ready(function () {
-
+  $(document).ready(function () {
     let rolesById = {};
 
     const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
     });
 
     function esc(v) {
-        return String(v ?? "").replace(/[&<>"']/g, function (c) {
-            return {
-                "&":"&amp;",
-                "<":"&lt;",
-                ">":"&gt;",
-                '"':"&quot;",
-                "'":"&#39;"
-            }[c];
-        });
+      return String(v ?? "").replace(/[&<>"']/g, function (c) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c];
+      });
     }
 
-    // ==========================
-    // LOAD ROLES
-    // ==========================
+    // ---------- LOAD ----------
     async function loadRoles() {
+      const roles = await queryUtility.Load("/roles/loadRole");
+      const $tbody = $("#roleTable").empty();
+      rolesById = {};
 
-        try {
-
-            const roles = await queryUtility.Load("/roles/loadRole");
-
-            rolesById = {};
-
-            const $tbody = $("#roleTable").empty();
-
-            $.each(roles, function(i, role){
-
-                rolesById[role.id] = role;
-
-                $tbody.append(`
+      for (const role of roles) {
+        rolesById[role.id] = role;
+        $tbody.append(`
                     <tr>
                         <td>${esc(role.id)}</td>
                         <td>${esc(role.name)}</td>
                         <td>${formatDate(role.createdDate)}</td>
                         <td>${formatDate(role.updatedDate)}</td>
-
-                        <td class="text-center">
-
-                            <button
-                                class="btn btn-secondary btn-sm btn-edit"
-                                data-id="${role.id}">
+                        <td>
+                          <div class="d-flex justify-content-center align-items-center action-buttons">
+                            <button type="button"
+                                class="btn btn-secondary btn-sm mb-1 btn-edit"
+                                data-id="${esc(role.id)}">
                                 <i class="fas fa-edit"></i>
-                                Edit
                             </button>
-
-                            <button
-                                class="btn btn-danger btn-sm btn-delete"
-                                data-id="${role.id}">
+                            <button type="button"
+                                class="btn btn-danger btn-sm mb-1 btn-delete"
+                                data-id="${esc(role.id)}">
                                 <i class="fas fa-trash"></i>
-                                Delete
                             </button>
+                            </div>
 
                         </td>
                     </tr>
                 `);
-
-            });
-
-            if ($.fn.DataTable.isDataTable("#dataTable")) {
-                $("#dataTable").DataTable().destroy();
-            }
-
-            $("#dataTable").DataTable({
-                responsive:true
-            });
-
-        } catch(err){
-
-            console.error(err);
-
-            Swal.fire(
-                "Error",
-                "Unable to load roles.",
-                "error"
-            );
-
-        }
-
+      }
     }
-
     // ==========================
     // OPEN MODAL
     // ==========================
-    function openModal(role=null){
+    function openModal(role = null) {
+      $("#roleForm")[0].reset();
+      $("#roleId").val("");
 
-        $("#roleForm")[0].reset();
+      if (role) {
+        $("#modalTitle").text("Edit Role");
 
-        $("#roleId").val("");
+        $("#roleId").val(role.id);
+        $("#roleName").val(role.name);
+      } else {
+        $("#modalTitle").text("Add Role");
+      }
 
-        if(role){
-
-            $("#modalTitle").text("Edit Role");
-
-            $("#roleId").val(role.id);
-            $("#roleName").val(role.name);
-
-        }
-        else{
-
-            $("#modalTitle").text("Add Role");
-
-        }
-
-        $("#roleModal").modal("show");
-
+      $("#roleModal").modal("show");
     }
 
     // ==========================
     // GET FORM DATA
     // ==========================
-    function getFormData(){
-
-        return{
-
-            Name:$("#roleName").val().trim()
-
-        };
-
+    function getFormData() {
+      return {
+        Name: $("#roleName").val().trim(),
+      };
     }
 
     // ==========================
     // VALIDATE
     // ==========================
-    function validate(data){
+    function validate(data) {
+      let valid = true;
 
-        let valid=true;
+      $("#roleName").toggleClass("is-invalid", !data.Name);
 
-        $("#roleName").toggleClass("is-invalid", !data.Name);
+      if (!data.Name) {
+        valid = false;
+      }
 
-        if(!data.Name){
-            valid=false;
-        }
-
-        return valid;
-
+      return valid;
     }
 
     // ==========================
-    // ADD BUTTON
+    // ADD
     // ==========================
-    $("#btnAdd").click(function(){
-
-        openModal();
-
+    $("#btnAdd").on("click", function () {
+      openModal();
     });
 
     // ==========================
-    // EDIT BUTTON
+    // EDIT
     // ==========================
-    $("#roleTable").on("click",".btn-edit",function(){
+    $("#roleTable").on("click", ".btn-edit", function () {
+      const role = rolesById[$(this).data("id")];
 
-        const role=rolesById[$(this).data("id")];
-
-        if(role){
-
-            openModal(role);
-
-        }
-
+      if (role) {
+        openModal(role);
+      }
     });
 
     // ==========================
     // SAVE
     // ==========================
-    $("#roleForm").submit(async function(e){
+    $("#roleForm").on("submit", async function (e) {
+      e.preventDefault();
 
-        e.preventDefault();
+      const id = $("#roleId").val();
+      const body = getFormData();
 
-        const id=$("#roleId").val();
+      if (!validate(body)) return;
 
-        const body=getFormData();
+      try {
+        if (id === "") {
+          await queryUtility.Save("/roles/createRole", body);
 
-        if(!validate(body)){
+          Toast.fire({
+            icon: "success",
+            title: "Role added successfully.",
+          });
+        } else {
+          await queryUtility.Update("/roles/updateRole/" + id, body);
 
-            return;
-
+          Toast.fire({
+            icon: "success",
+            title: "Role updated successfully.",
+          });
         }
 
-        try{
+        $("#roleModal").modal("hide");
 
-            if(id===""){
+        loadRoles();
+      } catch (err) {
+        console.error(err);
 
-                await queryUtility.Save(
-                    "/roles/createRole",
-                    body
-                );
-
-                Toast.fire({
-                    icon:"success",
-                    title:"Role added successfully."
-                });
-
-            }
-            else{
-
-                await queryUtility.Update(
-                    "/roles/updateRole/"+id,
-                    body
-                );
-
-                Toast.fire({
-                    icon:"success",
-                    title:"Role updated successfully."
-                });
-
-            }
-
-            $("#roleModal").modal("hide");
-
-            loadRoles();
-
-        }
-        catch(err){
-
-            console.error(err);
-
-            Swal.fire(
-                "Error",
-                "Unable to save role.",
-                "error"
-            );
-
-        }
-
+        Swal.fire("Error", "Unable to save role.", "error");
+      }
     });
 
     // ==========================
     // DELETE
     // ==========================
-    $("#roleTable").on("click",".btn-delete",async function(){
+    $("#roleTable").on("click", ".btn-delete", async function () {
+      const id = $(this).data("id");
 
-        const id=$(this).data("id");
+      const result = await Swal.fire({
+        title: "Delete Role?",
+        text: "This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Delete",
+      });
 
-        const result=await Swal.fire({
+      if (!result.isConfirmed) return;
 
-            title:"Delete Role?",
-            text:"This action cannot be undone.",
-            icon:"warning",
-            showCancelButton:true,
-            confirmButtonText:"Delete"
+      try {
+        await queryUtility.Delete("/roles/deleteRole/" + id);
 
+        Toast.fire({
+          icon: "success",
+          title: "Role deleted.",
         });
 
-        if(!result.isConfirmed){
+        loadRoles();
+      } catch (err) {
+        console.error(err);
 
-            return;
-
-        }
-
-        try{
-
-            await queryUtility.Delete(
-                "/roles/deleteRole/"+id
-            );
-
-            Toast.fire({
-
-                icon:"success",
-                title:"Role deleted."
-
-            });
-
-            loadRoles();
-
-        }
-        catch(err){
-
-            console.error(err);
-
-            Swal.fire(
-                "Error",
-                "Unable to delete role.",
-                "error"
-            );
-
-        }
-
+        Swal.fire("Error", "Unable to delete role.", "error");
+      }
     });
 
     // ==========================
     // FORMAT DATE
     // ==========================
-    function formatDate(date){
+    function formatDate(date) {
+      if (!date) return "";
 
-        if(!date) return "";
+      const d = new Date(date);
 
-        const d=new Date(date);
-
-        return d.toLocaleDateString()+" "+d.toLocaleTimeString();
-
+      return d.toLocaleDateString() + " " + d.toLocaleTimeString();
     }
 
     // ==========================
     // INITIALIZE
     // ==========================
     loadRoles();
-
-});
+  });
 </script>
