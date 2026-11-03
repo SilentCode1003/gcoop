@@ -18,6 +18,8 @@ var permissionsRouter = require('./routes/permissions')
 var loanRatesRouter = require('./routes/loan-rates')
 var denominationRouter = require('./routes/denominations')
 var profileRouter = require('./routes/profile')
+var settingsRouter = require('./routes/settings')
+
 
 
 var app = express();
@@ -46,6 +48,7 @@ app.use('/permissions', permissionsRouter)
 app.use('/loan-rates', loanRatesRouter)
 app.use('/denominations', denominationRouter)
 app.use('/profile', profileRouter)
+app.use('/settings', settingsRouter)
 
 // // catch 404 and forward to error handler
 // app.use(function(req, res, next) {

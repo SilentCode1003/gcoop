@@ -1,0 +1,114 @@
+<div class="container-fluid">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="dashboard-title">
+      <i class="fas fa-cog mr-2"></i>
+      Settings
+    </h3>
+
+    <button type="button" class="btn btn-save" id="btnSaveSettings">
+      <i class="fas fa-save mr-1"></i>
+      Save Settings
+    </button>
+  </div>
+
+  <div class="row">
+    <!-- ACCOUNT -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow h-100">
+        <div class="card-header bg-danger text-white">
+          <h5 class="m-0">
+            <i class="fas fa-user-cog mr-2"></i>
+            Account Settings
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" class="form-control" id="username" readonly />
+          </div>
+
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" class="form-control" id="fullName" readonly />
+          </div>
+
+          <div class="form-group mb-0">
+            <label>Role</label>
+            <input type="text" class="form-control" id="role" readonly />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow h-100">
+        <div class="card-header bg-danger text-white">
+          <h5 class="m-0">
+            <i class="fas fa-lock mr-2"></i>
+            Change Password
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" class="form-control" id="currentPassword" />
+          </div>
+
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" class="form-control" id="newPassword" />
+          </div>
+
+          <div class="form-group mb-0">
+            <label>Confirm Password</label>
+            <input type="password" class="form-control" id="confirmPassword" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow h-100">
+        <div class="card-header bg-danger text-white">
+          <h5 class="m-0">
+            <i class="fas fa-bell mr-2"></i>
+            Notifications
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <div class="custom-control custom-switch mb-3">
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              id="emailNotification"
+              checked
+            />
+
+            <label class="custom-control-label" for="emailNotification">
+              Email Notifications
+            </label>
+          </div>
+
+          <div class="custom-control custom-switch">
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              id="systemNotification"
+              checked
+            />
+
+            <label class="custom-control-label" for="systemNotification">
+              System Notifications
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
