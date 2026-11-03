@@ -65,3 +65,56 @@
 .btn-add-member:hover{
     background: var(--primary-hover) !important;
 }
+/* ==========================
+   CARD BORDER
+========================== */
+
+.card{
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px;
+}
+
+/* Dashboard cards only */
+.dashboard-card{
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+}
+
+/* Keep colored left borders */
+.dashboard-card.border-left-danger{
+    border-left:5px solid #e74a3b !important;
+}
+
+.dashboard-card.border-left-primary{
+    border-left:5px solid #4e73df !important;
+}
+
+.dashboard-card.border-left-success{
+    border-left:5px solid #1cc88a !important;
+}
+
+.dashboard-card.border-left-warning{
+    border-left:5px solid #f6c23e !important;
+}
+
+/* Members page */
+.members-card{
+    border-left:5px solid #e74a3b !important;
+}
+
+/* Users page */
+.users-card{
+    border-left:5px solid #4e73df !important;
+}
+
+/* Loan Rates page */
+.loan-card{
+    border-left:5px solid #1cc88a !important;
+}
+
+/* Denominations page */
+.denomination-card{
+    border-left:5px solid #f6c23e !important;
+}

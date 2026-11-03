@@ -1,55 +1,43 @@
 <div class="container-fluid">
+  <!-- Roles Card -->
+  <div class="card shadow mb-4 roles-table">
+    <div
+      class="card-header py-3 d-flex justify-content-between align-items-center"
+    >
+      <h5 class="m-0 font-weight-bold text-white">
+        <i class="fas fa-user-shield mr-2"></i>
+        Roles
+      </h5>
 
-    <!-- Roles Card -->
-    <div class="card shadow mb-4 roles-table">
-
-        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-
-            <h5 class="m-0 font-weight-bold text-white">
-                <i class="fas fa-user-shield mr-2"></i>
-                Roles
-            </h5>
-
-            <button type="button" class="btn btn-primary btn-sm" id="btnAdd">
-                <i class="fas fa-plus mr-1"></i>
-                Add Role
-            </button>
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="table-responsive">
-
-                <table
-                    id="dataTable"
-                    class="table table-bordered table-hover"
-                    width="100%"
-                    cellspacing="0">
-
-                    <thead>
-
-                        <tr>
-                            <th width="70">ID</th>
-                            <th>Role Name</th>
-                            <th width="180">Created Date</th>
-                            <th width="180">Updated Date</th>
-                            <th width="140" class="text-center">Action</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="roleTable">
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
+      <button type="button" class="btn btn-primary btn-sm" id="btnAdd">
+        <i class="fas fa-plus mr-1"></i>
+        Add Role
+      </button>
     </div>
 
+    <div class="card-body">
+      <div class="table-responsive">
+        <table
+          id="dataTable"
+          class="table table-bordered table-hover"
+          width="100%"
+          cellspacing="0"
+        >
+          <thead>
+            <tr>
+              <th width="70">ID</th>
+              <th>Role Name</th>
+              <th width="180">Created Date</th>
+              <th width="180">Updated Date</th>
+              <th width="140" class="text-center">Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="roleTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ==========================================
@@ -57,92 +45,66 @@
 =========================================== -->
 
 <div
-    class="modal fade"
-    id="roleModal"
-    tabindex="-1"
-    aria-labelledby="modalTitle"
-    aria-hidden="true">
+  class="modal fade"
+  id="roleModal"
+  tabindex="-1"
+  aria-labelledby="modalTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="roleForm" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">
+            <i class="fas fa-user-tag mr-2"></i>
+            Add Role
+          </h5>
 
-    <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <form id="roleForm">
-
-                <div class="modal-header">
-
-                    <h5 class="modal-title" id="modalTitle">
-                        <i class="fas fa-user-tag mr-2"></i>
-                        Add Role
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close">
-
-                        <span aria-hidden="true">&times;</span>
-
-                    </button>
-
-                </div>
-
-                <div class="modal-body">
-
-                    <input
-                        type="hidden"
-                        id="roleId">
-
-                    <div class="form-group">
-
-                        <label for="roleName">
-                            Role Name
-                        </label>
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="roleName"
-                            placeholder="Enter role name"
-                            autocomplete="off">
-
-                        <div class="invalid-feedback">
-                            Role name is required.
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-dismiss="modal">
-
-                        <i class="fas fa-times mr-1"></i>
-                        Cancel
-
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                        id="btnSave">
-
-                        <i class="fas fa-save mr-1"></i>
-                        Save
-
-                    </button>
-
-                </div>
-
-            </form>
-
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
 
-    </div>
+        <div class="modal-body">
+          <input type="hidden" id="roleId" />
 
+          <div class="form-group">
+            <label for="roleName">
+              Role Name <span class="text-danger"></span>
+            </label>
+
+            <input
+              type="text"
+              class="form-control"
+              id="roleName"
+              name="roleName"
+              placeholder="Enter role name"
+              autocomplete="off"
+              maxlength="300"
+              required
+            />
+
+            <div class="invalid-feedback">Role name is required.</div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i>
+            Cancel
+          </button>
+
+          <button type="submit" class="btn btn-primary" id="btnSave">
+            <i class="fas fa-save mr-1"></i>
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

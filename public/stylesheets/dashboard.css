@@ -3,31 +3,31 @@
 ========================== */
 
 .dashboard-card{
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
 
-    background: var(--card) !important;
-    border: none !important;
-    border-radius: 14px !important;
+    background:var(--card) !important;
+    border:none !important;
+    border-radius:14px !important;
+    box-shadow:0 8px 20px rgba(0,0,0,.12) !important;
 
-    box-shadow: 0 8px 20px rgba(0,0,0,.12) !important;
-
-    transition: .35s ease;
+    transition:all .35s ease;
 }
 
-/* Left color strip */
+/* ==========================
+   LEFT COLOR BAR
+========================== */
 
 .dashboard-card::after{
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 6px;
-    height: 100%;
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:6px;
+    height:100%;
+    border-radius:14px 0 0 14px;
 }
-
-/* Card Colors */
 
 .dashboard-card.card-danger::after{
     background:#ef4444;
@@ -45,54 +45,6 @@
     background:#f59e0b;
 }
 
-/* Left Color Bar */
-.dashboard-card::after{
-    content:"";
-    position:absolute;
-    top:0;
-    left:0;
-    width:6px;
-    height:100%;
-    border-radius:14px 0 0 14px;
-}
-
-/* Color Variants */
-.dashboard-card.border-left-danger::after{
-    background:#ef4444;
-}
-
-.dashboard-card.border-left-primary::after{
-    background:#3b82f6;
-}
-
-.dashboard-card.border-left-success::after{
-    background:#10b981;
-}
-
-.dashboard-card.border-left-warning::after{
-    background:#f59e0b;
-}
-
-/* ==========================
-   STAGGER ANIMATION
-========================== */
-
-.col-xl-3:nth-child(1) .dashboard-card{
-    animation-delay:.1s;
-}
-
-.col-xl-3:nth-child(2) .dashboard-card{
-    animation-delay:.2s;
-}
-
-.col-xl-3:nth-child(3) .dashboard-card{
-    animation-delay:.3s;
-}
-
-.col-xl-3:nth-child(4) .dashboard-card{
-    animation-delay:.4s;
-}
-
 /* ==========================
    SHINE EFFECT
 ========================== */
@@ -104,14 +56,12 @@
     left:-150%;
     width:60%;
     height:100%;
-
     background:linear-gradient(
         120deg,
         transparent,
         rgba(255,255,255,.15),
         transparent
     );
-
     transform:skewX(-25deg);
     transition:left .8s ease;
     pointer-events:none;
@@ -120,19 +70,6 @@
 
 .dashboard-card:hover::before{
     left:150%;
-}
-
-/* ==========================
-   HOVER
-========================== */
-
-.dashboard-card:hover{
-    transform:translateY(-8px) scale(1.02);
-    box-shadow:0 18px 35px rgba(0,0,0,.28) !important;
-}
-
-.dashboard-card:active{
-    transform:translateY(-3px) scale(.98);
 }
 
 /* ==========================
@@ -146,8 +83,24 @@
 }
 
 /* ==========================
-   TITLE
+   TITLE COLORS
 ========================== */
+
+.dashboard-card.card-danger .text-xs{
+    color:#ef4444 !important;
+}
+
+.dashboard-card.card-primary .text-xs{
+    color:#3b82f6 !important;
+}
+
+.dashboard-card.card-success .text-xs{
+    color:#10b981 !important;
+}
+
+.dashboard-card.card-warning .text-xs{
+    color:#f59e0b !important;
+}
 
 .dashboard-card .text-xs{
     transition:letter-spacing .3s ease;
@@ -171,7 +124,7 @@
 }
 
 /* ==========================
-   ICON
+   ICONS
 ========================== */
 
 .dashboard-card i{
@@ -181,29 +134,38 @@
         filter .35s ease;
 }
 
+.dashboard-card.card-danger i{
+    color:#ef4444 !important;
+}
+
+.dashboard-card.card-primary i{
+    color:#3b82f6 !important;
+}
+
+.dashboard-card.card-success i{
+    color:#10b981 !important;
+}
+
+.dashboard-card.card-warning i{
+    color:#f59e0b !important;
+}
+
 .dashboard-card:hover i{
     transform:scale(1.15) rotate(8deg);
     filter:drop-shadow(0 0 6px rgba(255,255,255,.25));
 }
 
 /* ==========================
-   ICON COLORS
+   HOVER
 ========================== */
 
-.border-left-danger i{
-    color:#ef4444 !important;
+.dashboard-card:hover{
+    transform:translateY(-8px) scale(1.02);
+    box-shadow:0 18px 35px rgba(0,0,0,.28) !important;
 }
 
-.border-left-primary i{
-    color:#3b82f6 !important;
-}
-
-.border-left-success i{
-    color:#10b981 !important;
-}
-
-.border-left-warning i{
-    color:#f59e0b !important;
+.dashboard-card:active{
+    transform:translateY(-3px) scale(.98);
 }
 
 /* ==========================
@@ -219,6 +181,26 @@
         opacity:1;
         transform:translateY(0);
     }
+}
+
+.col-xl-3:nth-child(1) .dashboard-card{
+    animation:cardFade .5s ease forwards;
+    animation-delay:.1s;
+}
+
+.col-xl-3:nth-child(2) .dashboard-card{
+    animation:cardFade .5s ease forwards;
+    animation-delay:.2s;
+}
+
+.col-xl-3:nth-child(3) .dashboard-card{
+    animation:cardFade .5s ease forwards;
+    animation-delay:.3s;
+}
+
+.col-xl-3:nth-child(4) .dashboard-card{
+    animation:cardFade .5s ease forwards;
+    animation-delay:.4s;
 }
 
 /* ==========================
@@ -242,12 +224,11 @@
     font-size:15px !important;
     font-weight:700 !important;
 
-    cursor:pointer !important;
-    text-decoration:none !important;
+    cursor:pointer;
+    text-decoration:none;
 
     box-shadow:0 6px 18px rgba(153,27,27,.35) !important;
-
-    transition:all .3s ease !important;
+    transition:all .3s ease;
 }
 
 #btnRefresh:hover,
@@ -283,7 +264,7 @@
 }
 
 /* ==========================
-   DASHBOARD PAGE TITLE
+   DASHBOARD TITLE
 ========================== */
 
 .dashboard-title{
@@ -292,7 +273,6 @@
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:1.5px;
-    margin:0;
     display:flex;
     align-items:center;
 }

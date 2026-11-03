@@ -25,7 +25,7 @@
               <th>Username</th>
               <th>Created At</th>
               <th>Updated At</th>
-              <th width="170">Action</th>
+              <th width="170" class="text-center">Action</th>
             </tr>
           </thead>
 
@@ -49,7 +49,9 @@
 >
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
+
       <form id="userForm" novalidate>
+
         <div class="modal-header">
           <h5 class="modal-title" id="userModalLabel">
             <i class="fas fa-user-plus mr-2"></i>
@@ -60,73 +62,127 @@
             type="button"
             class="close"
             data-dismiss="modal"
-            aria-label="Close"
-          >
+            aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
 
         <div class="modal-body">
-          <input type="hidden" id="userId" />
+
+          <input type="hidden" id="userId">
 
           <div class="form-row">
+
             <div class="form-group col-md-6">
-              <label for="FullName">Full Name</label>
+              <label for="FullName">
+                Full Name <span class="text-danger"></span>
+              </label>
+
               <input
                 type="text"
                 class="form-control"
                 id="FullName"
                 placeholder="Enter full name"
-              />
+                autocomplete="off"
+                required>
+
+              <div class="invalid-feedback">
+                Full name is required.
+              </div>
             </div>
 
             <div class="form-group col-md-6">
-              <label for="Role">Role</label>
-              <select class="form-control" id="Role">
+              <label for="Role">
+                Role <span class="text-danger"></span>
+              </label>
+
+              <select
+                class="form-control"
+                id="Role"
+                required>
+
                 <option value="">Select Role</option>
+
               </select>
+
+              <div class="invalid-feedback">
+                Role is required.
+              </div>
             </div>
+
           </div>
 
           <div class="form-row">
+
             <div class="form-group col-md-6">
-              <label for="Username">Username</label>
+              <label for="Username">
+                Username <span class="text-danger"></span>
+              </label>
+
               <input
                 type="text"
                 class="form-control"
                 id="Username"
                 placeholder="Enter username"
-              />
+                autocomplete="off"
+                required>
+
+              <div class="invalid-feedback">
+                Username is required.
+              </div>
             </div>
 
             <div class="form-group col-md-6">
-              <label for="Password">Password</label>
+
+              <label for="Password">
+                Password
+                <span class="text-danger" id="passwordRequired"></span>
+              </label>
+
               <input
                 type="password"
                 class="form-control"
                 id="Password"
-                placeholder="Enter password"
-              />
+                placeholder="Enter password">
 
-              <small class="form-text text-muted">
-                Leave blank when editing if you don't want to change the
-                password.
+              <div class="invalid-feedback">
+                Password is required.
+              </div>
+
+              <small
+                class="form-text text-muted"
+                id="passwordHelp"
+                style="display:none;">
+                Leave blank when editing if you don't want to change the password.
               </small>
+
             </div>
+
           </div>
+
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-cancel" data-dismiss="modal">
+
+          <button
+            type="button"
+            class="btn btn-cancel"
+            data-dismiss="modal">
             Cancel
           </button>
 
-          <button type="submit" class="btn btn-save" id="btnSave">
+          <button
+            type="submit"
+            class="btn btn-save"
+            id="btnSave">
             <i class="fas fa-save mr-1"></i>
             Save
           </button>
+
         </div>
+
       </form>
+
     </div>
   </div>
 </div>

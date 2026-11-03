@@ -48,9 +48,14 @@
 >
   <div class="modal-dialog">
     <div class="modal-content">
-      <form id="routesForm">
+
+      <form id="routesForm" novalidate>
+
         <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">Add Route</h5>
+          <h5 class="modal-title" id="modalTitle">
+            <i class="fas fa-route mr-2"></i>
+            Add Route
+          </h5>
 
           <button type="button" class="close" data-dismiss="modal">
             <span>&times;</span>
@@ -58,33 +63,53 @@
         </div>
 
         <div class="modal-body">
+
           <input type="hidden" id="routesId" />
 
           <div class="form-group">
-            <label for="routeName"> Route Name </label>
+            <label for="routeName">
+              Route Name <span class="text-danger"></span>
+            </label>
 
             <input
               type="text"
               class="form-control"
               id="routeName"
               placeholder="Enter route name"
+              autocomplete="off"
+              required
             />
 
-            <div class="invalid-feedback">Route name is required.</div>
+            <div class="invalid-feedback">
+              Route name is required.
+            </div>
           </div>
+
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-dismiss="modal"
+          >
             Cancel
           </button>
 
-          <button type="submit" class="btn btn-primary" id="btnSave">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            id="btnSave"
+          >
             <i class="fas fa-save mr-1"></i>
             Save
           </button>
+
         </div>
+
       </form>
+
     </div>
   </div>
 </div>

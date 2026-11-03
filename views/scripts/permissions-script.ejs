@@ -50,12 +50,12 @@
                     <td>
 
                        <button type="button"
-                                class="btn btn-secondary btn-sm mb-1 btn-edit"
+                                class="btn btn-secondary btn-sm btn-edit"
                                 data-id="${esc(permission.id)}">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button type="button"
-                                class="btn btn-danger btn-sm mb-1 btn-delete"
+                                class="btn btn-danger btn-sm ml-2 btn-delete"
                                 data-id="${esc(permission.id)}">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -191,14 +191,15 @@
 
       const id = $("#permissionId").val();
       const isEdit = id !== "";
-      const payload = getFormData();
+      const payload = getFormData(loadRole);
+
       if (!validate(payload)) return;
 
       const confirm = await Swal.fire({
         title: isEdit ? "Save changes?" : "Add this permission?",
         text: isEdit
-          ? `Update ${payload.roleId}'s record?`
-          : `Add ${payload.roleId} to the list?`,
+          ? `Update ${payload.RoleId}'s record?`
+          : `Add ${payload.RoleId} to the list?`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: isEdit ? "Yes, save" : "Yes, add",

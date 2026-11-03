@@ -1,205 +1,298 @@
 <script>
-  $(document).ready(function () {
+$(document).ready(function () {
+
     let rolesById = {};
 
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
-    });
-
-    function esc(v) {
-      return String(v ?? "").replace(/[&<>"']/g, function (c) {
-        return {
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        }[c];
-      });
+    // ==========================
+    // DATE FORMATTER
+    // ==========================
+    function formatDate(date) {
+        if (!date) return "";
+        return new Date(date).toLocaleString();
     }
 
-    // ---------- LOAD ----------
-    async function loadRoles() {
-      const roles = await queryUtility.Load("/roles/loadRole");
-      const $tbody = $("#roleTable").empty();
-      rolesById = {};
+    // ==========================
+    // ESCAPE HTML
+    // ==========================
+    const esc = (v) =>
+        String(v ?? "").replace(
+            /[&<>"']/g,
+            (c) =>
+                ({
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;",
+                })[c],
+        );
 
-      for (const role of roles) {
-        rolesById[role.id] = role;
-        $tbody.append(`
-                    <tr>
-                        <td>${esc(role.id)}</td>
-                        <td>${esc(role.name)}</td>
-                        <td>${formatDate(role.createdDate)}</td>
-                        <td>${formatDate(role.updatedDate)}</td>
-                        <td>
-                          <div class="d-flex justify-content-center align-items-center action-buttons">
-                            <button type="button"
-                                class="btn btn-secondary btn-sm mb-1 btn-edit"
+    // ==========================
+    // TOAST
+    // ==========================
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+    });
+
+    const errorMessage = (err, fallback) =>
+        err?.responseJSON?.message || fallback;
+
+    // ==========================
+    // LOAD ROLES
+    // ==========================
+    async function loadRoles() {
+
+        const roles = await queryUtility.Load("/roles/loadRole");
+
+        const $tbody = $("#roleTable").empty();
+
+        rolesById = {};
+
+        for (const role of roles) {
+
+            rolesById[role.id] = role;
+
+            $tbody.append(`
+                <tr>
+                    <td>${esc(role.id)}</td>
+                    <td>${esc(role.name)}</td>
+                    <td>${esc(formatDate(role.createdDate))}</td>
+                    <td>${esc(formatDate(role.updatedDate))}</td>
+
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <button
+                                type="button"
+                                class="btn btn-secondary btn-sm btn-edit mr-2"
                                 data-id="${esc(role.id)}">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button type="button"
-                                class="btn btn-danger btn-sm mb-1 btn-delete"
+
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm btn-delete"
                                 data-id="${esc(role.id)}">
                                 <i class="fas fa-trash"></i>
                             </button>
-                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `);
 
-                        </td>
-                    </tr>
-                `);
-      }
+        }
+
     }
+
     // ==========================
     // OPEN MODAL
     // ==========================
-    function openModal(role = null) {
-      $("#roleForm")[0].reset();
-      $("#roleId").val("");
+    function openModal(role) {
 
-      if (role) {
-        $("#modalTitle").text("Edit Role");
+        const isEdit = !!role;
 
-        $("#roleId").val(role.id);
-        $("#roleName").val(role.name);
-      } else {
-        $("#modalTitle").text("Add Role");
-      }
+        $("#roleForm")[0].reset();
+        $("#roleForm .form-control").removeClass("is-invalid");
 
-      $("#roleModal").modal("show");
+        $("#roleId").val(isEdit ? role.id : "");
+
+        $("#modalTitle").html(
+            isEdit
+                ? '<i class="fas fa-user-edit mr-2"></i>Edit Role'
+                : '<i class="fas fa-user-tag mr-2"></i>Add Role'
+        );
+
+        if (isEdit) {
+            $("#roleName").val(role.name);
+        }
+
+        $("#roleModal").modal("show");
+
     }
 
     // ==========================
     // GET FORM DATA
     // ==========================
     function getFormData() {
-      return {
-        Name: $("#roleName").val().trim(),
-      };
+
+        return {
+            Name: $("#roleName").val().trim(),
+        };
+
     }
 
     // ==========================
     // VALIDATE
     // ==========================
     function validate(data) {
-      let valid = true;
 
-      $("#roleName").toggleClass("is-invalid", !data.Name);
+        const checks = {
+            "#roleName": !!data.Name,
+        };
 
-      if (!data.Name) {
-        valid = false;
-      }
+        let valid = true;
 
-      return valid;
+        for (const [selector, ok] of Object.entries(checks)) {
+            $(selector).toggleClass("is-invalid", !ok);
+            if (!ok) valid = false;
+        }
+
+        return valid;
+
     }
 
     // ==========================
-    // ADD
+    // ADD BUTTON
     // ==========================
-    $("#btnAdd").on("click", function () {
-      openModal();
-    });
+    $("#btnAdd").on("click", () => openModal(null));
 
     // ==========================
-    // EDIT
+    // EDIT BUTTON
     // ==========================
     $("#roleTable").on("click", ".btn-edit", function () {
-      const role = rolesById[$(this).data("id")];
 
-      if (role) {
-        openModal(role);
-      }
+        const role = rolesById[$(this).data("id")];
+
+        if (role) openModal(role);
+
     });
 
     // ==========================
     // SAVE
     // ==========================
     $("#roleForm").on("submit", async function (e) {
-      e.preventDefault();
 
-      const id = $("#roleId").val();
-      const body = getFormData();
+        e.preventDefault();
 
-      if (!validate(body)) return;
+        const id = $("#roleId").val();
+        const isEdit = id !== "";
 
-      try {
-        if (id === "") {
-          await queryUtility.Save("/roles/createRole", body);
+        const payload = getFormData();
 
-          Toast.fire({
-            icon: "success",
-            title: "Role added successfully.",
-          });
-        } else {
-          await queryUtility.Update("/roles/updateRole/" + id, body);
+        if (!validate(payload)) return;
 
-          Toast.fire({
-            icon: "success",
-            title: "Role updated successfully.",
-          });
+        const confirm = await Swal.fire({
+            title: isEdit ? "Save changes?" : "Add this Role?",
+            text: isEdit
+                ? `Update "${payload.Name}"?`
+                : `Add "${payload.Name}" to the role list?`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: isEdit ? "Yes, save" : "Yes, add",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#991b1b",
+            cancelButtonColor: "#6c757d",
+        });
+
+        if (!confirm.isConfirmed) return;
+
+        Swal.fire({
+            title: "Saving...",
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+        });
+
+        try {
+
+            if (isEdit) {
+
+                await queryUtility.Update(
+                    `/roles/updateRole/${encodeURIComponent(id)}`,
+                    payload
+                );
+
+            } else {
+
+                await queryUtility.Save(
+                    "/roles/createRole",
+                    payload
+                );
+
+            }
+
+            $("#roleModal").modal("hide");
+
+            await loadRoles();
+
+            Swal.close();
+
+            Toast.fire({
+                icon: "success",
+                title: isEdit
+                    ? "Role updated successfully"
+                    : "Role added successfully",
+            });
+
+        } catch (err) {
+
+            Swal.fire({
+                icon: "error",
+                title: isEdit ? "Update failed" : "Create failed",
+                text: errorMessage(err, "Something went wrong. Please try again."),
+                confirmButtonColor: "#991b1b",
+            });
+
         }
 
-        $("#roleModal").modal("hide");
-
-        loadRoles();
-      } catch (err) {
-        console.error(err);
-
-        Swal.fire("Error", "Unable to save role.", "error");
-      }
     });
 
     // ==========================
     // DELETE
     // ==========================
     $("#roleTable").on("click", ".btn-delete", async function () {
-      const id = $(this).data("id");
 
-      const result = await Swal.fire({
-        title: "Delete Role?",
-        text: "This action cannot be undone.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Delete",
-      });
+        const id = $(this).data("id");
 
-      if (!result.isConfirmed) return;
+        const role = rolesById[id];
 
-      try {
-        await queryUtility.Delete("/roles/deleteRole/" + id);
+        if (!role) return;
 
-        Toast.fire({
-          icon: "success",
-          title: "Role deleted.",
+        const confirm = await Swal.fire({
+            title: "Delete this role?",
+            text: `"${role.name}" will be permanently removed.`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#6c757d",
         });
 
-        loadRoles();
-      } catch (err) {
-        console.error(err);
+        if (!confirm.isConfirmed) return;
 
-        Swal.fire("Error", "Unable to delete role.", "error");
-      }
+        try {
+
+            await queryUtility.Delete(
+                `/roles/deleteRole/${encodeURIComponent(id)}`
+            );
+
+            await loadRoles();
+
+            Toast.fire({
+                icon: "success",
+                title: "Role deleted successfully",
+            });
+
+        } catch (err) {
+
+            Swal.fire({
+                icon: "error",
+                title: "Delete failed",
+                text: errorMessage(err, "Something went wrong. Please try again."),
+                confirmButtonColor: "#991b1b",
+            });
+
+        }
+
     });
 
     // ==========================
-    // FORMAT DATE
-    // ==========================
-    function formatDate(date) {
-      if (!date) return "";
-
-      const d = new Date(date);
-
-      return d.toLocaleDateString() + " " + d.toLocaleTimeString();
-    }
-
-    // ==========================
-    // INITIALIZE
+    // INITIAL LOAD
     // ==========================
     loadRoles();
-  });
+
+});
 </script>

@@ -1,0 +1,159 @@
+/* ==========================
+   ADD BUTTON
+========================== */
+
+.btn-add{
+    background: #000 !important;
+    border: 1px solid #000 !important;
+    color: #fff !important;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 8px 18px;
+    border-radius: 6px;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    transition: all .3s ease;
+}
+
+.btn-add:hover{
+    background: #222 !important;
+    border-color: #222 !important;
+    color: #fff !important;
+    transform: translateY(-2px);
+}
+
+.btn-add:focus,
+.btn-add:active{
+    background: #000 !important;
+    border-color: #000 !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+
+.btn-add i{
+    color:#fff !important;
+}
+/* ==========================
+   EDIT BUTTON
+========================== */
+
+.btn-edit{
+    width:36px;
+    height:36px;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0;
+
+    background:#6c757d !important;
+    border:1px solid #6c757d !important;
+    color:#fff !important;
+
+    border-radius:4px;
+
+    transition:.3s ease;
+}
+
+.btn-edit:hover{
+    background:#5a6268 !important;
+    border-color:#5a6268 !important;
+    color:#fff !important;
+    transform:translateY(-2px);
+}
+
+.btn-edit i{
+    color:#fff !important;
+}
+/* ==========================
+   DELETE BUTTON
+========================== */
+
+.btn-delete{
+    width:36px;
+    height:36px;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0;
+
+    background:#dc3545 !important;
+    border:1px solid #dc3545 !important;
+    color:#fff !important;
+
+    border-radius:4px;
+
+    transition:.3s ease;
+}
+
+.btn-delete:hover{
+    background:#bb2d3b !important;
+    border-color:#bb2d3b !important;
+    color:#fff !important;
+    transform:translateY(-2px);
+}
+
+.btn-delete i{
+    color:#fff !important;
+}
+/* ==========================
+   SAVE & CANCEL BUTTONS
+========================== */
+
+.modal-footer .btn-save,
+.modal-footer .btn-cancel{
+    min-width:100px;
+    font-weight:600;
+    border-radius:6px;
+    padding:8px 20px;
+}
+
+.modal-footer .btn-save{
+    background:#6c757d !important;
+    border:1px solid #6c757d !important;
+    color:#fff !important;
+}
+
+.modal-footer .btn-save:hover{
+    background:#5a6268 !important;
+    border-color:#5a6268 !important;
+    color:#fff !important;
+}
+
+.modal-footer .btn-cancel{
+    background:#6c757d !important;
+    border:1px solid #6c757d !important;
+    color:#fff !important;
+}
+
+.modal-footer .btn-cancel:hover{
+    background:#5a6268 !important;
+    border-color:#5a6268 !important;
+    color:#fff !important;
+}
+
+.modal-footer .btn-save:focus,
+.modal-footer .btn-save:active,
+.modal-footer .btn-cancel:focus,
+.modal-footer .btn-cancel:active{
+    box-shadow:none !important;
+}
+/* ==========================
+   ACTION BUTTONS
+========================== */
+
+.action-buttons{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+}

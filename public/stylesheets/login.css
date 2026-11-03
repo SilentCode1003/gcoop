@@ -41,27 +41,33 @@ body{
     height:100%;
 }
 
-body{
-    min-height:100vh;
-    overflow:hidden;
-    color:var(--text-color);
+
+body::before{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    width:110%;
+    height:110%;
+
+    background:url("/images/background.jpg") center center/cover no-repeat;
+
+    animation:backgroundMove 25s ease-in-out infinite alternate;
+
+    transform-origin:center;
+
+    z-index:-2;
 }
 
 /* ==========================
    BACKGROUND
 ========================== */
+body{
+    min-height:100vh;
+    overflow:hidden;
 
-.bg-layer{
-    position:fixed;
-    inset:0;
-    background:url("/images/background.jpg") center center/cover no-repeat;
-    z-index:-1;
-}
-
-/* Keep background the same in both themes */
-
-body.dark .bg-layer{
-    filter:none;
+    background:url("/images/background.jpg") center center/cover no-repeat fixed;
+    color:var(--text-color);
 }
 
 /* ==========================
@@ -72,20 +78,25 @@ body.dark .bg-layer{
     position:fixed;
     top:50%;
     left:50%;
-    transform:translate(-50%,-50%);
+    transform:translate(-50%, -50%);
 
-    width:340px;
+    width:380px;
     padding:40px;
 
-    background:var(--card-color);
+   background:var(--card-color);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
     color:var(--text-color);
 
-    border:1px solid var(--input-border);
-    border-radius:15px;
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:18px;
 
-    box-shadow:0 15px 35px rgba(0,0,0,.30);
+    box-shadow:0 20px 45px rgba(0,0,0,.35);
 
     z-index:100;
+
+    animation:floatCard 5s ease-in-out infinite;
 
     transition:
         background-color .3s ease,
@@ -93,7 +104,22 @@ body.dark .bg-layer{
         border-color .3s ease,
         box-shadow .3s ease;
 }
+/* ==========================
+   LOGO
+========================== */
 
+.login-logo{
+    display:block;
+    width:150px;
+    height:auto;
+    margin:0 auto 20px;
+    object-fit:contain;
+    transition:transform .3s ease;
+}
+
+.login-logo:hover{
+    transform:scale(1.05);
+}
 /* ==========================
    HEADER
 ========================== */
@@ -233,25 +259,6 @@ body.dark .bg-layer{
     box-shadow:0 10px 20px rgba(153,27,27,.35);
 }
 
-/* ==========================
-   SIGNUP
-========================== */
-
-.signup{
-    margin-top:20px;
-    text-align:center;
-    color:var(--text-secondary);
-}
-
-.signup a{
-    color:var(--button);
-    text-decoration:none;
-    font-weight:bold;
-}
-
-.signup a:hover{
-    color:var(--button-hover);
-}
 
 /* ==========================
    THEME BUTTON
@@ -327,6 +334,44 @@ input:-webkit-autofill:focus{
     .login-container{
         width:90%;
         padding:30px 25px;
+    }
+
+}
+@keyframes backgroundMove{
+
+    0%{
+        transform:scale(1) translate(0,0);
+    }
+
+    25%{
+        transform:scale(1.05) translate(-2%,-1%);
+    }
+
+    50%{
+        transform:scale(1.08) translate(2%,1%);
+    }
+
+    75%{
+        transform:scale(1.05) translate(-1%,2%);
+    }
+
+    100%{
+        transform:scale(1.1) translate(2%,-2%);
+    }
+
+}
+@keyframes floatCard{
+
+    0%{
+        transform:translate(-50%, -50%);
+    }
+
+    50%{
+        transform:translate(-50%, calc(-50% - 10px));
+    }
+
+    100%{
+        transform:translate(-50%, -50%);
     }
 
 }

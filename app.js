@@ -17,6 +17,8 @@ var routesRouter = require('./routes/routes');
 var permissionsRouter = require('./routes/permissions')
 var loanRatesRouter = require('./routes/loan-rates')
 var denominationRouter = require('./routes/denominations')
+var profileRouter = require('./routes/profile')
+
 
 var app = express();
 
@@ -43,7 +45,7 @@ app.use('/routes', routesRouter);
 app.use('/permissions', permissionsRouter)
 app.use('/loan-rates', loanRatesRouter)
 app.use('/denominations', denominationRouter)
-
+app.use('/profile', profileRouter)
 
 // // catch 404 and forward to error handler
 // app.use(function(req, res, next) {

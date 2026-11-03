@@ -437,8 +437,11 @@ html body .border-left-warning{
     color: var(--text) !important;
 }
 
-.modal-body *{
-    color: var(--text) !important;
+.modal-body label,
+.modal-body p,
+.modal-body span,
+.modal-body small{
+    color:var(--text)!important;
 }
 
 .modal-footer{
@@ -612,4 +615,49 @@ html.no-transition *,
 html.no-transition *::before,
 html.no-transition *::after{
     transition:none!important;
+}
+/* ==========================
+   MODAL BUTTONS
+========================== */
+
+.modal-footer .btn-save{
+    background:#b00202 !important;
+    border:1px solid #b00202 !important;
+    color:#ffffff !important;
+    min-width:110px;
+    font-weight:600;
+}
+
+.modal-footer .btn-save i{
+    color:#ffffff !important;
+}
+
+.modal-footer .btn-save:hover{
+    background:#b00202 !important;
+    border-color:#b00202 !important;
+    color:#ffffff !important;
+}
+
+.modal-footer .btn-cancel{
+    background:#6c757d !important;
+    border:1px solid #6c757d !important;
+    color:#ffffff !important;
+    min-width:110px;
+    font-weight:600;
+}
+
+.modal-footer .btn-cancel:hover{
+    background:#5a6268 !important;
+    border-color:#5a6268 !important;
+    color:#ffffff !important;
+}
+
+.modal-footer .btn-save:focus,
+.modal-footer .btn-save:active,
+.modal-footer .btn-cancel:focus,
+.modal-footer .btn-cancel:active{
+    background:#b00202 !important;
+    border-color:#b00202 !important;
+    color:#ffffff !important;
+    box-shadow:none !important;
 }

@@ -50,9 +50,12 @@
 >
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form id="permissionForm">
+      <form id="permissionForm" novalidate>
         <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">Add Permission</h5>
+          <h5 class="modal-title" id="modalTitle">
+            <i class="fas fa-user-lock mr-2"></i>
+            Add Permission
+          </h5>
 
           <button type="button" class="close" data-dismiss="modal">
             <span>&times;</span>
@@ -64,31 +67,43 @@
 
           <div class="form-row">
             <div class="form-group col-md-6">
-              <label for="roleId">Role</label>
+              <label for="roleId">
+                Role <span class="text-danger"></span>
+              </label>
 
-              <select class="form-control" id="roleId">
+              <select class="form-control" id="roleId" required>
                 <option value="">Select Role</option>
               </select>
+
+              <div class="invalid-feedback">Please select a role.</div>
             </div>
 
             <div class="form-group col-md-6">
-              <label for="routeId">Route</label>
+              <label for="routeId">
+                Route <span class="text-danger"></span>
+              </label>
 
-              <select class="form-control" id="routeId">
+              <select class="form-control" id="routeId" required>
                 <option value="">Select Route</option>
               </select>
+
+              <div class="invalid-feedback">Please select a route.</div>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="permission">Permission</label>
+            <label for="permission">
+              Permission <span class="text-danger"></span>
+            </label>
 
-            <select class="form-control" id="permission">
+            <select class="form-control" id="permission" required>
               <option value="">Select Permission</option>
               <option value="view">View</option>
               <option value="write">Write</option>
               <option value="all">All</option>
             </select>
+
+            <div class="invalid-feedback">Please select a permission.</div>
           </div>
         </div>
 

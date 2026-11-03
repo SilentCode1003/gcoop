@@ -1,0 +1,140 @@
+<script>
+  $(document).ready(function () {
+    // ==========================
+    // TOAST
+    // ==========================
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+    });
+
+    const errorMessage = (err, fallback) =>
+      err?.responseJSON?.message || fallback;
+
+    async function loadProfile() {
+    try {
+
+        const profile = await queryUtility.Load("/profile/loadProfile");
+
+        console.log(profile);
+
+        if (!profile) {
+            throw new Error("Profile not found.");
+        }
+
+        $("#profileFullName").text(profile.fullName);
+        $("#profileEmployeeId").text(profile.employeeId);
+
+        $("#employeeId").val(profile.employeeId);
+        $("#fullName").val(profile.fullName);
+        $("#address").val(profile.address);
+        $("#contact").val(profile.contact);
+        $("#registeredBy").val(profile.registeredBy);
+
+    } catch (err) {
+
+        console.error(err);
+
+        Swal.fire({
+            icon: "error",
+            title: "Unable to load profile",
+            text: errorMessage(err, "Something went wrong."),
+            confirmButtonColor: "#991b1b"
+        });
+
+    }
+}
+
+    // ==========================
+    // GET FORM DATA
+    // ==========================
+    function getFormData() {
+      return {
+        EmployeeId: $("#employeeId").val().trim(),
+        FullName: $("#fullName").val().trim(),
+        Address: $("#address").val().trim(),
+        Contact: $("#contact").val().trim(),
+        RegisteredBy: $("#registeredBy").val().trim(),
+      };
+    }
+
+    // ==========================
+    // VALIDATE
+    // ==========================
+    function validate(data) {
+      let valid = true;
+
+      const checks = {
+        "#employeeId": !!data.EmployeeId,
+        "#fullName": !!data.FullName,
+        "#address": !!data.Address,
+        "#contact": !!data.Contact,
+        "#registeredBy": !!data.RegisteredBy,
+      };
+
+      $.each(checks, function (selector, ok) {
+        $(selector).toggleClass("is-invalid", !ok);
+
+        if (!ok) valid = false;
+      });
+
+      return valid;
+    }
+
+    // ==========================
+    // SAVE
+    // ==========================
+    $("#profileForm").on("submit", async function (e) {
+      e.preventDefault();
+
+      const payload = getFormData();
+
+      if (!validate(payload)) return;
+
+      const confirm = await Swal.fire({
+        title: "Save changes?",
+        text: `Update ${payload.FullName}'s profile?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Save",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#991b1b",
+        cancelButtonColor: "#6c757d",
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      Swal.fire({
+        title: "Saving...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        await queryUtility.Update("/profile/updateProfile", payload);
+
+        Swal.close();
+
+        Toast.fire({
+          icon: "success",
+          title: "Profile updated successfully",
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Update failed",
+          text: errorMessage(err, "Something went wrong."),
+          confirmButtonColor: "#991b1b",
+        });
+      }
+    });
+
+    // ==========================
+    // INITIAL LOAD
+    // ==========================
+    loadProfile();
+  });
+</script>

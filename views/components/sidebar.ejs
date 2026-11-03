@@ -16,7 +16,7 @@
   <hr class="sidebar-divider my-0">
 
   <!-- Dashboard -->
-  <li class="nav-item active">
+  <li class="nav-item <%= title === 'Dashboard' ? 'active' : '' %>">
     <a class="nav-link" href="/dashboard">
       <img src="/images/dashboard.png" width="22">
       <span>Dashboard</span>
@@ -31,7 +31,7 @@
   </div>
 
   <!-- Members -->
-  <li class="nav-item">
+  <li class="nav-item <%= title === 'Members' ? 'active' : '' %>">
     <a class="nav-link" href="/members">
       <i class="fas fa-users"></i>
       <span>Members</span>
@@ -39,7 +39,7 @@
   </li>
 
   <!-- Users -->
-  <li class="nav-item">
+  <li class="nav-item <%= title === 'User Accounts' ? 'active' : '' %>">
     <a class="nav-link" href="/users">
       <i class="fas fa-user"></i>
       <span>Users</span>
@@ -47,7 +47,7 @@
   </li>
 
   <!-- Roles -->
-  <li class="nav-item">
+  <li class="nav-item <%= title === 'Roles' ? 'active' : '' %>">
     <a class="nav-link" href="/roles">
       <i class="fas fa-user-shield"></i>
       <span>Roles</span>
@@ -55,7 +55,7 @@
   </li>
 
   <!-- Routes -->
-  <li class="nav-item">
+  <li class="nav-item <%= title === 'Routes' ? 'active' : '' %>">
     <a class="nav-link" href="/routes">
       <i class="fas fa-route"></i>
       <span>Routes</span>
@@ -63,7 +63,7 @@
   </li>
 
   <!-- Permissions -->
-  <li class="nav-item">
+  <li class="nav-item <%= title === 'Permissions' ? 'active' : '' %>">
     <a class="nav-link" href="/permissions">
       <i class="fas fa-lock"></i>
       <span>Permissions</span>
@@ -78,7 +78,7 @@
   </div>
 
   <!-- Loan Rates -->
-  <li class="nav-item">
+  <li class="nav-item <%= title === 'Loan Rates' ? 'active' : '' %>">
     <a class="nav-link" href="/loan-rates">
       <i class="fas fa-percent"></i>
       <span>Loan Rates</span>
@@ -86,7 +86,7 @@
   </li>
 
   <!-- Denominations -->
-  <li class="nav-item">
+  <li class="nav-item <%= title === 'Denominations' ? 'active' : '' %>">
     <a class="nav-link" href="/denominations">
       <i class="fas fa-coins"></i>
       <span>Denominations</span>
