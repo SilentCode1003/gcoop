@@ -61,26 +61,40 @@
     }
 
     function openModal(user) {
-      const isEdit = !!user;
+    const isEdit = !!user;
 
-      $("#userForm")[0].reset();
-      $("#userForm .form-control").removeClass("is-invalid");
+    $("#userForm")[0].reset();
+    $("#userForm").removeClass("was-validated");
+    $("#userForm .form-control").removeClass("is-invalid");
 
-      $("#userId").val(isEdit ? user.id : "");
-      $("#userModalLabel").html(
+    $("#userId").val(isEdit ? user.id : "");
+
+    $("#userModalLabel").html(
         isEdit
-          ? '<i class="fas fa-user-edit mr-2"></i>Edit User'
-          : '<i class="fas fa-user-plus mr-2"></i>Add User',
-      );
+            ? '<i class="fas fa-user-edit mr-2"></i> Edit User'
+            : '<i class="fas fa-user-plus mr-2"></i> Add User'
+    );
 
-      if (isEdit) {
+    if (isEdit) {
         $("#FullName").val(user.fullname);
         $("#Role").val(user.roleid);
         $("#Username").val(user.username);
-        $("#Password").val(""); // leave blank when editing
-      }
-      $("#userModal").modal("show");
+        $("#Password").val("");
+
+        // Password is optional when editing
+        $("#Password").prop("required", false);
+        $("#passwordRequired").text("");
+        $("#passwordHelp").show();
+
+    } else {
+        // Password is required when adding
+        $("#Password").val("").prop("required", true);
+        $("#passwordRequired").text("*");
+        $("#passwordHelp").hide();
     }
+
+    $("#userModal").modal("show");
+}
 
     async function loadRoles() {
       const roles = await queryUtility.Load("/users/insertRole");
