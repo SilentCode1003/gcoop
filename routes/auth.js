@@ -4,9 +4,9 @@ const {Query} = require("./../database/config/db.js")
 const {EncryptString, DecryptString} = require("./../database/cryptography.js")
 
 // For Login
-function validateCredentials(body, ignoreId = null) {
-  const username = (body.Username ?? "").trim();
-  const password = (body.Password ?? "").trim();
+function validateCredentials(body) {
+  const username = (body.Username ?? body.username ?? "").toString().trim();
+  const password = (body.Password ?? body.password ?? "").toString().trim();
 
 
   if (!username) return { error: "Invalid username, please try again." };

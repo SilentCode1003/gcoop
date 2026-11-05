@@ -1,0 +1,169 @@
+<script>
+  $(document).ready(function () {
+    // ==========================
+    // TOAST
+    // ==========================
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+    });
+
+    const errorMessage = (err, fallback) =>
+      err?.responseJSON?.message || fallback;
+
+    // ==========================
+    // LOAD SETTINGS
+    // ==========================
+    async function loadSettings() {
+      try {
+        const settings = await queryUtility.Load("/settings/loadSettings");
+
+        $("#username").val(settings.username || "");
+        $("#fullName").val(settings.fullName || "");
+        $("#role").val(settings.role || "");
+
+        $("#theme").val(localStorage.getItem("theme") || "light");
+
+        $("#emailNotification").prop(
+          "checked",
+          settings.emailNotification == 1,
+        );
+
+        $("#systemNotification").prop(
+          "checked",
+          settings.systemNotification == 1,
+        );
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Unable to load settings",
+          text: errorMessage(err, "Something went wrong."),
+          confirmButtonColor: "#991b1b",
+        });
+      }
+    }
+
+    // ==========================
+    // VALIDATE PASSWORD
+    // ==========================
+    function validatePassword() {
+      const current = $("#currentPassword").val().trim();
+      const password = $("#newPassword").val().trim();
+      const confirm = $("#confirmPassword").val().trim();
+
+      $("#currentPassword,#newPassword,#confirmPassword").removeClass(
+        "is-invalid",
+      );
+
+      if (password === "" && confirm === "" && current === "") {
+        return true;
+      }
+
+      if (!current) {
+        $("#currentPassword").addClass("is-invalid");
+        return false;
+      }
+
+      if (!password) {
+        $("#newPassword").addClass("is-invalid");
+        return false;
+      }
+
+      if (password.length < 6) {
+        $("#newPassword").addClass("is-invalid");
+
+        Swal.fire({
+          icon: "warning",
+          title: "Password too short",
+          text: "Password must be at least 6 characters.",
+          confirmButtonColor: "#991b1b",
+        });
+
+        return false;
+      }
+
+      if (password !== confirm) {
+        $("#confirmPassword").addClass("is-invalid");
+
+        Swal.fire({
+          icon: "warning",
+          title: "Passwords do not match.",
+          confirmButtonColor: "#991b1b",
+        });
+
+        return false;
+      }
+
+      return true;
+    }
+
+    // ==========================
+    // SAVE SETTINGS
+    // ==========================
+    $("#btnSaveSettings").on("click", async function () {
+      if (!validatePassword()) return;
+
+      const payload = {
+        Theme: $("#theme").val(),
+        CurrentPassword: $("#currentPassword").val().trim(),
+        NewPassword: $("#newPassword").val().trim(),
+        EmailNotification: $("#emailNotification").is(":checked") ? 1 : 0,
+        SystemNotification: $("#systemNotification").is(":checked") ? 1 : 0,
+      };
+
+      const confirm = await Swal.fire({
+        title: "Save Settings?",
+        text: "Your settings will be updated.",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Save",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#991b1b",
+        cancelButtonColor: "#6c757d",
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      Swal.fire({
+        title: "Saving...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        await queryUtility.Update("/settings/updateSettings", payload);
+
+        // Save Theme
+        localStorage.setItem("theme", payload.Theme);
+
+        $("html").toggleClass("dark", payload.Theme === "dark");
+
+        Swal.close();
+
+        $("#currentPassword").val("");
+        $("#newPassword").val("");
+        $("#confirmPassword").val("");
+
+        Toast.fire({
+          icon: "success",
+          title: "Settings updated successfully.",
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: errorMessage(err, "Something went wrong."),
+          confirmButtonColor: "#991b1b",
+        });
+      }
+    });
+
+    // ==========================
+    // INITIAL LOAD
+    // ==========================
+    loadSettings();
+  });
+</script>
