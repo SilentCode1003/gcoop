@@ -10,6 +10,9 @@
       timerProgressBar: true,
     });
 
+    const errorMessage = (err, fallback) =>
+      err?.responseJSON?.message || fallback;
+
     function esc(v) {
       return String(v ?? "").replace(/[&<>"']/g, function (c) {
         return {
@@ -25,8 +28,10 @@
     // ==========================
     // LOAD DENOMINATIONS
     // ==========================
-   async function loadDenominations() {
-      const denominations = await queryUtility.Load("/denominations/loadDenomination");
+    async function loadDenominations() {
+      const denominations = await queryUtility.Load(
+        "/denominations/loadDenomination",
+      );
 
       $("#denominationTable").empty();
 
@@ -35,7 +40,7 @@
       denominations.forEach((denomination) => {
         denominationsById[denomination.id] = denomination;
 
-          $("#denominationTable").append(`
+        $("#denominationTable").append(`
                     <tr>
 
                         <td>${esc(denomination.id)}</td>
@@ -66,8 +71,7 @@
 
                     </tr>
                 `);
-        });
-
+      });
     }
 
     // ==========================

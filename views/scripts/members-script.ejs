@@ -1,62 +1,59 @@
 <script>
-$(document).ready(function () {
-
+  $(document).ready(function () {
     let membersById = {};
 
     // ==========================
     // DATE FORMATTER
     // ==========================
     function formatDate(date) {
-        if (!date) return "";
-        return new Date(date).toLocaleString();
+      if (!date) return "";
+      return new Date(date).toLocaleString();
     }
 
     // ==========================
     // ESCAPE HTML
     // ==========================
     const esc = (v) =>
-        String(v ?? "").replace(
-            /[&<>"']/g,
-            (c) =>
-                ({
-                    "&": "&amp;",
-                    "<": "&lt;",
-                    ">": "&gt;",
-                    '"': "&quot;",
-                    "'": "&#39;",
-                })[c],
-        );
+      String(v ?? "").replace(
+        /[&<>"']/g,
+        (c) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[c],
+      );
 
     // ==========================
     // TOAST
     // ==========================
     const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
     });
 
     const errorMessage = (err, fallback) =>
-        err?.responseJSON?.message || fallback;
+      err?.responseJSON?.message || fallback;
 
     // ==========================
     // LOAD MEMBERS
     // ==========================
     async function loadMembers() {
+      const members = await queryUtility.Load("/members/loadMember");
 
-        const members = await queryUtility.Load("/members/loadMember");
+      const $tbody = $("#memberTable").empty();
 
-        const $tbody = $("#memberTable").empty();
+      membersById = {};
 
-        membersById = {};
+      for (const m of members) {
+        membersById[m.id] = m;
 
-        for (const m of members) {
-
-            membersById[m.id] = m;
-
-            $tbody.append(`
+        $tbody.append(`
                 <tr>
                     <td>${esc(m.employeeId)}</td>
                     <td>${esc(m.fullName)}</td>
@@ -82,80 +79,67 @@ $(document).ready(function () {
                     </td>
                 </tr>
             `);
-
-        }
-
+      }
     }
 
     // ==========================
     // OPEN MODAL
     // ==========================
     function openModal(member) {
+      const isEdit = !!member;
 
-        const isEdit = !!member;
+      $("#memberForm")[0].reset();
+      $("#memberForm .form-control").removeClass("is-invalid");
 
-        $("#memberForm")[0].reset();
-        $("#memberForm .form-control").removeClass("is-invalid");
+      $("#memberId").val(isEdit ? member.id : "");
 
-        $("#memberId").val(isEdit ? member.id : "");
+      $("#modalTitle").html(
+        isEdit
+          ? '<i class="fas fa-user-edit mr-2"></i>Edit Member'
+          : '<i class="fas fa-user-plus mr-2"></i>Add Member',
+      );
 
-        $("#modalTitle").html(
-            isEdit
-                ? '<i class="fas fa-user-edit mr-2"></i>Edit Member'
-                : '<i class="fas fa-user-plus mr-2"></i>Add Member'
-        );
+      if (isEdit) {
+        $("#employeeId").val(member.employeeId);
+        $("#fullName").val(member.fullName);
+        $("#address").val(member.address);
+        $("#contact").val(member.contact);
+      }
 
-        if (isEdit) {
-
-            $("#employeeId").val(member.employeeId);
-            $("#fullName").val(member.fullName);
-            $("#address").val(member.address);
-            $("#contact").val(member.contact);
-            $("#registeredBy").val(member.registeredBy);
-
-        }
-
-        $("#memberModal").modal("show");
-
+      $("#memberModal").modal("show");
     }
 
     // ==========================
     // GET FORM DATA
     // ==========================
     function getFormData() {
-
-        return {
-            EmployeeId: $("#employeeId").val().trim(),
-            FullName: $("#fullName").val().trim(),
-            Address: $("#address").val().trim(),
-            Contact: $("#contact").val().trim(),
-            RegisteredBy: $("#registeredBy").val().trim(),
-        };
-
+      return {
+        EmployeeId: $("#employeeId").val().trim(),
+        FullName: $("#fullName").val().trim(),
+        Address: $("#address").val().trim(),
+        Contact: $("#contact").val().trim(),
+      };
     }
 
     // ==========================
     // VALIDATE
     // ==========================
     function validate(data) {
+      const checks = {
+        "#employeeId": !!data.EmployeeId,
+        "#fullName": !!data.FullName,
+        "#address": !!data.Address,
+        "#contact": !!data.Contact,
+      };
 
-        const checks = {
-            "#employeeId": !!data.EmployeeId,
-            "#fullName": !!data.FullName,
-            "#address": !!data.Address,
-            "#contact": !!data.Contact,
-            "#registeredBy": !!data.RegisteredBy,
-        };
+      let valid = true;
 
-        let valid = true;
+      for (const [selector, ok] of Object.entries(checks)) {
+        $(selector).toggleClass("is-invalid", !ok);
+        if (!ok) valid = false;
+      }
 
-        for (const [selector, ok] of Object.entries(checks)) {
-            $(selector).toggleClass("is-invalid", !ok);
-            if (!ok) valid = false;
-        }
-
-        return valid;
-
+      return valid;
     }
 
     // ==========================
@@ -167,146 +151,124 @@ $(document).ready(function () {
     // EDIT BUTTON
     // ==========================
     $("#memberTable").on("click", ".btn-edit", function () {
+      const member = membersById[$(this).data("id")];
 
-        const member = membersById[$(this).data("id")];
-
-        if (member) openModal(member);
-
+      if (member) openModal(member);
     });
 
     // ==========================
     // SAVE
     // ==========================
     $("#memberForm").on("submit", async function (e) {
+      e.preventDefault();
 
-        e.preventDefault();
+      const id = $("#memberId").val();
+      const isEdit = id !== "";
 
-        const id = $("#memberId").val();
-        const isEdit = id !== "";
+      const payload = getFormData();
 
-        const payload = getFormData();
+      if (!validate(payload)) return;
 
-        if (!validate(payload)) return;
+      const confirm = await Swal.fire({
+        title: isEdit ? "Save changes?" : "Add this Member?",
+        text: isEdit
+          ? `Update ${payload.FullName}'s record?`
+          : `Add ${payload.FullName} to the members list?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: isEdit ? "Yes, save" : "Yes, add",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#991b1b",
+        cancelButtonColor: "#6c757d",
+      });
 
-        const confirm = await Swal.fire({
-            title: isEdit ? "Save changes?" : "Add this Member?",
-            text: isEdit
-                ? `Update ${payload.FullName}'s record?`
-                : `Add ${payload.FullName} to the members list?`,
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonText: isEdit ? "Yes, save" : "Yes, add",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#991b1b",
-            cancelButtonColor: "#6c757d",
-        });
+      if (!confirm.isConfirmed) return;
 
-        if (!confirm.isConfirmed) return;
+      Swal.fire({
+        title: "Saving...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
 
-        Swal.fire({
-            title: "Saving...",
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading(),
-        });
-
-        try {
-
-            if (isEdit) {
-
-                await queryUtility.Update(
-                    `/members/updateMember/${encodeURIComponent(id)}`,
-                    payload
-                );
-
-            } else {
-
-                await queryUtility.Save(
-                    "/members/createMember",
-                    payload
-                );
-
-            }
-
-            $("#memberModal").modal("hide");
-
-            await loadMembers();
-
-            Swal.close();
-
-            Toast.fire({
-                icon: "success",
-                title: isEdit
-                    ? "Member updated successfully"
-                    : "Member added successfully",
-            });
-
-        } catch (err) {
-
-            Swal.fire({
-                icon: "error",
-                title: isEdit ? "Update failed" : "Create failed",
-                text: errorMessage(err, "Something went wrong. Please try again."),
-                confirmButtonColor: "#991b1b",
-            });
-
+      try {
+        if (isEdit) {
+          await queryUtility.Update(
+            `/members/updateMember/${encodeURIComponent(id)}`,
+            payload,
+          );
+        } else {
+          await queryUtility.Save("/members/createMember", payload);
         }
 
+        $("#memberModal").modal("hide");
+
+        await loadMembers();
+
+        Swal.close();
+
+        Toast.fire({
+          icon: "success",
+          title: isEdit
+            ? "Member updated successfully"
+            : "Member added successfully",
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: isEdit ? "Update failed" : "Create failed",
+          text: errorMessage(err, "Something went wrong. Please try again."),
+          confirmButtonColor: "#991b1b",
+        });
+      }
     });
 
     // ==========================
     // DELETE
     // ==========================
     $("#memberTable").on("click", ".btn-delete", async function () {
+      const id = $(this).data("id");
 
-        const id = $(this).data("id");
+      const member = membersById[id];
 
-        const member = membersById[id];
+      if (!member) return;
 
-        if (!member) return;
+      const confirm = await Swal.fire({
+        title: "Delete this member?",
+        text: `${member.fullName} will be permanently removed.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+      });
 
-        const confirm = await Swal.fire({
-            title: "Delete this member?",
-            text: `${member.fullName} will be permanently removed.`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, delete",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#dc3545",
-            cancelButtonColor: "#6c757d",
+      if (!confirm.isConfirmed) return;
+
+      try {
+        await queryUtility.Delete(
+          `/members/deleteMember/${encodeURIComponent(id)}`,
+        );
+
+        await loadMembers();
+
+        Toast.fire({
+          icon: "success",
+          title: "Member deleted successfully",
         });
-
-        if (!confirm.isConfirmed) return;
-
-        try {
-
-            await queryUtility.Delete(
-                `/members/deleteMember/${encodeURIComponent(id)}`
-            );
-
-            await loadMembers();
-
-            Toast.fire({
-                icon: "success",
-                title: "Member deleted successfully",
-            });
-
-        } catch (err) {
-
-            Swal.fire({
-                icon: "error",
-                title: "Delete failed",
-                text: errorMessage(err, "Something went wrong. Please try again."),
-                confirmButtonColor: "#991b1b",
-            });
-
-        }
-
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Delete failed",
+          text: errorMessage(err, "Something went wrong. Please try again."),
+          confirmButtonColor: "#991b1b",
+        });
+      }
     });
 
     // ==========================
     // INITIAL LOAD
     // ==========================
     loadMembers();
-
-});
+  });
 </script>

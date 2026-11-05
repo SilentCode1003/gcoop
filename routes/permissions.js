@@ -29,7 +29,7 @@ router.get("/", function (req, res) {
 
 // Load Permissions
 router.get("/loadPermission",async function(req,res){
-    const data = await Query("SELECT p.mrp_id as id, role.mr_name as roleId, route.mr_name as routeId, p.mrp_permission as permission, p.mrp_create_at as createdDate, p.mrp_update_at as updatedDate from master_role_permission p inner join master_roles role on role.mr_id = p.mrp_role_id inner join master_routes route on route.mr_id = p.mrp_route_id");
+    const data = await Query("SELECT p.mrp_id AS id, p.mrp_role_id AS roleValue, p.mrp_route_id AS routeValue, role.mr_name AS roleId, route.mr_name AS routeId, p.mrp_permission AS permission, p.mrp_create_at AS createdDate, p.mrp_update_at AS updatedDate FROM master_role_permission p INNER JOIN master_roles role ON role.mr_id = p.mrp_role_id INNER JOIN master_routes route ON route.mr_id = p.mrp_route_id ORDER BY p.mrp_id ASC");
     console.log(data)
     res.json(data)
 });
@@ -49,33 +49,75 @@ router.get("/insertRoute", async function (req, res) {
 });
 
 // Create Permissions
-router.post("/createPermission",async function (req, res) {
-  const { error, value } = validatePermission(req.body);
-  if (error) {
-    return res.status(400).json({ success: false, message: error });
+router.post("/createPermission", async function (req, res) {
+  try {
+    const { error, value } = validatePermission(req.body);
+    if (error) {
+      return res.status(400).json({ success: false, message: error });
+    }
+
+    // Stop duplicates (same role + same route)
+    const existing = await Query(
+      "SELECT mrp_id FROM master_role_permission WHERE mrp_role_id = ? AND mrp_route_id = ?",
+      [value.roleId, value.routeId]
+    );
+    if (existing.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "This role already has a permission for that route.",
+      });
+    }
+
+    const createPermission = await Query(
+      "INSERT INTO master_role_permission (mrp_role_id, mrp_route_id, mrp_permission, mrp_create_at) VALUES (?,?,?,?)",
+      [value.roleId, value.routeId, value.permission, new Date()]
+    );
+
+    res.status(201).json({ success: true, message: "Permission created.", data: createPermission });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to save permission." });
   }
- const createPermission = await Query("Insert into master_role_permission (mrp_role_id, mrp_route_id, mrp_permission, mrp_create_at ) values (?,?,?,?)", [value.roleId, value.routeId, value.permission, new Date]);
-  res
-    .status(201)
-    .json({ success: true, message: "Permission created.", data: createPermission});
 });
 
 // Update Permissions
- router.put("/updatePermission/:id",async function (req, res) {
-   const id = parseInt(req.params.id, 10);
+router.put("/updatePermission/:id", async function (req, res) {
+  try {
+    const id = parseInt(req.params.id, 10);
 
-   const { error, value } = validatePermission(req.body, id);
-   const updatePermissions = await Query("Update master_role_permission set mrp_role_id = ?, mrp_route_id = ?, mrp_permission = ?, mrp_update_at = ? where mrp_id = ?", [value.roleId, value.routeId, value.permission, new Date(), id]) ;
-   if (error) {
-     return res.status(400).json({ success: false, message: error });
-   }
-   res.json({ success: true, message: "Permission updated.", data: updatePermissions });
- });
+    const { error, value } = validatePermission(req.body);
+    if (error) {
+      return res.status(400).json({ success: false, message: error });
+    }
+
+    // Duplicate check, ignoring the row being edited
+    const existing = await Query(
+      "SELECT mrp_id FROM master_role_permission WHERE mrp_role_id = ? AND mrp_route_id = ? AND mrp_id <> ?",
+      [value.roleId, value.routeId, id]
+    );
+    if (existing.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "This role already has a permission for that route.",
+      });
+    }
+
+    const updatePermissions = await Query(
+      "UPDATE master_role_permission SET mrp_role_id = ?, mrp_route_id = ?, mrp_permission = ?, mrp_update_at = ? WHERE mrp_id = ?",
+      [value.roleId, value.routeId, value.permission, new Date(), id]
+    );
+
+    res.json({ success: true, message: "Permission updated.", data: updatePermissions });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to update permission." });
+  }
+});
 
  // Delete  Permissions
  router.delete("/deletePermission/:id", async function (req, res) {
    const id = parseInt(req.params.id, 10);
- 
+
    if (id.length === 0) {
      return res
        .status(404)
@@ -85,7 +127,7 @@ router.post("/createPermission",async function (req, res) {
    const deletePermissions = await Query("Delete from master_role_permission where mrp_id = ?", [id]);
   
  
-   res.json({ success: true, message: "Route deleted.", data : deletePermissions });
+   res.json({ success: true, message: "Permission deleted.", data : deletePermissions });
  });
 
 module.exports = router;

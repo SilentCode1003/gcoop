@@ -48,12 +48,13 @@ router.post("/createRole",async function (req, res) {
      return res.status(400).json({ success: false, message: error });
    }
    res.json({ success: true, message: "Role updated.", data: updateRole });
+   
  });
 
 // Delete Roles
 router.delete("/deleteRole/:id", async function (req, res) {
   const id = parseInt(req.params.id, 10);
-
+ 
   if (id.length === 0) {
     return res
       .status(404)

@@ -43,7 +43,7 @@ router.post("/createRoute",async function (req, res) {
 
 // Update Route
  router.put("/updateRoute/:id",async function (req, res) {
-   const id = parseInt(req.params.id, 10);
+   const id = parseInt(req.params.id, 10); 
 
    const { error, value } = validateRoutes(req.body, id);
    const updateRoutes = await Query("Update master_routes set mr_name = ?, mr_update_at = ? where mr_id = ?", [value.name, new Date(), id]) ;

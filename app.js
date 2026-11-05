@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const {testConnection} = require("./database/config/db")
 const {initSession} = require("./middleware/session")
-const{auth} = require("./middleware/auth")
+const{auth, permission} = require("./middleware/auth")
 
 var authRouter = require('./routes/auth')
 var indexRouter = require('./routes/index');
@@ -38,6 +38,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 initSession(app);
 app.use("/auth", authRouter);
 app.use(auth)
+app.use(permission())
+
 app.use('/', indexRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/members', membersRouter);

@@ -10,6 +10,9 @@
       timerProgressBar: true,
     });
 
+    const errorMessage = (err, fallback) =>
+      err?.responseJSON?.message || fallback;
+
     function esc(v) {
       return String(v ?? "").replace(/[&<>"']/g, function (c) {
         return {
@@ -119,9 +122,9 @@
 
       $("#permissionId").val("");
 
-      await loadRole(permission ? permission.roleId : "");
+      await loadRole(permission ? permission.roleValue : "");
 
-      await loadRoute(permission ? permission.routeId : "");
+      await loadRoute(permission ? permission.routeValue : "");
 
       if (permission) {
         $("#modalTitle").text("Edit Permission");
@@ -191,15 +194,16 @@
 
       const id = $("#permissionId").val();
       const isEdit = id !== "";
-      const payload = getFormData(loadRole);
+      const payload = getFormData();
+      const roleName = $("#roleId option:selected").text().trim();
 
       if (!validate(payload)) return;
 
       const confirm = await Swal.fire({
         title: isEdit ? "Save changes?" : "Add this permission?",
         text: isEdit
-          ? `Update ${payload.RoleId}'s record?`
-          : `Add ${payload.RoleId} to the list?`,
+          ? `Update ${roleName}'s record?`
+          : `Add ${roleName} to the list?`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: isEdit ? "Yes, save" : "Yes, add",

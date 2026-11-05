@@ -7,16 +7,14 @@ function validateMembers(body, ignoreId = null) {
   const fullName = (body.FullName ?? "").trim();
   const address = (body.Address ?? "").trim();
   const contact = (body.Contact ?? "").trim();
-  const registerBy = (body.RegisteredBy ?? "").trim();
  
 
   if (!employeeId) return { error: "First Name is required." };
   if (!fullName) return { error: "Middle Name is required." };
   if (!address) return { error: "Last Name is required." };
   if (!contact) return { error: "Status is required." };
-  if (!registerBy) return { error: "Section Name is required." };
   
-return { value: { employeeId, fullName, address, contact, registerBy }};
+return { value: { employeeId, fullName, address, contact }};
 
 }
 
@@ -32,7 +30,7 @@ router.get("/", function (req, res) {
 
 // Load Member
 router.get("/loadMember",async function(req,res){
-    const data = await Query("SELECT mm_id AS id, mm_employee_id AS employeeId, mm_fullname AS fullName, mm_address AS address, mm_contact_no AS contact, mm_register_date AS registeredDate, mm_register_by AS registeredBy FROM master_members ORDER BY mm_fullname ASC")
+    const data = await Query("SELECT mm_id AS id, mm_employee_id AS employeeId, mm_fullname AS fullName, mm_address AS address, mm_contact_no AS contact, mm_register_date AS registeredDate, mm_register_by AS registeredBy FROM master_members ORDER BY mm_id ASC")
     console.log(data)
     res.json(data)
 });
@@ -43,7 +41,7 @@ router.post("/createMember",async function (req, res) {
   if (error) {
     return res.status(400).json({ success: false, message: error });
   }
- const createMembers = await Query("Insert into master_members (mm_employee_id, mm_fullname, mm_address, mm_contact_no, mm_register_date, mm_register_by) values (?,?,?,?,?,?)", [value.employeeId, value.fullName, value.address, value.contact, new Date(), value.registerBy]);
+ const createMembers = await Query("Insert into master_members (mm_employee_id, mm_fullname, mm_address, mm_contact_no, mm_register_date, mm_register_by) values (?,?,?,?,?, (Select mu_fullname from master_users where mu_id = ?))", [value.employeeId, value.fullName, value.address, value.contact, new Date(),req.session.userId]);
   res
     .status(201)
     .json({ success: true, message: "Member created.", data: createMembers});
@@ -52,9 +50,9 @@ router.post("/createMember",async function (req, res) {
 // Update Member
  router.put("/updateMember/:id",async function (req, res) {
    const id = parseInt(req.params.id, 10);
-
+  
    const { error, value } = validateMembers(req.body, id);
-   const updateMembers = await Query("Update master_members set mm_employee_id = ?, mm_fullname = ?, mm_address = ?, mm_contact_no = ?, mm_register_by = ? where mm_id = ?", [value.employeeId, value.fullName, value.address, value.contact, value.registerBy, id]) ;
+   const updateMembers = await Query("Update master_members set mm_employee_id = ?, mm_fullname = ?, mm_address = ?, mm_contact_no = ? where mm_id = ?", [value.employeeId, value.fullName, value.address, value.contact, id]) ;
    if (error) {
      return res.status(400).json({ success: false, message: error });
    }
@@ -64,11 +62,11 @@ router.post("/createMember",async function (req, res) {
 // Delete Member
 router.delete("/deleteMember/:id", async function (req, res) {
   const id = parseInt(req.params.id, 10);
-
+ 
   if (id.length === 0) {
     return res
       .status(404)
-      .json({ success: false, message: "Student not found." });
+      .json({ success: false, message: "Member not found." });
   }
 
   const deleteMembers = await Query("Delete from master_members where mm_id = ?", [id]);

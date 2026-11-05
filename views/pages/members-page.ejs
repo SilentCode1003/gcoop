@@ -50,9 +50,7 @@
 >
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-
       <form id="memberForm" novalidate>
-
         <div class="modal-header">
           <h5 class="modal-title" id="modalTitle">
             <i class="fas fa-user-plus mr-2"></i>
@@ -70,11 +68,9 @@
         </div>
 
         <div class="modal-body">
-
           <input type="hidden" id="memberId" />
 
           <div class="form-row">
-
             <div class="form-group col-md-6">
               <label for="employeeId">
                 Employee ID <span class="text-danger"></span>
@@ -89,9 +85,7 @@
                 required
               />
 
-              <div class="invalid-feedback">
-                Employee ID is required.
-              </div>
+              <div class="invalid-feedback">Employee ID is required.</div>
             </div>
 
             <div class="form-group col-md-6">
@@ -108,15 +102,11 @@
                 required
               />
 
-              <div class="invalid-feedback">
-                Full name is required.
-              </div>
+              <div class="invalid-feedback">Full name is required.</div>
             </div>
-
           </div>
 
           <div class="form-group">
-
             <label for="address">
               Address <span class="text-danger"></span>
             </label>
@@ -129,15 +119,11 @@
               required
             ></textarea>
 
-            <div class="invalid-feedback">
-              Address is required.
-            </div>
-
+            <div class="invalid-feedback">Address is required.</div>
           </div>
 
           <div class="form-row">
-
-           <div class="form-group col-md-6">
+            <div class="form-group col-md-6">
               <label for="contact">
                 Contact No. <span class="text-danger"></span>
               </label>
@@ -151,7 +137,7 @@
                 inputmode="numeric"
                 maxlength="11"
                 pattern="09[0-9]{9}"
-                oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                 required
               />
 
@@ -160,52 +146,18 @@
               </div>
             </div>
 
-            <div class="form-group col-md-6">
-              <label for="registeredBy">
-                Registered By <span class="text-danger"></span>
-              </label>
-
-              <input
-                type="text"
-                class="form-control"
-                id="registeredBy"
-                placeholder="Enter registered by"
-                autocomplete="off"
-                required
-              />
-
-              <div class="invalid-feedback">
-                Registered By is required.
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
+        
         <div class="modal-footer">
-
-          <button
-            type="button"
-            class="btn btn-cancel"
-            data-dismiss="modal"
-          >
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">
             Cancel
           </button>
 
-          <button
-            type="submit"
-            class="btn btn-save"
-            id="btnSave"
-          >
+          <button type="submit" class="btn btn-save" id="btnSave">
             <i class="fas fa-save mr-1"></i>
             Save
           </button>
-
         </div>
-
       </form>
-
     </div>
   </div>
 </div>

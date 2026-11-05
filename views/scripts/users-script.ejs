@@ -1,25 +1,14 @@
 <script>
   $(document).ready(function () {
     let usersById = {};
-  $(document).ready(function () {
-    let usersById = {};
 
-    // Date Formatter
-    // Date Formatter
-    function formatDate(date) {
+    // ---------- HELPERS ----------
+    const formatDate = (date) => {
       if (!date) return "";
-
       return new Date(date).toLocaleString();
-      if (!date) return "";
-
-      return new Date(date).toLocaleString();
-    }
+    };
 
     const esc = (v) =>
-      String(v ?? "").replace(
-        /[&<>"']/g,
-        (c) =>
-          ({
       String(v ?? "").replace(
         /[&<>"']/g,
         (c) =>
@@ -38,17 +27,12 @@
       showConfirmButton: false,
       timer: 2500,
       timerProgressBar: true,
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
     });
 
     const errorMessage = (err, fallback) =>
       err?.responseJSON?.message || fallback;
-      err?.responseJSON?.message || fallback;
 
+    // ---------- LOAD DATA ----------
     async function loadUsers() {
       const users = await queryUtility.Load("/users/loadUser");
       const $tbody = $("#userTable").empty();
@@ -76,6 +60,17 @@
       }
     }
 
+    async function loadRoles() {
+      const roles = await queryUtility.Load("/users/insertRole");
+      const $roles = $("#Role").empty();
+      $roles.append('<option value="">Select Role</option>');
+
+      for (const r of roles) {
+        $roles.append(`<option value="${esc(r.id)}">${esc(r.name)}</option>`);
+      }
+    }
+
+    // ---------- MODAL ----------
     function openModal(user) {
       const isEdit = !!user;
 
@@ -98,16 +93,7 @@
       $("#userModal").modal("show");
     }
 
-    async function loadRoles() {
-      const roles = await queryUtility.Load("/users/insertRole");
-      const $roles = $("#Role").empty();
-      $roles.append('<option value="">Select Role</option>');
-
-      for (const r of roles) {
-        $roles.append(`<option value="${esc(r.id)}">${esc(r.name)}</option>`);
-      }
-    }
-
+    // ---------- FORM ----------
     function getFormData() {
       return {
         FullName: $("#FullName").val().trim(),
@@ -133,40 +119,7 @@
       return valid;
     }
 
-    $("#btnAdd").on("click", () => openModal(null));
-
-    $("#userTable").on("click", ".btn-edit", function () {
-      const user = usersById[$(this).data("id")];
-      if (user) openModal(user);
-    });
-
-    // ---------- SUBMIT (create or update) ----------
-    $("#userForm").on("submit", async function (e) {
-      e.preventDefault();
-      return {
-        FullName: $("#FullName").val().trim(),
-        Role: $("#Role").val(),
-        Username: $("#Username").val().trim(),
-        Password: $("#Password").val(),
-      };
-    }
-
-    function validate(p, isEdit) {
-      const checks = {
-        "#FullName": !!p.FullName,
-        "#Role": !!p.Role,
-        "#Username": !!p.Username,
-        // password is required only when adding a new user
-        "#Password": isEdit || !!p.Password,
-      };
-      let valid = true;
-      for (const [sel, ok] of Object.entries(checks)) {
-        $(sel).toggleClass("is-invalid", !ok);
-        if (!ok) valid = false;
-      }
-      return valid;
-    }
-
+    // ---------- EVENTS ----------
     $("#btnAdd").on("click", () => openModal(null));
 
     $("#userTable").on("click", ".btn-edit", function () {
@@ -178,10 +131,6 @@
     $("#userForm").on("submit", async function (e) {
       e.preventDefault();
 
-      const id = $("#userId").val();
-      const isEdit = id !== "";
-      const payload = getFormData();
-      if (!validate(payload, isEdit)) return;
       const id = $("#userId").val();
       const isEdit = id !== "";
       const payload = getFormData();
@@ -200,25 +149,7 @@
         cancelButtonColor: "#858796",
       });
       if (!confirm.isConfirmed) return;
-      const confirm = await Swal.fire({
-        title: isEdit ? "Save changes?" : "Add this User?",
-        text: isEdit
-          ? `Update ${payload.FullName}'s record?`
-          : `Add ${payload.FullName} to the list?`,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: isEdit ? "Yes, save" : "Yes, add",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#4e73df",
-        cancelButtonColor: "#858796",
-      });
-      if (!confirm.isConfirmed) return;
 
-      Swal.fire({
-        title: "Saving...",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
       Swal.fire({
         title: "Saving...",
         allowOutsideClick: false,
@@ -286,74 +217,10 @@
           confirmButtonColor: "#4e73df",
         });
       }
-      try {
-        if (isEdit) {
-          await queryUtility.Update(
-            `/users/updateUser/${encodeURIComponent(id)}`,
-            payload,
-          );
-        } else {
-          await queryUtility.Save("/users/createUser", payload);
-        }
-
-        $("#userModal").modal("hide");
-        await loadUsers();
-        Swal.close();
-        Toast.fire({
-          icon: "success",
-          title: isEdit
-            ? "User updated successfully"
-            : "User added successfully",
-        });
-      } catch (err) {
-        Swal.fire({
-          icon: "error",
-          title: isEdit ? "Update failed" : "Create failed",
-          text: errorMessage(err, "Something went wrong. Please try again."),
-          confirmButtonColor: "#4e73df",
-        });
-      }
     });
 
-    // ---------- DELETE ----------
-    $("#userTable").on("click", ".btn-delete", async function () {
-      const id = $(this).data("id");
-      const user = usersById[id];
-      if (!user) return;
-
-      const confirm = await Swal.fire({
-        title: "Delete this user?",
-        text: `${user.fullname} will be permanently removed.`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#e74a3b",
-        cancelButtonColor: "#858796",
-      });
-      if (!confirm.isConfirmed) return;
-
-      try {
-        await queryUtility.Delete(
-          `/users/deleteUser/${encodeURIComponent(id)}`,
-        );
-        await loadUsers();
-        Toast.fire({ icon: "success", title: "User deleted" });
-      } catch (err) {
-        Swal.fire({
-          icon: "error",
-          title: "Delete failed",
-          text: errorMessage(err, "Something went wrong. Please try again."),
-          confirmButtonColor: "#4e73df",
-        });
-      }
-    });
-
-    loadRoles();
-    loadUsers();
-  });
+    // ---------- INIT ----------
     loadRoles();
     loadUsers();
   });
 </script>
-

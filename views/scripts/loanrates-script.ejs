@@ -10,6 +10,9 @@
       timerProgressBar: true,
     });
 
+    const errorMessage = (err, fallback) =>
+      err?.responseJSON?.message || fallback;
+
     function esc(v) {
       return String(v ?? "").replace(/[&<>"']/g, function (c) {
         return {
@@ -93,7 +96,7 @@
     function getFormData() {
       return {
         Name: $("#loanName").val().trim(),
-        Rate: ($("#loanRate").val()),
+        Rate: $("#loanRate").val(),
       };
     }
 
@@ -196,7 +199,6 @@
         });
       }
     });
-
 
     // ==========================
     // DELETE
