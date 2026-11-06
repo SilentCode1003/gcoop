@@ -34,7 +34,7 @@
 
     // ---------- LOAD DATA ----------
     async function loadUsers() {
-      const users = await queryUtility.Load("/users/loadUser");
+      const users = await queryUtility.Load("/users/load-user");
       const $tbody = $("#userTable").empty();
       usersById = {};
 
@@ -61,7 +61,7 @@
     }
 
     async function loadRoles() {
-      const roles = await queryUtility.Load("/users/insertRole");
+      const roles = await queryUtility.Load("/users/insert-role");
       const $roles = $("#Role").empty();
       $roles.append('<option value="">Select Role</option>');
 
@@ -159,11 +159,11 @@
       try {
         if (isEdit) {
           await queryUtility.Update(
-            `/users/updateUser/${encodeURIComponent(id)}`,
+            `/users/update-user/${encodeURIComponent(id)}`,
             payload,
           );
         } else {
-          await queryUtility.Save("/users/createUser", payload);
+          await queryUtility.Save("/users/create-user", payload);
         }
 
         $("#userModal").modal("hide");
@@ -205,7 +205,7 @@
 
       try {
         await queryUtility.Delete(
-          `/users/deleteUser/${encodeURIComponent(id)}`,
+          `/users/delete-user/${encodeURIComponent(id)}`,
         );
         await loadUsers();
         Toast.fire({ icon: "success", title: "User deleted" });

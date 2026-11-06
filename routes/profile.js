@@ -13,7 +13,7 @@ router.get("/", function (req, res) {
 });
 
 // Load Profile (the logged-in user only)
-router.get("/loadProfile", async (req, res) => {
+router.get("/load-profile", async (req, res) => {
   try {
     const [profile] = await Query(
       `SELECT u.mu_id        AS id,
@@ -40,7 +40,7 @@ router.get("/loadProfile", async (req, res) => {
 });
 
 // Update Profile (own record only)
-router.put("/updateProfile", async (req, res) => {
+router.put("/update-profile", async (req, res) => {
   try {
     const fullName = String(req.body.FullName ?? "").trim();
     const username = String(req.body.Username ?? "").trim();

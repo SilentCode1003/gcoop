@@ -30,7 +30,7 @@
     // ==========================
     async function loadDenominations() {
       const denominations = await queryUtility.Load(
-        "/denominations/loadDenomination",
+        "/denominations/load-denomination",
       );
 
       $("#denominationTable").empty();
@@ -177,11 +177,11 @@
       try {
         if (isEdit) {
           await queryUtility.Update(
-            `/denominations/updateDenomination/${encodeURIComponent(id)}`,
+            `/denominations/update-denomination/${encodeURIComponent(id)}`,
             payload,
           );
         } else {
-          await queryUtility.Save("/denominations/createDenomination", payload);
+          await queryUtility.Save("/denominations/create-denomination", payload);
         }
 
         $("#denominationModal").modal("hide");
@@ -220,7 +220,7 @@
       if (!result.isConfirmed) return;
 
       try {
-        await queryUtility.Delete("/denominations/deleteDenomination/" + id);
+        await queryUtility.Delete("/denominations/delete-denomination/" + id);
 
         Toast.fire({
           icon: "success",

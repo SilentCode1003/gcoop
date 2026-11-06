@@ -23,14 +23,14 @@ router.get("/", function (req, res) {
 });
 
 // Load Route
-router.get("/loadRoute",async function(req,res){
+router.get("/load-route",async function(req,res){
     const data = await Query("SELECT mr_id as id, mr_name as name, mr_create_at as createdDate, mr_update_at as updatedDate from master_routes")
     console.log(data)
     res.json(data)
 });
 
 // Create Route
-router.post("/createRoute",async function (req, res) {
+router.post("/create-route",async function (req, res) {
   const { error, value } = validateRoutes(req.body);
   if (error) {
     return res.status(400).json({ success: false, message: error });
@@ -42,7 +42,7 @@ router.post("/createRoute",async function (req, res) {
 });
 
 // Update Route
- router.put("/updateRoute/:id",async function (req, res) {
+ router.put("/update-route/:id",async function (req, res) {
    const id = parseInt(req.params.id, 10); 
 
    const { error, value } = validateRoutes(req.body, id);
@@ -54,7 +54,7 @@ router.post("/createRoute",async function (req, res) {
  });
 
  // Delete  Route
- router.delete("/deleteRoute/:id", async function (req, res) {
+ router.delete("/delete-route/:id", async function (req, res) {
    const id = parseInt(req.params.id, 10);
  
    if (id.length === 0) {

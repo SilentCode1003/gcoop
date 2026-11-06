@@ -29,14 +29,14 @@ router.get("/", function (req, res) {
 });
 
 // Load Member
-router.get("/loadMember",async function(req,res){
+router.get("/load-member",async function(req,res){
     const data = await Query("SELECT mm_id AS id, mm_employee_id AS employeeId, mm_fullname AS fullName, mm_address AS address, mm_contact_no AS contact, mm_register_date AS registeredDate, mm_register_by AS registeredBy FROM master_members ORDER BY mm_id ASC")
     console.log(data)
     res.json(data)
 });
 
 // Create Member
-router.post("/createMember",async function (req, res) {
+router.post("/create-member",async function (req, res) {
   const { error, value } = validateMembers(req.body);
   if (error) {
     return res.status(400).json({ success: false, message: error });
@@ -48,7 +48,7 @@ router.post("/createMember",async function (req, res) {
 });
 
 // Update Member
- router.put("/updateMember/:id",async function (req, res) {
+ router.put("/update-member/:id",async function (req, res) {
    const id = parseInt(req.params.id, 10);
   
    const { error, value } = validateMembers(req.body, id);
@@ -60,7 +60,7 @@ router.post("/createMember",async function (req, res) {
  });
 
 // Delete Member
-router.delete("/deleteMember/:id", async function (req, res) {
+router.delete("/delete-member/:id", async function (req, res) {
   const id = parseInt(req.params.id, 10);
  
   if (id.length === 0) {

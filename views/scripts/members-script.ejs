@@ -44,7 +44,7 @@
     // LOAD MEMBERS
     // ==========================
     async function loadMembers() {
-      const members = await queryUtility.Load("/members/loadMember");
+      const members = await queryUtility.Load("/members/load-member");
 
       const $tbody = $("#memberTable").empty();
 
@@ -193,11 +193,11 @@
       try {
         if (isEdit) {
           await queryUtility.Update(
-            `/members/updateMember/${encodeURIComponent(id)}`,
+            `/members/update-member/${encodeURIComponent(id)}`,
             payload,
           );
         } else {
-          await queryUtility.Save("/members/createMember", payload);
+          await queryUtility.Save("/members/create-member", payload);
         }
 
         $("#memberModal").modal("hide");
@@ -247,7 +247,7 @@
 
       try {
         await queryUtility.Delete(
-          `/members/deleteMember/${encodeURIComponent(id)}`,
+          `/members/delete-member/${encodeURIComponent(id)}`,
         );
 
         await loadMembers();

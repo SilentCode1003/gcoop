@@ -46,7 +46,7 @@ $(document).ready(function () {
     // ==========================
     async function loadRoles() {
 
-        const roles = await queryUtility.Load("/roles/loadRole");
+        const roles = await queryUtility.Load("/roles/load-role");
 
         const $tbody = $("#roleTable").empty();
 
@@ -200,14 +200,14 @@ $(document).ready(function () {
             if (isEdit) {
 
                 await queryUtility.Update(
-                    `/roles/updateRole/${encodeURIComponent(id)}`,
+                    `/roles/update-role/${encodeURIComponent(id)}`,
                     payload
                 );
 
             } else {
 
                 await queryUtility.Save(
-                    "/roles/createRole",
+                    "/roles/create-role",
                     payload
                 );
 
@@ -266,7 +266,7 @@ $(document).ready(function () {
         try {
 
             await queryUtility.Delete(
-                `/roles/deleteRole/${encodeURIComponent(id)}`
+                `/roles/delete-role/${encodeURIComponent(id)}`
             );
 
             await loadRoles();

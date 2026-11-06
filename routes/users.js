@@ -28,21 +28,21 @@ router.get("/", function (req, res) {
 });
 
 // Load Users
-router.get("/loadUser",async function(req,res){
+router.get("/load-user",async function(req,res){
     const data = await Query("SELECT u.mu_id AS id, u.mu_fullname AS fullname, u.mu_role AS roleid, r.mr_name AS role, u.mu_username AS username, u.mu_create_at AS createdat, u.mu_update_at AS updatedat FROM master_users u LEFT JOIN master_roles r ON u.mu_role = r.mr_id ORDER BY u.mu_id DESC")
 console.log(data)
     res.json(data)
 });
 
 // Load Roles in Modal
-router.get("/insertRole", async function (req, res) {
+router.get("/insert-role", async function (req, res) {
     const roles = await Query("SELECT mr_id AS id, mr_name AS name FROM master_roles ORDER BY mr_name");
     console.log(roles)
     res.json(roles);
 });
 
 // Create User
-router.post("/createUser",async function (req, res) {
+router.post("/create-user",async function (req, res) {
   const { error, value } = validateUsers(req.body);
   if (error) {
     return res.status(400).json({ success: false, message: error });
@@ -54,7 +54,7 @@ router.post("/createUser",async function (req, res) {
 });
 
 // Update User
- router.put("/updateUser/:id", async function (req, res) {
+ router.put("/update-user/:id", async function (req, res) {
   try {
     const id = parseInt(req.params.id, 10);
 
@@ -87,7 +87,7 @@ router.post("/createUser",async function (req, res) {
 });
 
 // Delete User
-router.delete("/deleteUser/:id", async function (req, res) {
+router.delete("/delete-user/:id", async function (req, res) {
   const id = parseInt(req.params.id, 10);
 
   if (id.length === 0) {

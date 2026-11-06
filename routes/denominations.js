@@ -24,14 +24,14 @@ router.get("/", function (req, res, next) {
 });
 
 // Load Loan Rate
-router.get("/loadDenomination",async function(req,res){
+router.get("/load-denomination",async function(req,res){
     const data = await Query("SELECT md_id as id, md_name as name, md_value as value , md_create_at as createdDate, md_update_at as updatedDate from master_denomination")
     console.log(data)
     res.json(data)
 });
 
 // Create Denomination
-router.post("/createDenomination",async function (req, res) {
+router.post("/create-denomination",async function (req, res) {
   const { error, value } = validateDenominations(req.body);
   if (error) {
     return res.status(400).json({ success: false, message: error });
@@ -43,7 +43,7 @@ router.post("/createDenomination",async function (req, res) {
 });
 
 // Update Denomination
- router.put("/updateDenomination/:id",async function (req, res) {
+ router.put("/update-denomination/:id",async function (req, res) {
    const id = parseInt(req.params.id, 10);
 
    const { error, value } = validateDenominations(req.body, id);
@@ -55,7 +55,7 @@ router.post("/createDenomination",async function (req, res) {
  });
 
 // Delete  Denomination
- router.delete("/deleteDenomination/:id", async function (req, res) {
+ router.delete("/delete-denomination/:id", async function (req, res) {
    const id = parseInt(req.params.id, 10);
  
    if (id.length === 0) {

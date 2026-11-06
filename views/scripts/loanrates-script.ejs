@@ -29,7 +29,7 @@
     // LOAD
     // ==========================
     async function loadloanRate() {
-      const loanRates = await queryUtility.Load("/loan-rates/loadloanRate");
+      const loanRates = await queryUtility.Load("/loan-rates/load-loanrate");
 
       $("#loan-rateTable").empty();
 
@@ -174,11 +174,11 @@
       try {
         if (isEdit) {
           await queryUtility.Update(
-            `/loan-rates/updateloanRate/${encodeURIComponent(id)}`,
+            `/loan-rates/update-loanrate/${encodeURIComponent(id)}`,
             payload,
           );
         } else {
-          await queryUtility.Save("/loan-rates/createloanRate", payload);
+          await queryUtility.Save("/loan-rates/create-loanrate", payload);
         }
 
         $("#loanRateModal").modal("hide");
@@ -217,7 +217,7 @@
       if (!result.isConfirmed) return;
 
       try {
-        await queryUtility.Delete("/loan-rates/deleteloanRate/" + id);
+        await queryUtility.Delete("/loan-rates/delete-loanrate/" + id);
 
         Toast.fire({
           icon: "success",

@@ -46,7 +46,7 @@
     // ==========================
     async function loadProfile() {
       try {
-        const profile = await queryUtility.Load("/profile/loadProfile");
+        const profile = await queryUtility.Load("/profile/load-profile");
 
         if (!profile) {
           throw new Error("Profile not found.");
@@ -147,7 +147,7 @@
       });
 
       try {
-        await queryUtility.Update("/profile/updateProfile", payload);
+        await queryUtility.Update("/profile/update-profile", payload);
 
         await loadProfile();
         setEditing(false);

@@ -13,7 +13,7 @@ router.get("/", function (req, res) {
 });
 
 // Load Dashboard Data
-router.get("/load", async function (req, res) {
+router.get("/load-dashboard", async function (req, res) {
     try {
 
         // Total Members

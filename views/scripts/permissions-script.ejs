@@ -31,7 +31,7 @@
 
     async function loadPermissions() {
       const permissions = await queryUtility.Load(
-        "/permissions/loadPermission",
+        "/permissions/load-permission",
       );
 
       $("#permissionTable").empty();
@@ -74,7 +74,7 @@
     ========================== */
 
     async function loadRole(selected = "") {
-      const roles = await queryUtility.Load("/permissions/insertRole");
+      const roles = await queryUtility.Load("/permissions/insert-role");
 
       $("#roleId").empty();
 
@@ -96,7 +96,7 @@
     ========================== */
 
     async function loadRoute(selected = "") {
-      const routes = await queryUtility.Load("/permissions/insertRoute");
+      const routes = await queryUtility.Load("/permissions/insert-route");
 
       $("#routeId").empty();
 
@@ -222,11 +222,11 @@
       try {
         if (isEdit) {
           await queryUtility.Update(
-            `/permissions/updatePermission/${encodeURIComponent(id)}`,
+            `/permissions/update-permission/${encodeURIComponent(id)}`,
             payload,
           );
         } else {
-          await queryUtility.Save("/permissions/createPermission", payload);
+          await queryUtility.Save("/permissions/create-permission", payload);
         }
 
         $("#permissionModal").modal("hide");
@@ -266,7 +266,7 @@
       if (!result.isConfirmed) return;
 
       try {
-        await queryUtility.Delete("/permissions/deletePermission/" + id);
+        await queryUtility.Delete("/permissions/delete-permission/" + id);
 
         Toast.fire({
           icon: "success",

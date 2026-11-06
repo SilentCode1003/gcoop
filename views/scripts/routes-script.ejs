@@ -27,7 +27,7 @@
 
     // ---------- LOAD ----------
     async function loadRoutes() {
-      const routes = await queryUtility.Load("/routes/loadRoute");
+      const routes = await queryUtility.Load("/routes/load-route");
       const $tbody = $("#routeTable").empty();
       routesById = {};
 
@@ -154,11 +154,11 @@
       try {
         if (isEdit) {
           await queryUtility.Update(
-            `/routes/updateRoute/${encodeURIComponent(id)}`,
+            `/routes/update-route/${encodeURIComponent(id)}`,
             payload,
           );
         } else {
-          await queryUtility.Save("/routes/createRoute", payload);
+          await queryUtility.Save("/routes/create-route", payload);
         }
 
         $("#routesModal").modal("hide");
@@ -200,7 +200,7 @@
       }
 
       try {
-        await queryUtility.Delete("/routes/deleteRoute/" + id);
+        await queryUtility.Delete("/routes/delete-route/" + id);
 
         Toast.fire({
           icon: "success",

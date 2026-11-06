@@ -20,14 +20,14 @@ router.get("/", (req, res) => {
 });
 
 /// Load Roles
-router.get("/loadRole",async function(req,res){
+router.get("/load-role",async function(req,res){
     const roles = await Query("SELECT mr_id as id, mr_name as name, mr_create_at as createdDate, mr_update_at as updatedDate FROM master_roles ORDER BY mr_id ASC")
     console.log(roles)
     res.json(roles)
 });
 
 // Create Roles
-router.post("/createRole",async function (req, res) {
+router.post("/create-role",async function (req, res) {
   const { error, value } = validateRoles(req.body);
   if (error) {
     return res.status(400).json({ success: false, message: error });
@@ -39,7 +39,7 @@ router.post("/createRole",async function (req, res) {
 });
 
 // Update Roles
- router.put("/updateRole/:id",async function (req, res) {
+ router.put("/update-role/:id",async function (req, res) {
    const id = parseInt(req.params.id, 10);
 
    const { error, value } = validateRoles(req.body, id);
@@ -52,7 +52,7 @@ router.post("/createRole",async function (req, res) {
  });
 
 // Delete Roles
-router.delete("/deleteRole/:id", async function (req, res) {
+router.delete("/delete-role/:id", async function (req, res) {
   const id = parseInt(req.params.id, 10);
  
   if (id.length === 0) {

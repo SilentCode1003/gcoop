@@ -28,28 +28,28 @@ router.get("/", function (req, res) {
 });
 
 // Load Permissions
-router.get("/loadPermission",async function(req,res){
+router.get("/load-permission",async function(req,res){
     const data = await Query("SELECT p.mrp_id AS id, p.mrp_role_id AS roleValue, p.mrp_route_id AS routeValue, role.mr_name AS roleId, route.mr_name AS routeId, p.mrp_permission AS permission, p.mrp_create_at AS createdDate, p.mrp_update_at AS updatedDate FROM master_role_permission p INNER JOIN master_roles role ON role.mr_id = p.mrp_role_id INNER JOIN master_routes route ON route.mr_id = p.mrp_route_id ORDER BY p.mrp_id ASC");
     console.log(data)
     res.json(data)
 });
 
 // Load Roles in Modal
-router.get("/insertRole", async function (req, res) {
+router.get("/insert-role", async function (req, res) {
     const roles = await Query("SELECT mr_id AS id, mr_name AS name FROM master_roles ORDER BY mr_name");
     console.log(roles)
     res.json(roles);
 });
 
 // Load Routes in Modal
-router.get("/insertRoute", async function (req, res) {
+router.get("/insert-route", async function (req, res) {
     const routes = await Query("SELECT mr_id AS id, mr_name AS name FROM master_routes ORDER BY mr_name");
     console.log(routes)
     res.json(routes);
 });
 
 // Create Permissions
-router.post("/createPermission", async function (req, res) {
+router.post("/create-permission", async function (req, res) {
   try {
     const { error, value } = validatePermission(req.body);
     if (error) {
@@ -81,7 +81,7 @@ router.post("/createPermission", async function (req, res) {
 });
 
 // Update Permissions
-router.put("/updatePermission/:id", async function (req, res) {
+router.put("/update-permission/:id", async function (req, res) {
   try {
     const id = parseInt(req.params.id, 10);
 
@@ -115,7 +115,7 @@ router.put("/updatePermission/:id", async function (req, res) {
 });
 
  // Delete  Permissions
- router.delete("/deletePermission/:id", async function (req, res) {
+ router.delete("/delete-permission/:id", async function (req, res) {
    const id = parseInt(req.params.id, 10);
 
    if (id.length === 0) {

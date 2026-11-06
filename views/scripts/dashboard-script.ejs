@@ -72,7 +72,7 @@ async function loadDashboard() {
 
     try {
 
-        const dashboard = await queryUtility.Load("/dashboard/load");
+        const dashboard = await queryUtility.Load("/dashboard/load-dashboard");
 
         $("#totalMembers").text(dashboard.totalMembers || 0);
         $("#totalUsers").text(dashboard.totalUsers || 0);

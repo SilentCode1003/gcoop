@@ -25,14 +25,14 @@ router.get("/", function (req, res) {
 });
 
 // Load Loan Rate
-router.get("/loadloanRate",async function(req,res){
+router.get("/load-loanrate",async function(req,res){
     const data = await Query("SELECT mlr_id as id, mlr_name as name, mlr_loan_rate as rate, mlr_create_at as createdDate, mlr_update_at as updatedDate from master_loan_rates")
     console.log(data)
     res.json(data)
 });
 
 // Create Loan Rate
-router.post("/createloanRate",async function (req, res) {
+router.post("/create-loanrate",async function (req, res) {
   const { error, value } = validateloanRates(req.body);
   if (error) {
     return res.status(400).json({ success: false, message: error });
@@ -44,7 +44,7 @@ router.post("/createloanRate",async function (req, res) {
 });
 
 // Update Loan Rate
- router.put("/updateloanRate/:id",async function (req, res) {
+ router.put("/update-loanrate/:id",async function (req, res) {
    const id = parseInt(req.params.id, 10);
 
    const { error, value } = validateloanRates(req.body, id);
@@ -56,7 +56,7 @@ router.post("/createloanRate",async function (req, res) {
  });
 
 // Delete  Loan Rate
- router.delete("/deleteloanRate/:id", async function (req, res) {
+ router.delete("/delete-loanrate/:id", async function (req, res) {
    const id = parseInt(req.params.id, 10);
  
    if (id.length === 0) {
