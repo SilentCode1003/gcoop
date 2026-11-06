@@ -661,3 +661,7 @@ html.no-transition *::after{
     color:#ffffff !important;
     box-shadow:none !important;
 }
+
+.span1{
+    color: red;
+}

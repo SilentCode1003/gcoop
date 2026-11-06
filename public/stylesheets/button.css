@@ -3,42 +3,43 @@
 ========================== */
 
 .btn-add{
-    background: #000 !important;
-    border: 1px solid #000 !important;
-    color: #fff !important;
+    background:#000 !important;
+    border:1px solid #000 !important;
+    color:#fff !important;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
 
-    padding: 8px 18px;
-    border-radius: 6px;
+    padding:8px 18px;
+    border-radius:6px;
 
-    font-size: 15px;
-    font-weight: 600;
+    font-size:15px;
+    font-weight:600;
 
-    transition: all .3s ease;
+    transition:all .3s ease;
 }
 
 .btn-add:hover{
-    background: #222 !important;
-    border-color: #222 !important;
-    color: #fff !important;
-    transform: translateY(-2px);
+    background:#222 !important;
+    border-color:#222 !important;
+    color:#fff !important;
+    transform:translateY(-2px);
 }
 
 .btn-add:focus,
 .btn-add:active{
-    background: #000 !important;
-    border-color: #000 !important;
-    color: #fff !important;
-    box-shadow: none !important;
+    background:#000 !important;
+    border-color:#000 !important;
+    color:#fff !important;
+    box-shadow:none !important;
 }
 
 .btn-add i{
     color:#fff !important;
 }
+
 /* ==========================
    EDIT BUTTON
 ========================== */
@@ -58,8 +59,7 @@
     color:#fff !important;
 
     border-radius:4px;
-
-    transition:.3s ease;
+    transition:all .3s ease;
 }
 
 .btn-edit:hover{
@@ -69,9 +69,15 @@
     transform:translateY(-2px);
 }
 
+.btn-edit:focus,
+.btn-edit:active{
+    box-shadow:none !important;
+}
+
 .btn-edit i{
     color:#fff !important;
 }
+
 /* ==========================
    DELETE BUTTON
 ========================== */
@@ -91,8 +97,7 @@
     color:#fff !important;
 
     border-radius:4px;
-
-    transition:.3s ease;
+    transition:all .3s ease;
 }
 
 .btn-delete:hover{
@@ -102,43 +107,74 @@
     transform:translateY(-2px);
 }
 
+.btn-delete:focus,
+.btn-delete:active{
+    box-shadow:none !important;
+}
+
 .btn-delete i{
     color:#fff !important;
 }
+
 /* ==========================
-   SAVE & CANCEL BUTTONS
+   MODAL FOOTER
 ========================== */
 
-.modal-footer .btn-save,
-.modal-footer .btn-cancel{
-    min-width:100px;
-    font-weight:600;
-    border-radius:6px;
-    padding:8px 20px;
+.modal-footer{
+    display:flex !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:12px;
 }
 
+/* ==========================
+   SAVE BUTTON
+========================== */
+
 .modal-footer .btn-save{
-    background:#6c757d !important;
-    border:1px solid #6c757d !important;
+    min-width:120px;
+    padding:8px 20px;
+
+    background:#991b1b !important;
+    border:1px solid #991b1b !important;
     color:#fff !important;
+
+    border-radius:6px;
+    font-weight:600;
+
+    transition:all .3s ease;
 }
 
 .modal-footer .btn-save:hover{
-    background:#5a6268 !important;
-    border-color:#5a6268 !important;
+    background:#7f1d1d !important;
+    border-color:#7f1d1d !important;
     color:#fff !important;
+    transform:translateY(-2px);
 }
 
+/* ==========================
+   CANCEL BUTTON
+========================== */
+
 .modal-footer .btn-cancel{
+    min-width:120px;
+    padding:8px 20px;
+
     background:#6c757d !important;
     border:1px solid #6c757d !important;
     color:#fff !important;
+
+    border-radius:6px;
+    font-weight:600;
+
+    transition:all .3s ease;
 }
 
 .modal-footer .btn-cancel:hover{
     background:#5a6268 !important;
     border-color:#5a6268 !important;
     color:#fff !important;
+    transform:translateY(-2px);
 }
 
 .modal-footer .btn-save:focus,
@@ -147,6 +183,7 @@
 .modal-footer .btn-cancel:active{
     box-shadow:none !important;
 }
+
 /* ==========================
    ACTION BUTTONS
 ========================== */
@@ -156,4 +193,19 @@
     justify-content:center;
     align-items:center;
     gap:6px;
+}
+
+.action-buttons .btn{
+    width:36px;
+    height:36px;
+    padding:0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.action-buttons .btn i{
+    font-size:14px;
+    line-height:1;
 }

@@ -70,47 +70,65 @@
         <div class="modal-body">
           <input type="hidden" id="memberId" />
 
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="employeeId">
-                Employee ID <span class="text-danger"></span>
-              </label>
+          <!-- Employee ID -->
+          <div class="form-group">
+            <label for="employeeId">
+              Employee ID <span class="text-danger"></span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="employeeId"
+              placeholder="Enter employee ID"
+              autocomplete="off"
+              required
+            />
+            <div class="invalid-feedback">Employee ID is required.</div>
+          </div>
 
-              <input
-                type="text"
-                class="form-control"
-                id="employeeId"
-                placeholder="Enter employee ID"
-                autocomplete="off"
-                required
-              />
+          <!-- Full Name -->
+          <div class="form-group">
+            <label for="fullName">
+              Full Name <span class="text-danger"></span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="fullName"
+              placeholder="Enter full name"
+              autocomplete="off"
+              required
+            />
+            <div class="invalid-feedback">Full name is required.</div>
+          </div>
 
-              <div class="invalid-feedback">Employee ID is required.</div>
-            </div>
-
-            <div class="form-group col-md-6">
-              <label for="fullName">
-                Full Name <span class="text-danger"></span>
-              </label>
-
-              <input
-                type="text"
-                class="form-control"
-                id="fullName"
-                placeholder="Enter full name"
-                autocomplete="off"
-                required
-              />
-
-              <div class="invalid-feedback">Full name is required.</div>
+          <!-- Contact No. -->
+          <div class="form-group">
+            <label for="contact">
+              Contact No. <span class="text-danger"></span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="contact"
+              placeholder="09XXXXXXXXX"
+              autocomplete="off"
+              inputmode="numeric"
+              maxlength="11"
+              pattern="09[0-9]{9}"
+              oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+              required
+            />
+            <div class="invalid-feedback">
+              Please enter a valid 11-digit contact number.
             </div>
           </div>
 
+          <!-- Address -->
           <div class="form-group">
             <label for="address">
               Address <span class="text-danger"></span>
             </label>
-
             <textarea
               class="form-control"
               id="address"
@@ -118,35 +136,10 @@
               placeholder="Enter address"
               required
             ></textarea>
-
             <div class="invalid-feedback">Address is required.</div>
           </div>
+        </div>
 
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="contact">
-                Contact No. <span class="text-danger"></span>
-              </label>
-
-              <input
-                type="text"
-                class="form-control"
-                id="contact"
-                placeholder="09XXXXXXXXX"
-                autocomplete="off"
-                inputmode="numeric"
-                maxlength="11"
-                pattern="09[0-9]{9}"
-                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                required
-              />
-
-              <div class="invalid-feedback">
-                Please enter a valid 11-digit contact number.
-              </div>
-            </div>
-
-        
         <div class="modal-footer">
           <button type="button" class="btn btn-cancel" data-dismiss="modal">
             Cancel
