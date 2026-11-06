@@ -9,127 +9,132 @@
 <script src="/javascripts/sb-admin-2.min.js"></script>
 
 <script>
-    // ==========================
-    // AJAX Utility
-    // ==========================
+  // ==========================
+  // AJAX Utility
+  // ==========================
 
-    function Query(url, type, data = null) {
+  function Query(url, type, data = null) {
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        url: url,
+        method: type,
+        dataType: "json",
 
-        return new Promise(function (resolve, reject) {
+        contentType: ["POST", "PUT", "PATCH", "DELETE"].includes(type)
+          ? "application/json"
+          : undefined,
 
-            $.ajax({
-                url: url,
-                method: type,
-                dataType: "json",
+        data:
+          data && ["POST", "PUT", "PATCH", "DELETE"].includes(type)
+            ? JSON.stringify(data)
+            : undefined,
 
-                contentType:
-                    ["POST", "PUT", "PATCH", "DELETE"].includes(type)
-                        ? "application/json"
-                        : undefined,
+        success: resolve,
+        error: reject,
+      });
+    });
+  }
 
-                data:
-                    data &&
-                    ["POST", "PUT", "PATCH", "DELETE"].includes(type)
-                        ? JSON.stringify(data)
-                        : undefined,
+  const queryUtility = {
+    Load(url) {
+      return Query(url, "GET");
+    },
 
-                success: resolve,
-                error: reject
-            });
+    Save(url, data) {
+      return Query(url, "POST", data);
+    },
 
-        });
+    Update(url, data) {
+      return Query(url, "PUT", data);
+    },
 
+    Delete(url) {
+      return Query(url, "DELETE");
+    },
+  };
+
+  // ==========================
+  // Logout
+  // ==========================
+
+  $(document).on("click", "#logoutModal .btn-primary", async function (e) {
+    e.preventDefault();
+
+    try {
+      await queryUtility.Save("/auth/logout");
+      window.location.href = "/auth";
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Logout Failed",
+        text: err.responseJSON?.message || "Unable to logout.",
+      });
+    }
+  });
+
+  // ==========================
+  // Theme
+  // ==========================
+  $(function () {
+    const html = $("html");
+    const body = $("body");
+    const btn = $("#themeBtn");
+    const icon = $("#themeBtn i");
+
+    const theme = localStorage.getItem("theme") || "light";
+
+    function applyTheme(theme) {
+      if (theme === "dark") {
+        html.addClass("dark");
+        body.addClass("dark");
+        icon.removeClass("fa-moon").addClass("fa-sun");
+      } else {
+        html.removeClass("dark");
+        body.removeClass("dark");
+        icon.removeClass("fa-sun").addClass("fa-moon");
+      }
     }
 
-    const queryUtility = {
+    // Apply saved theme
+    applyTheme(theme);
 
-        Load(url) {
-            return Query(url, "GET");
-        },
+    // Exit if no theme button exists
+    if (!btn.length) return;
 
-        Save(url, data) {
-            return Query(url, "POST", data);
-        },
+    // Toggle Theme
+    btn.off("click").on("click", function () {
+      const dark = !html.hasClass("dark");
 
-        Update(url, data) {
-            return Query(url, "PUT", data);
-        },
+      applyTheme(dark ? "dark" : "light");
 
-        Delete(url) {
-            return Query(url, "DELETE");
-        }
-
-    };
-
-    // ==========================
-    // Logout
-    // ==========================
-
-    $(document).on("click", "#logoutModal .btn-primary", async function (e) {
-
-        e.preventDefault();
-
-        try {
-
-            await queryUtility.Save("/auth/logout");
-            window.location.href = "/auth";
-
-        } catch (err) {
-
-            Swal.fire({
-                icon: "error",
-                title: "Logout Failed",
-                text: err.responseJSON?.message || "Unable to logout."
-            });
-
-        }
-
+      localStorage.setItem("theme", dark ? "dark" : "light");
     });
+  });
 
-    // ==========================
-    // Theme
-    // ==========================
-    $(function () {
+  const $form = $(".navbar-search");
+  const $input = $form.find("input");
+  const $button = $form.find("button");
 
-        const html = $("html");
-        const body = $("body");
-        const btn = $("#themeBtn");
-        const icon = $("#themeBtn i");
+  // Hide table rows that don't contain the typed text
+  function filterTable() {
+    const q = $input.val().toLowerCase().trim();
 
-        const theme = localStorage.getItem("theme") || "light";
-
-        function applyTheme(theme) {
-
-            if (theme === "dark") {
-                html.addClass("dark");
-                body.addClass("dark");
-                icon.removeClass("fa-moon").addClass("fa-sun");
-            } else {
-                html.removeClass("dark");
-                body.removeClass("dark");
-                icon.removeClass("fa-sun").addClass("fa-moon");
-            }
-
-        }
-
-        // Apply saved theme
-        applyTheme(theme);
-
-        // Exit if no theme button exists
-        if (!btn.length) return;
-
-        // Toggle Theme
-        btn.off("click").on("click", function () {
-
-            const dark = !html.hasClass("dark");
-
-            applyTheme(dark ? "dark" : "light");
-
-            localStorage.setItem("theme", dark ? "dark" : "light");
-
-        });
-
+    $("#dataTable tbody tr").each(function () {
+      $(this).toggle($(this).text().toLowerCase().includes(q));
     });
+  }
+
+  // Exposed so each page can re-apply the filter after it reloads its table
+  window.filterTable = filterTable;
+
+  $input.on("input", filterTable);
+  $button.on("click", filterTable);
+
+  // Pressing Enter shouldn't reload the page
+  $form.on("submit", function (e) {
+    e.preventDefault();
+    filterTable();
+  });
 
 
 </script>

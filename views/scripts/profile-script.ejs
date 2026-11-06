@@ -1,8 +1,5 @@
 <script>
   $(document).ready(function () {
-    // ==========================
-    // TOAST
-    // ==========================
     const Toast = Swal.mixin({
       toast: true,
       position: "top-end",
@@ -14,50 +11,71 @@
     const errorMessage = (err, fallback) =>
       err?.responseJSON?.message || fallback;
 
-    async function loadProfile() {
-    try {
+    const formatDate = (date) => (date ? new Date(date).toLocaleString() : "");
 
+    let original = {};
+
+    // ==========================
+    // EDIT MODE (full name, username and password only)
+    // ==========================
+    function setEditing(on) {
+      $("#fullName, #username").prop("readonly", !on);
+      $("#editActions, #passwordSection").toggleClass("d-none", !on);
+      $("#btnEdit").toggleClass("d-none", on);
+
+      if (!on) {
+        $("#profileForm .form-control").removeClass("is-invalid");
+        $("#currentPassword, #newPassword, #confirmPassword").val("");
+      }
+    }
+
+    function fill(profile) {
+      $("#profileFullName").text(profile.fullName ?? "");
+      $("#profileRole").text(profile.role ?? "");
+      $("#profileUsername").text("@" + (profile.username ?? ""));
+
+      $("#fullName").val(profile.fullName ?? "");
+      $("#username").val(profile.username ?? "");
+      $("#role").val(profile.role ?? "");
+      $("#createdDate").val(formatDate(profile.createdDate));
+      $("#updatedDate").val(formatDate(profile.updatedDate));
+    }
+
+    // ==========================
+    // LOAD PROFILE
+    // ==========================
+    async function loadProfile() {
+      try {
         const profile = await queryUtility.Load("/profile/loadProfile");
 
-        console.log(profile);
-
         if (!profile) {
-            throw new Error("Profile not found.");
+          throw new Error("Profile not found.");
         }
 
-        $("#profileFullName").text(profile.fullName);
-        $("#profileEmployeeId").text(profile.employeeId);
-
-        $("#employeeId").val(profile.employeeId);
-        $("#fullName").val(profile.fullName);
-        $("#address").val(profile.address);
-        $("#contact").val(profile.contact);
-        $("#registeredBy").val(profile.registeredBy);
-
-    } catch (err) {
-
+        original = profile;
+        fill(profile);
+      } catch (err) {
         console.error(err);
 
         Swal.fire({
-            icon: "error",
-            title: "Unable to load profile",
-            text: errorMessage(err, "Something went wrong."),
-            confirmButtonColor: "#991b1b"
+          icon: "error",
+          title: "Unable to load profile",
+          text: errorMessage(err, "Something went wrong."),
+          confirmButtonColor: "#991b1b",
         });
-
+      }
     }
-}
 
     // ==========================
     // GET FORM DATA
     // ==========================
     function getFormData() {
       return {
-        EmployeeId: $("#employeeId").val().trim(),
         FullName: $("#fullName").val().trim(),
-        Address: $("#address").val().trim(),
-        Contact: $("#contact").val().trim(),
-        RegisteredBy: $("#registeredBy").val().trim(),
+        Username: $("#username").val().trim(),
+        CurrentPassword: $("#currentPassword").val(),
+        NewPassword: $("#newPassword").val(),
+        ConfirmPassword: $("#confirmPassword").val(),
       };
     }
 
@@ -65,19 +83,21 @@
     // VALIDATE
     // ==========================
     function validate(data) {
-      let valid = true;
+      const wantsNewPassword = !!data.NewPassword;
 
       const checks = {
-        "#employeeId": !!data.EmployeeId,
         "#fullName": !!data.FullName,
-        "#address": !!data.Address,
-        "#contact": !!data.Contact,
-        "#registeredBy": !!data.RegisteredBy,
+        "#username": !!data.Username,
+        "#currentPassword": !wantsNewPassword || !!data.CurrentPassword,
+        "#newPassword": !wantsNewPassword || data.NewPassword.length >= 6,
+        "#confirmPassword":
+          !wantsNewPassword || data.NewPassword === data.ConfirmPassword,
       };
+
+      let valid = true;
 
       $.each(checks, function (selector, ok) {
         $(selector).toggleClass("is-invalid", !ok);
-
         if (!ok) valid = false;
       });
 
@@ -85,18 +105,31 @@
     }
 
     // ==========================
+    // EDIT / CANCEL
+    // ==========================
+    $("#btnEdit").on("click", () => setEditing(true));
+
+    $("#btnCancel").on("click", function () {
+      fill(original);
+      setEditing(false);
+    });
+
+    // ==========================
     // SAVE
     // ==========================
     $("#profileForm").on("submit", async function (e) {
       e.preventDefault();
 
-      const payload = getFormData();
+      const data = getFormData();
 
-      if (!validate(payload)) return;
+      if (!validate(data)) return;
+
+      // ConfirmPassword is only for the check above, so the server never gets it
+      const { ConfirmPassword, ...payload } = data;
 
       const confirm = await Swal.fire({
         title: "Save changes?",
-        text: `Update ${payload.FullName}'s profile?`,
+        text: "Update your profile?",
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Yes, Save",
@@ -116,6 +149,8 @@
       try {
         await queryUtility.Update("/profile/updateProfile", payload);
 
+        await loadProfile();
+        setEditing(false);
         Swal.close();
 
         Toast.fire({

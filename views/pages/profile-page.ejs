@@ -1,151 +1,164 @@
 <div class="container-fluid">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="dashboard-title">
+      <i class="fas fa-user-circle mr-2"></i>
+      My Profile
+    </h3>
 
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <button type="button" class="btn btn-save" id="btnEdit">
+      <i class="fas fa-edit mr-1"></i>
+      Edit Profile
+    </button>
+  </div>
 
-        <h3 class="dashboard-title">
-            <i class="fas fa-user-circle mr-2"></i>
-            My Profile
-        </h3>
+  <div class="row">
+    <!-- Profile Card -->
+    <div class="col-lg-4">
+      <div class="card shadow mb-4">
+        <div class="card-body text-center">
+          <img
+            src="/images/logo.png"
+            class="rounded-circle shadow mb-3"
+            width="150"
+            height="150"
+            alt="Profile"
+          />
 
-        <button
-            type="button"
-            class="btn btn-save"
-            id="btnEdit">
-            <i class="fas fa-edit mr-1"></i>
-            Edit Profile
-        </button>
+          <h4 class="font-weight-bold mb-1" id="profileFullName">Loading...</h4>
 
+          <p class="text-muted mb-2" id="profileUsername"></p>
+
+          <span class="badge badge-success px-3 py-2" id="profileRole"></span>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
+    <!-- Information -->
+    <div class="col-lg-8">
+      <form id="profileForm" novalidate>
+        <div class="card shadow mb-4">
+          <div class="card-header bg-danger text-white">
+            <h5 class="m-0">
+              <i class="fas fa-id-card mr-2"></i>
+              Account Information
+            </h5>
+          </div>
 
-        <!-- Profile Card -->
-        <div class="col-lg-4">
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="fullName">Full Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="fullName"
+                  autocomplete="off"
+                  readonly
+                />
+                <div class="invalid-feedback">Full name is required.</div>
+              </div>
 
-            <div class="card shadow mb-4">
-
-                <div class="card-body text-center">
-
-                    <img
-                        src="/images/logo.png"
-                        class="rounded-circle shadow mb-3"
-                        width="150"
-                        height="150"
-                        alt="Profile">
-
-                    <h4
-                        class="font-weight-bold mb-1"
-                        id="profileFullName">
-                        Loading...
-                    </h4>
-
-                    <p
-                        class="text-muted"
-                        id="profileEmployeeId">
-                        Employee ID
-                    </p>
-
-                    <span class="badge badge-success px-3 py-2">
-                        Active Member
-                    </span>
-
-                </div>
-
+              <div class="form-group col-md-6">
+                <label for="username">Username</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  autocomplete="off"
+                  readonly
+                />
+                <div class="invalid-feedback">Username is required.</div>
+              </div>
             </div>
 
-        </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="role">Role</label>
+                <input type="text" class="form-control" id="role" readonly />
+              </div>
 
-        <!-- Information -->
-        <div class="col-lg-8">
+              <div class="form-group col-md-4">
+                <label for="createdDate">Created</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="createdDate"
+                  readonly
+                />
+              </div>
 
-            <div class="card shadow mb-4">
-
-                <div class="card-header bg-danger text-white">
-
-                    <h5 class="m-0">
-                        <i class="fas fa-id-card mr-2"></i>
-                        Personal Information
-                    </h5>
-
-                </div>
-
-                <div class="card-body">
-
-                    <div class="form-row">
-
-                        <div class="form-group col-md-6">
-
-                            <label>Employee ID</label>
-
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="employeeId"
-                                readonly>
-
-                        </div>
-
-                        <div class="form-group col-md-6">
-
-                            <label>Full Name</label>
-
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="fullName"
-                                readonly>
-
-                        </div>
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label>Address</label>
-
-                        <textarea
-                            class="form-control"
-                            id="address"
-                            rows="3"
-                            readonly></textarea>
-
-                    </div>
-
-                    <div class="form-row">
-
-                        <div class="form-group col-md-6">
-
-                            <label>Contact No.</label>
-
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="contact"
-                                readonly>
-
-                        </div>
-
-                        <div class="form-group col-md-6">
-
-                            <label>Registered By</label>
-
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="registeredBy"
-                                readonly>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
+              <div class="form-group col-md-4">
+                <label for="updatedDate">Last Updated</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="updatedDate"
+                  readonly
+                />
+              </div>
             </div>
 
-        </div>
+            <!-- Shown only while editing -->
+            <div id="passwordSection" class="d-none">
+              <hr />
 
+              <h6 class="font-weight-bold mb-1">Change Password</h6>
+              <p class="small text-muted">
+                Leave these blank to keep your current password.
+              </p>
+
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <label for="currentPassword">Current Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="currentPassword"
+                    autocomplete="current-password"
+                  />
+                  <div class="invalid-feedback">
+                    Enter your current password.
+                  </div>
+                </div>
+
+                <div class="form-group col-md-4">
+                  <label for="newPassword">New Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="newPassword"
+                    autocomplete="new-password"
+                  />
+                  <div class="invalid-feedback">At least 6 characters.</div>
+                </div>
+
+                <div class="form-group col-md-4">
+                  <label for="confirmPassword">Confirm Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="confirmPassword"
+                    autocomplete="new-password"
+                  />
+                  <div class="invalid-feedback">Passwords don't match.</div>
+                </div>
+              </div>
+            </div>
+
+            <div id="editActions" class="text-right d-none">
+              <button type="button" class="btn btn-cancel" id="btnCancel">
+                Cancel
+              </button>
+
+              <button type="submit" class="btn btn-save" id="btnSave">
+                <i class="fas fa-save mr-1"></i>
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
-
+  </div>
 </div>

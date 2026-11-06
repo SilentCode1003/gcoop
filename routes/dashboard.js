@@ -48,8 +48,7 @@ router.get("/load", async function (req, res) {
                 mm_contact_no AS contact,
                 mm_register_date AS registerdate
             FROM master_members
-            ORDER BY mm_register_date DESC
-            LIMIT 5
+            ORDER BY mm_employee_id ASC
         `);
 
         res.json({

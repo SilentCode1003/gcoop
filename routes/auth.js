@@ -55,7 +55,7 @@ router.post("/login", async function (req, res) {
     }
 
     const [user] = await Query(
-      "SELECT mu_id, mu_role, mu_username FROM master_users WHERE mu_username = ? AND mu_password = ?",
+      "SELECT mu_id, mu_fullname, mu_role, mu_username FROM master_users WHERE mu_username = ? AND mu_password = ?",
       [value.username, EncryptString(value.password)]
     );
 
@@ -74,6 +74,7 @@ router.post("/login", async function (req, res) {
       req.session.roleName = access.roleName;
       req.session.permissions = access.permissions;
       req.session.username = user.mu_username;
+      req.session.fullname = user.mu_fullname;
 
       req.session.save((err) => {
         if (err) return res.status(500).json({ success: false, message: "Session error" });
@@ -113,5 +114,7 @@ router.post("/logout", async function (req, res) {
     res.sendStatus(204);
   });
 });
+
+
 
 module.exports = router;
