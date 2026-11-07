@@ -19,6 +19,7 @@ router.get("/", function (req, res) {
         title: "Routes",
         // pageStyle: "/stylesheets/routes.css",
         pageScript: "../scripts/routes-script.ejs",
+        roleName: req.session.roleName
     });
 });
 

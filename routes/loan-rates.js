@@ -21,6 +21,7 @@ router.get("/", function (req, res) {
         title: "Loan Rates",
         // pageStyle: "/stylesheets/dashboard.css",
         pageScript: "../scripts/loanrates-script.ejs",
+        roleName: req.session.roleName
     });
 });
 
@@ -52,7 +53,7 @@ router.post("/create-loanrate",async function (req, res) {
    if (error) {
      return res.status(400).json({ success: false, message: error });
    }
-   res.json({ success: true, message: "Permission updated.", data: updateloanRates });
+   res.json({ success: true, message: "Loan Rate updated.", data: updateloanRates });
  });
 
 // Delete  Loan Rate

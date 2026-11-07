@@ -20,6 +20,7 @@ router.get("/", function (req, res, next) {
     body: "../pages/denominations-page.ejs",
     title: "Denominations",
     pageScript: "../scripts/denominations-script.ejs",
+     roleName: req.session.roleName
   });
 });
 

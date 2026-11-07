@@ -9,6 +9,7 @@ router.get("/", function (req, res) {
         title: "Dashboard",
         pageStyle: "dashboard.css",
         pageScript: "../scripts/dashboard-script.ejs",
+        roleName: req.session.roleName
     });
 });
 

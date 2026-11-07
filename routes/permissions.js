@@ -24,6 +24,7 @@ router.get("/", function (req, res) {
         title: "Permissions",
         // pageStyle: "/stylesheets/routes.css",
         pageScript: "../scripts/permissions-script.ejs",
+        roleName: req.session.roleName
     });
 });
 

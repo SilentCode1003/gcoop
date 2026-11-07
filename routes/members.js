@@ -25,6 +25,7 @@ router.get("/", function (req, res) {
     title: "Members",
     pageStyle: "/stylesheets/dashboard.css",
     pageScript: "../scripts/members-script.ejs",
+    roleName: req.session.roleName
   });
 });
 

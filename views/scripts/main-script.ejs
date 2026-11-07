@@ -9,6 +9,11 @@
 <script src="/javascripts/sb-admin-2.min.js"></script>
 
 <script>
+    const roleName = "<%= typeof roleName !== 'undefined' ? roleName : '' %>";
+</script>
+
+<script>
+
   // ==========================
   // AJAX Utility
   // ==========================
@@ -136,5 +141,21 @@
     filterTable();
   });
 
+  // ==========================
+// ROLE ACCESS
+// ==========================
+
+$(function () {
+
+    if (roleName === "Custodian") {
+
+        $("#menuUsers").hide();
+        $("#menuRoles").hide();
+        $("#menuRoutes").hide();
+        $("#menuPermissions").hide();
+
+    }
+
+});
 
 </script>

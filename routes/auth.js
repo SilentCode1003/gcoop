@@ -44,6 +44,7 @@ router.get("/", function (req, res, next) {
     title: "5L | COOP",
     pageStyle: "../stylesheets/login.css",
     pageScript: "../scripts/login-script.ejs",
+    roleName: ""
   });
 });
 

@@ -24,6 +24,7 @@ router.get("/", function (req, res) {
     title: "User Accounts",
     pageStyle: "../stylesheets/users.css",
     pageScript: "../scripts/users-script.ejs",
+    roleName: req.session.roleName
   });
 });
 
