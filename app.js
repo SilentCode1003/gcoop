@@ -19,6 +19,8 @@ var loanRatesRouter = require('./routes/loan-rates')
 var denominationRouter = require('./routes/denominations')
 var profileRouter = require('./routes/profile')
 var settingsRouter = require('./routes/settings')
+var mSavingsRouter = require('./routes/member-savings')
+var sLedgerRouter = require('./routes/savings-ledger')
 
 
 
@@ -51,6 +53,8 @@ app.use('/loan-rates', loanRatesRouter)
 app.use('/denominations', denominationRouter)
 app.use('/profile', profileRouter)
 app.use('/settings', settingsRouter)
+app.use('/member-savings', mSavingsRouter)
+app.use('/savings-ledger', sLedgerRouter)
 
 // // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
