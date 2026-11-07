@@ -6,7 +6,7 @@ const {EncryptString, DecryptString} = require("../database/cryptography.js")
 router.get("/", (req, res) => {
     res.render("layout/main-layout", {
         body: "../pages/savingsledger-page.ejs",
-        title: "Roles",
+        title: "Savings Ledger",
         pageScript: "../scripts/savingsledger-script.ejs",
         roleName: req.session.roleName
     });
