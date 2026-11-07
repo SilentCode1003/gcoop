@@ -1,0 +1,316 @@
+<script>
+  $(document).ready(function () {
+    let savingsById = {};
+
+    // ==========================
+    // HELPERS
+    // ==========================
+
+    const formatDate = (date) => {
+      if (!date) return "";
+      return new Date(date).toLocaleString();
+    };
+
+    const esc = (v) =>
+      String(v ?? "").replace(
+        /[&<>"']/g,
+        (c) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[c],
+      );
+
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+    });
+
+    const errorMessage = (err, fallback) =>
+      err?.responseJSON?.message || fallback;
+
+    // ==========================
+    // LOAD SAVINGS
+    // ==========================
+
+    async function loadSavings() {
+      const savings = await queryUtility.Load("/member-savings/load-savings");
+
+      const $tbody = $("#memberSavingsTable").empty();
+
+      savingsById = {};
+
+      savings.forEach((s) => {
+        savingsById[s.id] = s;
+
+        $tbody.append(`
+                <tr>
+                    <td>${esc(s.memberName)}</td>
+                    <td>₱ ${Number(s.currentBalance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td>${esc(formatDate(s.updatedAt))}</td>
+
+                    <td>
+                        <button
+                            type="button"
+                            class="btn btn-secondary btn-sm btn-edit"
+                            data-id="${esc(s.id)}">
+
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-danger btn-sm ml-2 btn-delete"
+                            data-id="${esc(s.id)}">
+
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `);
+      });
+    }
+
+    // ==========================
+    // LOAD MEMBERS
+    // ==========================
+
+    async function loadMembers(selected = "") {
+      const members = await queryUtility.Load("/member-savings/insert-member");
+
+      $("#MemberId").empty();
+
+      $("#MemberId").append(`
+            <option value="">Select Member</option>
+        `);
+
+      members.forEach((m) => {
+        $("#MemberId").append(`
+                <option value="${m.id}">
+                    ${m.fullName}
+                </option>
+            `);
+      });
+
+      $("#MemberId").val(selected);
+    }
+
+    // ==========================
+    // OPEN MODAL
+    // ==========================
+
+    async function openModal(data = null) {
+      $("#memberSavingsForm")[0].reset();
+
+      $("#memberSavingsForm .form-control").removeClass("is-invalid");
+
+      $("#SavingsId").val("");
+
+      await loadMembers(data ? data.memberId : "");
+
+      if (data) {
+        $("#memberSavingsModalLabel").html(`
+                <i class="fas fa-edit mr-2"></i>
+                Edit Savings
+            `);
+
+        $("#SavingsId").val(data.id);
+
+        $("#CurrentBalance").val(data.currentBalance);
+      } else {
+        $("#memberSavingsModalLabel").html(`
+                <i class="fas fa-plus mr-2"></i>
+                Add Savings
+            `);
+      }
+
+      $("#memberSavingsModal").modal("show");
+    }
+
+    // ==========================
+    // FORM DATA
+    // ==========================
+
+    function getFormData() {
+      return {
+        MemberId: $("#MemberId").val(),
+
+        CurrentBalance: $("#CurrentBalance").val(),
+      };
+    }
+
+    // ==========================
+    // VALIDATION
+    // ==========================
+
+    function validate(data) {
+      let valid = true;
+
+      $("#MemberId").toggleClass("is-invalid", !data.MemberId);
+
+      $("#CurrentBalance").toggleClass(
+        "is-invalid",
+        data.CurrentBalance === "" || Number(data.CurrentBalance) < 0,
+      );
+
+      if (!data.MemberId) valid = false;
+
+      if (data.CurrentBalance === "" || Number(data.CurrentBalance) < 0)
+        valid = false;
+
+      return valid;
+    }
+
+    // ==========================
+    // ADD BUTTON
+    // ==========================
+
+    $("#btnAdd").click(function () {
+      openModal();
+    });
+
+    // ==========================
+    // EDIT
+    // ==========================
+
+    $("#memberSavingsTable").on("click", ".btn-edit", function () {
+      openModal(savingsById[$(this).data("id")]);
+    });
+
+    // ==========================
+    // SAVE
+    // ==========================
+
+    $("#memberSavingsForm").submit(async function (e) {
+      e.preventDefault();
+
+      const id = $("#SavingsId").val();
+
+      const isEdit = id !== "";
+
+      const payload = getFormData();
+
+      if (!validate(payload)) return;
+
+      const confirm = await Swal.fire({
+        title: isEdit ? "Save changes?" : "Add Savings?",
+
+        icon: "question",
+
+        showCancelButton: true,
+
+        confirmButtonText: isEdit ? "Save" : "Add",
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      Swal.fire({
+        title: "Saving...",
+
+        allowOutsideClick: false,
+
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        if (isEdit) {
+          await queryUtility.Update(
+            "/member-savings/update-savings/" + encodeURIComponent(id),
+
+            payload,
+          );
+        } else {
+          await queryUtility.Save(
+            "/member-savings/create-savings",
+
+            payload,
+          );
+        }
+
+        $("#memberSavingsModal").modal("hide");
+
+        await loadSavings();
+
+        Swal.close();
+
+        Toast.fire({
+          icon: "success",
+
+          title: isEdit
+            ? "Savings updated successfully"
+            : "Savings added successfully",
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+
+          title: isEdit ? "Update failed" : "Create failed",
+
+          text: errorMessage(err, "Something went wrong."),
+        });
+      }
+    });
+
+    // ==========================
+    // DELETE
+    // ==========================
+
+    $("#memberSavingsTable").on("click", ".btn-delete", async function () {
+      const id = $(this).data("id");
+
+      const row = savingsById[id];
+
+      if (!row) return;
+
+      const confirm = await Swal.fire({
+        title: "Delete Savings?",
+
+        text: `Delete ${row.memberName}'s savings record?`,
+
+        icon: "warning",
+
+        showCancelButton: true,
+
+        confirmButtonText: "Delete",
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      try {
+        await queryUtility.Delete(
+          "/member-savings/delete-savings/" + encodeURIComponent(id),
+        );
+
+        await loadSavings();
+
+        Toast.fire({
+          icon: "success",
+
+          title: "Savings deleted",
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+
+          title: "Delete failed",
+
+          text: errorMessage(err, "Something went wrong."),
+        });
+      }
+    });
+
+    // ==========================
+    // INIT
+    // ==========================
+
+    loadMembers();
+
+    loadSavings();
+  });
+</script>
