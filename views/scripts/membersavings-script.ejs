@@ -42,7 +42,7 @@
     async function loadSavings() {
       const savings = await queryUtility.Load("/member-savings/load-savings");
 
-      const $tbody = $("#memberSavingsTable").empty();
+      const $tbody = $("#savingsTable").empty();
 
       savingsById = {};
 
@@ -179,7 +179,7 @@
     // EDIT
     // ==========================
 
-    $("#memberSavingsTable").on("click", ".btn-edit", function () {
+    $("#savingsTable").on("click", ".btn-edit", function () {
       openModal(savingsById[$(this).data("id")]);
     });
 
@@ -261,7 +261,7 @@
     // DELETE
     // ==========================
 
-    $("#memberSavingsTable").on("click", ".btn-delete", async function () {
+    $("#savingsTable").on("click", ".btn-delete", async function () {
       const id = $(this).data("id");
 
       const row = savingsById[id];
