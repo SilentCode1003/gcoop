@@ -1,305 +1,517 @@
-/* ==========================
-   ADD BUTTON
-========================== */
+/* ==========================================================
+   5L COOP
+   BUTTONS.CSS
+   Modern Glass Buttons
+========================================================== */
 
-.btn-add{
-    background:#000 !important;
-    border:1px solid #000 !important;
-    color:#fff !important;
+/* ==========================================
+   BASE BUTTON
+========================================== */
+
+.btn{
 
     display:inline-flex;
     align-items:center;
     justify-content:center;
     gap:8px;
 
-    padding:8px 18px;
-    border-radius:6px;
+    min-height:44px;
+    padding:0 22px !important;
 
-    font-size:15px;
+    border:none !important;
+    border-radius:14px !important;
+
+    font-size:14px;
     font-weight:600;
 
-    transition:all .3s ease;
+    cursor:pointer;
+    user-select:none;
+
+    transition:
+        background .25s ease,
+        color .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease,
+        transform .25s ease;
+
+    box-shadow:none;
+
 }
 
-.btn-add:hover{
-    background:#222 !important;
-    border-color:#222 !important;
-    color:#fff !important;
+.btn i{
+    color:inherit;
+}
+
+.btn:hover{
     transform:translateY(-2px);
 }
 
-.btn-add:focus,
-.btn-add:active{
-    background:#000 !important;
-    border-color:#000 !important;
-    color:#fff !important;
-    box-shadow:none !important;
+.btn:active{
+    transform:translateY(0) scale(.97);
 }
 
+/* ==========================================
+   PRIMARY
+========================================== */
+
+.btn-primary,
+.btn-save,
+#btnSave{
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    ) !important;
+
+    color:#fff !important;
+
+    box-shadow:0 10px 24px rgba(153,27,27,.28);
+
+}
+
+.btn-primary:hover,
+.btn-save:hover,
+#btnSave:hover{
+
+    box-shadow:0 16px 34px rgba(153,27,27,.42);
+
+}
+
+/* ==========================================
+   ADD BUTTON
+========================================== */
+
+#btnAdd,
+.btn-add,
+.btn-add-user{
+
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    padding:12px 22px !important;
+    min-height:44px;
+
+    background:#ef4444 !important;
+    background-image:none !important;
+
+    color:#ffffff !important;
+
+    border:2px solid #f87171 !important;
+    border-radius:12px !important;
+
+    font-weight:600;
+
+    box-shadow:
+        0 10px 24px rgba(239,68,68,.35);
+
+    transition:all .25s ease;
+}
+
+#btnAdd i,
 .btn-add i{
     color:#fff !important;
 }
 
-/* ==========================
-   EDIT BUTTON
-========================== */
+#btnAdd:hover,
+.btn-add:hover,
+.btn-add-user:hover{
 
-.btn-edit{
-    width:36px;
-    height:36px;
+    background:#f87171 !important;
 
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
+    border-color:#fca5a5 !important;
 
-    padding:0;
-
-    background:#6c757d !important;
-    border:1px solid #6c757d !important;
     color:#fff !important;
 
-    border-radius:4px;
-    transition:all .3s ease;
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 14px 30px rgba(248,113,113,.45);
+}
+
+#btnAdd:active,
+.btn-add:active{
+
+    transform:scale(.97);
+
+    background:#ef4444 !important;
+}
+/* ==========================================
+   SUCCESS
+========================================== */
+
+.btn-success{
+
+    background:linear-gradient(
+        135deg,
+        #16a34a,
+        #15803d
+    ) !important;
+
+    color:#fff !important;
+
+}
+
+/* ==========================================
+   INFO
+========================================== */
+
+.btn-info{
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    ) !important;
+
+    color:#fff !important;
+
+}
+
+/* ==========================================
+   WARNING
+========================================== */
+
+.btn-warning{
+
+    background:linear-gradient(
+        135deg,
+        #f59e0b,
+        #d97706
+    ) !important;
+
+    color:#fff !important;
+
+}
+
+/* ==========================================
+   DANGER
+========================================== */
+
+.btn-danger,
+.btn-delete{
+
+    background:linear-gradient(
+        135deg,
+        #ef4444,
+        #b91c1c
+    ) !important;
+
+    color:#fff !important;
+
+    box-shadow:0 10px 24px rgba(239,68,68,.30);
+
+}
+
+.btn-danger:hover,
+.btn-delete:hover{
+
+    box-shadow:0 16px 34px rgba(239,68,68,.42);
+
+}
+
+/* ==========================================
+   DARK BUTTON
+========================================== */
+
+.btn-dark,
+.btn-black{
+
+    background:#1f1f1f !important;
+
+    color:#fff !important;
+
+}
+
+.btn-dark:hover,
+.btn-black:hover{
+
+    background:#111 !important;
+
+}
+
+/* ==========================================
+   REFRESH BUTTON
+========================================== */
+
+.btn-refresh{
+
+    background:var(--glass) !important;
+
+    border:1px solid var(--border) !important;
+
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    color:var(--text) !important;
+
+    box-shadow:0 8px 18px rgba(0,0,0,.08);
+
+}
+
+.btn-refresh:hover{
+
+    background:var(--primary) !important;
+
+    border-color:var(--primary) !important;
+
+    color:#fff !important;
+
+    box-shadow:0 14px 30px rgba(153,27,27,.35);
+
+}
+
+html.dark .btn-refresh{
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    ) !important;
+
+    border-color:var(--primary) !important;
+
+    color:#fff !important;
+
+    box-shadow:0 14px 34px rgba(153,27,27,.42);
+
+}
+
+html.dark .btn-refresh:hover{
+
+    background:linear-gradient(
+        135deg,
+        #c01d1d,
+        #7f1d1d
+    ) !important;
+
+    border-color:#c01d1d !important;
+
+    box-shadow:0 18px 40px rgba(153,27,27,.50);
+
+}
+
+html.dark .btn-refresh i{
+    color:#fff !important;
+}
+
+/* ==========================================
+   EDIT
+========================================== */
+
+.btn-edit{
+
+    width:40px;
+    height:40px;
+
+    padding:0 !important;
+
+    border-radius:12px !important;
+
+    background:linear-gradient(
+        135deg,
+        #6b7280,
+        #4b5563
+    ) !important;
+
+    color:#fff !important;
+
 }
 
 .btn-edit:hover{
-    background:#5a6268 !important;
-    border-color:#5a6268 !important;
-    color:#fff !important;
-    transform:translateY(-2px);
+
+    box-shadow:0 10px 24px rgba(107,114,128,.35);
+
 }
 
-.btn-edit:focus,
-.btn-edit:active{
-    box-shadow:none !important;
-}
-
-.btn-edit i{
-    color:#fff !important;
-}
-
-/* ==========================
-   DELETE BUTTON
-========================== */
+/* ==========================================
+   DELETE ICON BUTTON
+========================================== */
 
 .btn-delete{
-    width:36px;
-    height:36px;
 
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
+    width:40px;
+    height:40px;
 
-    padding:0;
+    padding:0 !important;
 
-    background:#dc3545 !important;
-    border:1px solid #dc3545 !important;
-    color:#fff !important;
+    border-radius:12px !important;
 
-    border-radius:4px;
-    transition:all .3s ease;
 }
 
-.btn-delete:hover{
-    background:#bb2d3b !important;
-    border-color:#bb2d3b !important;
-    color:#fff !important;
-    transform:translateY(-2px);
-}
-
-.btn-delete:focus,
-.btn-delete:active{
-    box-shadow:none !important;
-}
-
-.btn-delete i{
-    color:#fff !important;
-}
-
-/* ==========================
-   MODAL FOOTER
-========================== */
-
-.modal-footer{
-    display:flex !important;
-    justify-content:center !important;
-    align-items:center !important;
-    gap:12px;
-}
-
-/* ==========================
-   SAVE BUTTON
-========================== */
-
-.modal-footer .btn-save{
-    min-width:120px;
-    padding:8px 20px;
-
-    background:#991b1b !important;
-    border:1px solid #991b1b !important;
-    color:#fff !important;
-
-    border-radius:6px;
-    font-weight:600;
-
-    transition:all .3s ease;
-}
-
-.modal-footer .btn-save:hover{
-    background:#7f1d1d !important;
-    border-color:#7f1d1d !important;
-    color:#fff !important;
-    transform:translateY(-2px);
-}
-
-/* ==========================
-   CANCEL BUTTON
-========================== */
-
-.modal-footer .btn-cancel{
-    min-width:120px;
-    padding:8px 20px;
-
-    background:#6c757d !important;
-    border:1px solid #6c757d !important;
-    color:#fff !important;
-
-    border-radius:6px;
-    font-weight:600;
-
-    transition:all .3s ease;
-}
-
-.modal-footer .btn-cancel:hover{
-    background:#5a6268 !important;
-    border-color:#5a6268 !important;
-    color:#fff !important;
-    transform:translateY(-2px);
-}
-
-.modal-footer .btn-save:focus,
-.modal-footer .btn-save:active,
-.modal-footer .btn-cancel:focus,
-.modal-footer .btn-cancel:active{
-    box-shadow:none !important;
-}
-
-/* ==========================
-   ACTION BUTTONS
-========================== */
-
-.action-buttons{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:6px;
-}
-
-.action-buttons .btn{
-    width:36px;
-    height:36px;
-    padding:0;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-.action-buttons .btn i{
-    font-size:14px;
-    line-height:1;
-}
-/* ==========================
-   PROFILE BUTTONS
-========================== */
+/* ==========================================
+   PROFILE
+========================================== */
 
 #btnEdit,
-#btnSave {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+#btnSave,
+#btnCancel{
 
-    min-width: 140px;
-    height: 42px;
+    min-width:150px;
 
-    padding: 0 18px;
-
-    background: #991b1b !important;
-    border: 1px solid #991b1b !important;
-    color: #fff !important;
-
-    border-radius: 6px;
-    font-size: 15px;
-    font-weight: 600;
-
-    transition: all .25s ease;
 }
 
-#btnEdit:hover,
-#btnSave:hover {
-    background: #7f1d1d !important;
-    border-color: #7f1d1d !important;
-    color: #fff !important;
+#btnEdit{
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    ) !important;
+
+    color:#fff !important;
+
 }
 
-#btnCancel {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
+/* ==========================================
+   ICON BUTTONS
+========================================== */
 
-    min-width: 140px;
-    height: 42px;
+.btn-icon{
 
-    padding: 0 18px;
+    width:44px;
+    height:44px;
 
-    background: #6c757d !important;
-    border: 1px solid #6c757d !important;
-    color: #fff !important;
+    padding:0 !important;
 
-    border-radius: 6px;
-    font-size: 15px;
-    font-weight: 600;
+    border-radius:50% !important;
 
-    transition: all .25s ease;
 }
 
-#btnCancel:hover {
-    background: #5a6268 !important;
-    border-color: #5a6268 !important;
-    color: #fff !important;
+/* ==========================================
+   OUTLINE
+========================================== */
+
+.btn-outline-primary{
+
+    background:transparent;
+
+    border:1px solid var(--primary) !important;
+
+    color:var(--primary) !important;
+
 }
 
-#btnEdit i,
-#btnSave i,
-#btnCancel i {
-    color: #fff !important;
+.btn-outline-primary:hover{
+
+    background:var(--primary) !important;
+
+    color:#fff !important;
+
 }
 
-/* Save / Edit */
+/* ==========================================
+   DISABLED
+========================================== */
 
-.btn-save {
-    background: #991b1b !important;
-    border: 1px solid #991b1b !important;
-    color: #fff !important;
+.btn:disabled{
+
+    opacity:.55;
+
+    cursor:not-allowed;
+
+    transform:none !important;
+
+    box-shadow:none !important;
+
 }
 
-.btn-save:hover {
-    background: #7f1d1d !important;
-    border-color: #7f1d1d !important;
-    color: #fff !important;
+/* ==========================================
+   FOCUS
+========================================== */
+
+.btn:focus{
+
+    outline:none;
+
+    box-shadow:
+        0 0 0 4px rgba(153,27,27,.18) !important;
+
 }
 
-/* Cancel */
+/* ==========================================
+   RESPONSIVE
+========================================== */
 
+@media (max-width:768px){
+
+    .btn{
+        width:100%;
+    }
+
+    .btn-edit,
+    .btn-delete,
+    .btn-icon{
+
+        width:40px;
+        min-width:40px;
+
+    }
+
+}
+/* ==========================================================
+   LOGOUT BUTTON
+========================================================== */
+
+.btn-logout{
+    background:#7B1E1E;
+    border:1px solid #7B1E1E;
+    color:#fff;
+}
+
+.btn-logout:hover{
+    background:#651818;
+    border-color:#651818;
+    color:#fff;
+}
+
+.btn-logout:focus,
+.btn-logout:active{
+    background:#4F1313 !important;
+    border-color:#4F1313 !important;
+    color:#fff !important;
+    box-shadow:none !important;
+}
+
+/* ==========================================================
+   CANCEL BUTTON
+========================================================== */
+
+#btnCancelRoute,
 .btn-cancel {
-    background: #6c757d !important;
-    border: 1px solid #6c757d !important;
+    background: #6b7280 !important;
+    background-image: none !important;
+
     color: #fff !important;
+
+    border: 1px solid #6b7280 !important;
+    border-radius: 12px !important;
+
+    box-shadow: 0 8px 18px rgba(107, 114, 128, .25);
+
+    cursor: pointer;
 }
 
+#btnCancelRoute:hover,
 .btn-cancel:hover {
-    background: #5a6268 !important;
-    border-color: #5a6268 !important;
+    background: #4b5563 !important;
+    border-color: #4b5563 !important;
+    color: #fff !important;
+
+    transform: translateY(-2px);
+}
+
+#btnCancelRoute:active,
+.btn-cancel:active {
+    background: #374151 !important;
+    border-color: #374151 !important;
+    color: #fff !important;
+
+    transform: scale(.97);
+}
+
+#btnCancelRoute i {
     color: #fff !important;
 }

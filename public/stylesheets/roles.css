@@ -1,74 +1,151 @@
-/* ==========================
-   SWEETALERT2 THEME
-========================== */
+/* ==========================================================
+   ROLES PAGE
+========================================================== */
 
-.swal2-popup{
-    background: var(--card) !important;
-    color: var(--text) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 12px !important;
+/* ==========================================================
+   PAGE TITLE
+========================================================== */
+
+.roles-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    margin-bottom:24px;
+
+    color:var(--text);
+
+    font-size:30px;
+    font-weight:700;
 }
 
-.swal2-popup *,
-.swal2-title,
-.swal2-html-container,
-.swal2-content,
-.swal2-footer{
-    color: var(--text) !important;
+.roles-title i{
+    color:var(--primary);
 }
 
-.swal2-toast{
-    background: var(--card) !important;
-    color: var(--text) !important;
-    border: 1px solid var(--border) !important;
+/* ==========================================================
+   ROLES CARD
+========================================================== */
+
+.roles-table{
+
+    background:var(--card);
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    border:1px solid var(--border);
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
 }
 
-.swal2-toast *,
-.swal2-toast .swal2-title,
-.swal2-toast .swal2-html-container{
-    color: var(--text) !important;
+.roles-table .card-header{
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+
+    border:none;
+
+    padding:16px 24px;
 }
 
-.swal2-input,
-.swal2-textarea,
-.swal2-select{
-    background: var(--table) !important;
-    color: var(--text) !important;
-    border: 1px solid var(--border) !important;
+.roles-table .card-header h5{
+
+    margin:0;
+
+    color:#fff;
+
+    font-size:18px;
+    font-weight:700;
 }
 
-.swal2-input::placeholder{
-    color:#999 !important;
+.roles-table .card-body{
+
+    background:transparent;
+
+    padding:24px;
 }
 
-.swal2-confirm{
-    background: var(--primary) !important;
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.roles-table table{
+    margin-bottom:0;
+}
+
+.roles-table th,
+.roles-table td{
+    text-align:center;
+    vertical-align:middle;
+}
+
+/* ==========================================================
+   LIGHT MODE
+========================================================== */
+
+html:not(.dark) .roles-table{
+
+    background:rgba(255,255,255,.18);
+
+    border:1px solid rgba(255,255,255,.20);
+}
+
+/* ==========================================================
+   DARK MODE
+========================================================== */
+
+html.dark .roles-table{
+
+    background:rgba(22,22,22,.38);
+
+    border-color:rgba(255,255,255,.08);
+}
+
+html.dark .roles-table .card-body{
+    background:transparent;
+}
+
+/* ==========================================================
+   FORCE ROLES ADD BUTTON
+========================================================== */
+
+.roles-table .card-header #btnAdd{
+    background:#6b7280 !important;
+    background-image:none !important;
     color:#fff !important;
-    border:none !important;
+
+    border:1px solid #6b7280 !important;
+    border-radius:12px !important;
+
+    min-height:44px !important;
+    padding:0 22px !important;
+
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:8px !important;
+
+    box-shadow:0 10px 24px rgba(107,114,128,.30) !important;
 }
 
-.swal2-confirm:hover{
-    background: var(--primary-hover) !important;
-}
+.roles-table .card-header #btnAdd:hover{
+    background:#4b5563 !important;
+    border-color:#4b5563 !important;
 
-.swal2-cancel{
-    background:#6c757d !important;
     color:#fff !important;
-    border:none !important;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 16px 34px rgba(75,85,99,.40) !important;
 }
 
-.swal2-close{
-    color: var(--text) !important;
-}
-
-.swal2-footer{
-    border-top:1px solid var(--border) !important;
-}
-
-.swal2-icon{
-    margin:1.5em auto .8em !important;
-}
-
-.swal2-timer-progress-bar{
-    background: var(--primary) !important;
+.roles-table .card-header #btnAdd i{
+    color:#fff !important;
 }

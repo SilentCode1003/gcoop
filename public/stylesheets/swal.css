@@ -1,0 +1,368 @@
+/* =====================================================
+   SWAL.CSS
+   5L COOP GLASSMORPHISM SWEETALERT2
+===================================================== */
+
+/* ==========================
+   Container
+========================== */
+
+.swal2-container{
+    z-index:99999 !important;
+}
+
+/* ==========================
+   Popup
+========================== */
+
+.swal2-popup{
+
+    background:rgba(28,28,28,.78) !important;
+
+    backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+
+    border:1px solid rgba(255,255,255,.12) !important;
+
+    border-radius:22px !important;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.45) !important;
+
+    color:#fff !important;
+
+    padding:25px;
+}
+
+/* Light Mode */
+
+html:not(.dark) .swal2-popup{
+
+    background:rgba(255,255,255,.18) !important;
+
+    border:1px solid rgba(255,255,255,.30) !important;
+}
+
+/* Dark Mode */
+
+html.dark .swal2-popup{
+
+    background:rgba(18,18,18,.80) !important;
+}
+
+/* ==========================
+   Title
+========================== */
+
+.swal2-title{
+
+    color:#fff !important;
+
+    font-size:26px;
+
+    font-weight:700;
+
+    margin-bottom:10px;
+}
+
+/* ==========================
+   Description
+========================== */
+
+.swal2-html-container{
+
+    color:rgba(255,255,255,.90) !important;
+
+    font-size:15px;
+
+    line-height:1.6;
+}
+
+/* ==========================
+   Inputs
+========================== */
+
+.swal2-input,
+.swal2-select,
+.swal2-textarea{
+
+    background:rgba(255,255,255,.10) !important;
+
+    color:#fff !important;
+
+    border:1px solid rgba(255,255,255,.15) !important;
+
+    border-radius:12px !important;
+
+    box-shadow:none !important;
+}
+
+.swal2-input::placeholder{
+
+    color:rgba(255,255,255,.55);
+}
+
+.swal2-input:focus,
+.swal2-select:focus,
+.swal2-textarea:focus{
+
+    border-color:var(--primary) !important;
+
+    box-shadow:
+        0 0 0 4px rgba(153,27,27,.18) !important;
+}
+
+/* ==========================
+   Confirm Button
+========================== */
+
+.swal2-confirm{
+
+    background:var(--primary) !important;
+
+    color:#fff !important;
+
+    border:none !important;
+
+    border-radius:10px !important;
+
+    padding:10px 28px !important;
+
+    font-weight:600 !important;
+
+    transition:.25s;
+}
+
+.swal2-confirm:hover{
+
+    background:var(--primary-hover) !important;
+
+    transform:translateY(-2px);
+}
+
+/* ==========================
+   Cancel Button
+========================== */
+
+.swal2-cancel{
+
+    background:#6c757d !important;
+
+    color:#fff !important;
+
+    border:none !important;
+
+    border-radius:10px !important;
+
+    padding:10px 28px !important;
+
+    font-weight:600 !important;
+
+    transition:.25s;
+}
+
+.swal2-cancel:hover{
+
+    background:#545b62 !important;
+
+    transform:translateY(-2px);
+}
+
+/* ==========================
+   Deny Button
+========================== */
+
+.swal2-deny{
+
+    background:#ef4444 !important;
+
+    color:#fff !important;
+
+    border:none !important;
+
+    border-radius:10px !important;
+
+    padding:10px 28px !important;
+}
+
+/* ==========================
+   Close Button
+========================== */
+
+.swal2-close{
+
+    color:#fff !important;
+
+    transition:.25s;
+}
+
+.swal2-close:hover{
+
+    transform:rotate(90deg);
+
+    color:#fff !important;
+}
+
+/* ==========================
+   Toast
+========================== */
+
+.swal2-toast{
+
+    background:rgba(28,28,28,.82) !important;
+
+    backdrop-filter:blur(22px);
+
+    -webkit-backdrop-filter:blur(22px);
+
+    border:1px solid rgba(255,255,255,.12);
+
+    border-radius:16px;
+
+    color:#fff !important;
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.35);
+}
+
+html:not(.dark) .swal2-toast{
+
+    background:rgba(255,255,255,.18) !important;
+}
+
+.swal2-toast .swal2-title,
+.swal2-toast .swal2-html-container{
+
+    color:#fff !important;
+}
+
+/* ==========================
+   Timer Progress
+========================== */
+
+.swal2-timer-progress-bar{
+
+    background:var(--primary) !important;
+}
+
+/* ==========================
+   Icons
+========================== */
+
+.swal2-success-ring{
+
+    border-color:#22c55e !important;
+}
+
+.swal2-success-line-tip,
+.swal2-success-line-long{
+
+    background:#22c55e !important;
+}
+
+.swal2-icon.swal2-success{
+
+    border-color:#22c55e !important;
+}
+
+.swal2-icon.swal2-error{
+
+    border-color:#ef4444 !important;
+
+    color:#ef4444 !important;
+}
+
+.swal2-icon.swal2-warning{
+
+    border-color:#f59e0b !important;
+
+    color:#f59e0b !important;
+}
+
+.swal2-icon.swal2-info{
+
+    border-color:#3b82f6 !important;
+
+    color:#3b82f6 !important;
+}
+
+.swal2-icon.swal2-question{
+
+    border-color:#8b5cf6 !important;
+
+    color:#8b5cf6 !important;
+}
+
+/* ==========================
+   Loader
+========================== */
+
+.swal2-loader{
+
+    border-color:var(--primary) transparent var(--primary) transparent !important;
+}
+
+/* ==========================
+   Actions
+========================== */
+
+.swal2-actions{
+
+    gap:10px;
+
+    margin-top:20px;
+}
+
+/* ==========================
+   Animation
+========================== */
+
+.swal2-show{
+
+    animation:swalGlassShow .25s ease;
+}
+
+.swal2-hide{
+
+    animation:swalGlassHide .2s ease;
+}
+
+@keyframes swalGlassShow{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(-20px) scale(.95);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0) scale(1);
+
+    }
+
+}
+
+@keyframes swalGlassHide{
+
+    from{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+    to{
+
+        opacity:0;
+
+        transform:scale(.96);
+
+    }
+
+}

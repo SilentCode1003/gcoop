@@ -1,0 +1,436 @@
+/* ==========================================================
+   5L COOP
+   TABLES.CSS
+   Modern Glass Tables
+========================================================== */
+
+/* ==========================================
+   TABLE CONTAINER
+========================================== */
+
+.table-responsive{
+
+    border-radius:22px;
+    overflow:auto;
+
+    background:var(--card);
+
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    border:1px solid var(--border);
+
+    box-shadow:var(--shadow);
+
+}
+
+/* ==========================================
+   TABLE
+========================================== */
+
+.table{
+
+    width:100%;
+    margin:0;
+
+    border-collapse:separate;
+    border-spacing:0;
+
+    background:transparent;
+    color:var(--text);
+
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.table thead{
+
+    position:sticky;
+    top:0;
+    z-index:5;
+
+}
+
+.table thead th{
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+
+    color:#fff !important;
+
+    border:none !important;
+
+    padding:18px 20px;
+
+    font-size:14px;
+    font-weight:700;
+
+    text-transform:uppercase;
+    letter-spacing:.7px;
+
+    white-space:nowrap;
+
+}
+
+.table thead th:first-child{
+
+    border-top-left-radius:18px;
+
+}
+
+.table thead th:last-child{
+
+    border-top-right-radius:18px;
+
+}
+
+/* ==========================================
+   BODY
+========================================== */
+
+.table tbody tr{
+
+    transition:
+        background-color .25s ease,
+        transform .25s ease;
+
+}
+
+.table tbody td{
+
+    padding:18px 20px;
+
+    border-top:1px solid var(--border);
+
+    background:transparent;
+
+    color:var(--text);
+
+    vertical-align:middle;
+
+    transition:
+        background-color .25s ease,
+        color .25s ease;
+
+}
+
+/* ==========================================
+   ZEBRA
+========================================== */
+
+/* LIGHT */
+
+html:not(.dark) .table-striped tbody tr:nth-child(odd){
+
+    background:#ffffff;
+
+}
+
+html:not(.dark) .table-striped tbody tr:nth-child(even){
+
+    background:#f7f9fc;
+
+}
+
+/* DARK */
+
+html.dark .table-striped tbody tr:nth-child(odd){
+
+    background:transparent;
+
+}
+
+html.dark .table-striped tbody tr:nth-child(even){
+
+    background:rgba(255,255,255,.03);
+
+}
+
+/* ==========================================
+   HOVER
+========================================== */
+
+/* LIGHT */
+
+html:not(.dark) .table-hover tbody tr:hover{
+
+    background:#edf2f7 !important;
+
+}
+
+html:not(.dark) .table-hover tbody tr:hover td{
+
+    background:#edf2f7 !important;
+
+    color:#1f2937 !important;
+
+}
+
+/* DARK */
+
+html.dark .table-hover tbody tr:hover{
+
+    background:rgba(255,255,255,.06) !important;
+
+}
+
+html.dark .table-hover tbody tr:hover td{
+
+    background:rgba(255,255,255,.06) !important;
+
+    color:#ffffff !important;
+
+}
+
+/* ==========================================
+   LAST ROW
+========================================== */
+
+.table tbody tr:last-child td:first-child{
+
+    border-bottom-left-radius:18px;
+
+}
+
+.table tbody tr:last-child td:last-child{
+
+    border-bottom-right-radius:18px;
+
+}
+
+/* ==========================================
+   LINKS
+========================================== */
+
+.table a{
+
+    color:var(--primary);
+    text-decoration:none;
+
+}
+
+.table a:hover{
+
+    color:var(--primary-hover);
+
+}
+
+/* ==========================================
+   ACTION COLUMN
+========================================== */
+
+.table th:last-child,
+.table td:last-child{
+
+    width:130px;
+    text-align:center;
+    white-space:nowrap;
+
+}
+
+/* ==========================================
+   BADGES
+========================================== */
+
+.table .badge{
+
+    padding:6px 14px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}
+
+/* ==========================================
+   EMPTY
+========================================== */
+
+.dataTables_empty{
+
+    padding:45px !important;
+
+    text-align:center;
+
+    color:var(--text-muted) !important;
+
+}
+
+/* ==========================================
+   DATATABLES
+========================================== */
+
+.dataTables_wrapper{
+
+    color:var(--text);
+
+}
+
+.dataTables_filter{
+
+    margin-bottom:18px;
+
+}
+
+.dataTables_filter label,
+.dataTables_length label{
+
+    color:var(--text);
+
+}
+
+.dataTables_filter input{
+
+    height:42px;
+
+    margin-left:10px;
+
+    padding:0 15px !important;
+
+    border-radius:14px !important;
+
+    border:1px solid var(--border) !important;
+
+    background:var(--glass) !important;
+
+    color:var(--text) !important;
+
+    box-shadow:none !important;
+
+}
+
+.dataTables_filter input:focus{
+
+    border-color:var(--primary) !important;
+
+    box-shadow:0 0 0 4px rgba(153,27,27,.12) !important;
+
+}
+
+.dataTables_filter input::placeholder{
+
+    color:var(--text-muted);
+
+}
+
+.dataTables_length select{
+
+    height:40px;
+
+    border-radius:12px !important;
+
+    border:1px solid var(--border) !important;
+
+    background:var(--glass) !important;
+
+    color:var(--text) !important;
+
+}
+
+.dataTables_info{
+
+    color:var(--text-muted) !important;
+
+    padding-top:18px !important;
+
+}
+
+/* ==========================================
+   PAGINATION
+========================================== */
+
+.dataTables_paginate{
+
+    margin-top:18px !important;
+
+}
+
+.paginate_button{
+
+    min-width:38px;
+    height:38px;
+
+    margin:0 4px !important;
+
+    line-height:26px !important;
+
+    border-radius:12px !important;
+
+    border:1px solid var(--border) !important;
+
+    background:var(--glass) !important;
+
+    color:var(--text) !important;
+
+    transition:.25s;
+
+}
+
+.paginate_button:hover{
+
+    background:var(--primary) !important;
+
+    border-color:var(--primary) !important;
+
+    color:#fff !important;
+
+}
+
+.paginate_button.current{
+
+    background:var(--primary) !important;
+
+    border-color:var(--primary) !important;
+
+    color:#fff !important;
+
+    box-shadow:0 8px 20px rgba(153,27,27,.30);
+
+}
+
+.paginate_button.disabled{
+
+    opacity:.45;
+
+}
+
+/* ==========================================
+   SORT ICONS
+========================================== */
+
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc{
+
+    background-position:right 10px center;
+
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width:768px){
+
+    .table thead th,
+    .table tbody td{
+
+        padding:14px;
+        font-size:13px;
+
+    }
+
+    .table-responsive{
+
+        border-radius:16px;
+
+    }
+
+}

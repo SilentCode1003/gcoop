@@ -1,22 +1,170 @@
-/* ==========================
-   FOOTER CSS
-   (your original file had no footer rules,
-    so this is a basic themed starter)
-========================== */
+/* ==========================================================
+   5L COOP
+   FOOTER.CSS
+   Glassmorphism Footer
+========================================================== */
 
+/* ===========================
+   FOOTER
+=========================== */
+
+footer,
 footer.sticky-footer,
 .footer{
-    background:var(--topbar)!important;
-    color:var(--text)!important;
-    border-top:1px solid var(--border)!important;
+
+    margin-top:auto;
+
+    padding:18px 25px;
+
+    background:var(--sidebar);
+
+    color:var(--text-muted);
+
+    border-top:1px solid var(--border);
+
+    backdrop-filter:blur(var(--blur));
+    -webkit-backdrop-filter:blur(var(--blur));
+
+    box-shadow:0 -8px 30px rgba(0,0,0,.12);
 
     transition:
         background .3s ease,
         color .3s ease,
-        border-color .3s ease;
+        border-color .3s ease,
+        box-shadow .3s ease;
+
 }
 
+/* ===========================
+   DARK MODE
+=========================== */
+
+html.dark footer,
+html.dark footer.sticky-footer,
+html.dark .footer{
+
+    background:#121212;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+}
+
+/* ===========================
+   LIGHT MODE
+=========================== */
+
+html:not(.dark) footer,
+html:not(.dark) footer.sticky-footer,
+html:not(.dark) .footer{
+
+    background:#ffffff;
+
+    border-top:1px solid rgba(0,0,0,.08);
+
+}
+
+/* ===========================
+   COPYRIGHT
+=========================== */
+
+footer .copyright,
+footer.sticky-footer .copyright,
+.footer .copyright{
+
+    color:var(--text-muted) !important;
+
+    font-size:14px;
+
+    font-weight:500;
+
+    letter-spacing:.3px;
+
+    text-align:center;
+
+}
+
+/* ===========================
+   TEXT
+=========================== */
+
+footer span,
 footer.sticky-footer span,
 .footer span{
-    color:var(--text)!important;
+
+    color:var(--text-muted) !important;
+
+    font-size:14px;
+
+    font-weight:500;
+
+}
+
+/* ===========================
+   LINKS
+=========================== */
+
+footer a,
+footer.sticky-footer a,
+.footer a{
+
+    color:var(--primary);
+
+    text-decoration:none;
+
+    transition:all .25s ease;
+
+}
+
+footer a:hover,
+footer.sticky-footer a:hover,
+.footer a:hover{
+
+    color:var(--primary-hover);
+
+    text-decoration:none;
+
+}
+
+/* ===========================
+   ICONS
+=========================== */
+
+footer i,
+footer.sticky-footer i,
+.footer i{
+
+    color:var(--primary);
+
+    margin-right:5px;
+
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width:768px){
+
+    footer,
+    footer.sticky-footer,
+    .footer{
+
+        padding:15px;
+
+        text-align:center;
+
+    }
+
+    footer .copyright,
+    footer.sticky-footer .copyright,
+    .footer .copyright,
+
+    footer span,
+    footer.sticky-footer span,
+    .footer span{
+
+        font-size:13px;
+
+    }
+
 }

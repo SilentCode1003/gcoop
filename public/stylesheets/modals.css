@@ -1,0 +1,419 @@
+/* =====================================================
+   MODALS.CSS
+   5L COOP
+===================================================== */
+
+/* ==========================
+   Bootstrap Modal
+========================== */
+
+.modal{
+    z-index:1060;
+}
+
+.modal-dialog{
+    max-width:650px;
+    position:relative;
+    z-index:1065;
+}
+
+.modal.fade .modal-dialog{
+    transform:translateY(-30px);
+    transition:all .30s ease;
+}
+
+.modal.show .modal-dialog{
+    transform:translateY(0);
+}
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.modal-content{
+
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+
+    border-radius:22px;
+    overflow:hidden;
+
+    transition:.3s;
+}
+
+/* ---------- LIGHT ---------- */
+
+html:not(.dark) .modal-content{
+
+    background:rgba(255,255,255,.92);
+
+    border:1px solid rgba(0,0,0,.08);
+
+    box-shadow:0 20px 60px rgba(0,0,0,.18);
+
+}
+
+/* ---------- DARK ---------- */
+
+html.dark .modal-content{
+
+    background:rgba(22,22,22,.82);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
+
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.modal-header{
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+
+    border:none;
+
+    padding:18px 24px;
+}
+
+.modal-title{
+
+    color:#fff;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.modal-header .close{
+
+    color:#fff;
+
+    opacity:1;
+
+    text-shadow:none;
+}
+
+/* =====================================================
+   BODY
+===================================================== */
+
+.modal-body{
+
+    padding:25px;
+
+    background:transparent;
+
+    color:var(--text);
+}
+
+.modal-body label{
+
+    font-weight:600;
+
+    color:var(--text);
+
+    margin-bottom:8px;
+}
+
+.modal-body small{
+
+    color:var(--text-muted);
+
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.modal-footer{
+
+    padding:18px 24px;
+
+    background:transparent;
+
+}
+
+/* Light */
+
+html:not(.dark) .modal-footer{
+
+    border-top:1px solid rgba(0,0,0,.08);
+
+}
+
+/* Dark */
+
+html.dark .modal-footer{
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+}
+
+/* =====================================================
+   INPUTS
+===================================================== */
+
+/* ---------- LIGHT ---------- */
+
+html:not(.dark) .modal .form-control,
+html:not(.dark) .modal select,
+html:not(.dark) .modal .custom-select{
+
+    background:#ffffff;
+
+    color:#111827;
+
+    border:1px solid #d1d5db;
+
+    border-radius:14px;
+
+    height:46px;
+
+    box-shadow:none;
+
+}
+
+html:not(.dark) .modal textarea{
+
+    background:#ffffff;
+
+    color:#111827;
+
+    border:1px solid #d1d5db;
+
+}
+
+html:not(.dark) .modal .form-control::placeholder{
+
+    color:#6b7280;
+
+}
+
+html:not(.dark) .modal .form-control:focus,
+html:not(.dark) .modal select:focus{
+
+    background:#ffffff;
+
+    color:#111827;
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 3px rgba(153,27,27,.15);
+
+}
+
+/* ---------- DARK ---------- */
+
+html.dark .modal .form-control,
+html.dark .modal select,
+html.dark .modal .custom-select{
+
+    background:#2b2b2b;
+
+    color:#ffffff;
+
+    border:1px solid #444;
+
+    border-radius:14px;
+
+    height:46px;
+
+}
+
+html.dark .modal textarea{
+
+    background:#2b2b2b;
+
+    color:#ffffff;
+
+    border:1px solid #444;
+
+}
+
+html.dark .modal .form-control::placeholder{
+
+    color:#bdbdbd;
+
+}
+
+html.dark .modal .form-control:focus,
+html.dark .modal select:focus{
+
+    background:#333;
+
+    color:#fff;
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 3px rgba(153,27,27,.20);
+
+}
+
+/* =====================================================
+   SELECT OPTIONS
+===================================================== */
+
+html:not(.dark) .modal select option{
+
+    background:#ffffff;
+
+    color:#111827;
+
+}
+
+html.dark .modal select option{
+
+    background:#2b2b2b;
+
+    color:#ffffff;
+
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.modal-footer .btn-save{
+
+    min-width:120px;
+
+    background:var(--primary);
+
+    color:#fff;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-weight:600;
+}
+
+.modal-footer .btn-save:hover{
+
+    background:var(--primary-hover);
+
+}
+
+.modal-footer .btn-cancel{
+
+    min-width:120px;
+
+    background:#6b7280;
+
+    color:#fff;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-weight:600;
+}
+
+.modal-footer .btn-cancel:hover{
+
+    background:#4b5563;
+
+}
+
+/* =====================================================
+   BACKDROP
+===================================================== */
+
+.modal-backdrop{
+
+    background:#000;
+
+    opacity:.65 !important;
+
+}
+
+/* =====================================================
+   SWEETALERT
+===================================================== */
+
+/* LIGHT */
+
+html:not(.dark) .swal2-popup{
+
+    background:#ffffff !important;
+
+    color:#111827 !important;
+
+    border-radius:18px;
+
+    border:1px solid #e5e7eb;
+
+}
+
+html:not(.dark) .swal2-title,
+html:not(.dark) .swal2-html-container{
+
+    color:#111827 !important;
+
+}
+
+/* DARK */
+
+html.dark .swal2-popup{
+
+    background:#1f1f1f !important;
+
+    color:#ffffff !important;
+
+    border-radius:18px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+}
+
+html.dark .swal2-title,
+html.dark .swal2-html-container{
+
+    color:#ffffff !important;
+
+}
+
+.swal2-confirm{
+
+    background:var(--primary)!important;
+
+}
+
+.swal2-cancel{
+
+    background:#6b7280!important;
+
+}
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+html:not(.dark) .swal2-toast{
+
+    background:#ffffff !important;
+
+    color:#111827 !important;
+
+    border:1px solid #e5e7eb;
+
+}
+
+html.dark .swal2-toast{
+
+    background:#222 !important;
+
+    color:#fff !important;
+
+}

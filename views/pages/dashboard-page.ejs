@@ -1,21 +1,16 @@
 <div class="container-fluid">
-  <!-- Page Header -->
+  <!-- Dashboard Header -->
   <div
-    class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4"
+    class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4"
   >
-    <h3 class="dashboard-title mb-3 mb-sm-0">
-      <i class="fas fa-chart-line text-danger mr-2"></i>
+    <h3 class="dashboard-title mb-3 mb-md-0">
+      <i class="fas fa-chart-line mr-2"></i>
       Dashboard
     </h3>
 
-    <button
-      type="button"
-      id="btnRefresh"
-      class="btn btn-refresh shadow-sm"
-      aria-label="Refresh Dashboard"
-    >
+    <button type="button" id="btnRefresh" class="btn btn-refresh shadow-sm">
       <i class="fas fa-sync-alt mr-2"></i>
-      <span>Refresh Dashboard</span>
+      Refresh Dashboard
     </button>
   </div>
 
@@ -24,31 +19,26 @@
     <!-- Members -->
     <div class="col-xl-3 col-md-6 mb-4">
       <div
-        class="card dashboard-card card-danger h-100 py-2"
+        class="card dashboard-card card-danger h-100"
         role="button"
         tabindex="0"
-        onclick="location.href = '/members'"
-        onkeydown="
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            location.href = '/members';
+        onclick="window.location.href = '/members'"
+        onkeypress="
+          if (event.key === 'Enter') {
+            window.location.href = '/members';
           }
         "
       >
         <div class="card-body">
           <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div
-                class="text-xs font-weight-bold text-danger text-uppercase mb-1"
-              >
-                Members
-              </div>
+            <div class="col">
+              <div class="card-label members">Members</div>
 
-              <h2 id="totalMembers" class="mb-0">0</h2>
+              <h2 id="totalMembers">0</h2>
             </div>
 
             <div class="col-auto">
-              <i class="fas fa-users fa-3x text-danger"></i>
+              <i class="fas fa-users dashboard-icon members"></i>
             </div>
           </div>
         </div>
@@ -58,31 +48,26 @@
     <!-- Users -->
     <div class="col-xl-3 col-md-6 mb-4">
       <div
-        class="card dashboard-card card-primary h-100 py-2"
+        class="card dashboard-card card-primary h-100"
         role="button"
         tabindex="0"
-        onclick="location.href = '/users'"
-        onkeydown="
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            location.href = '/users';
+        onclick="window.location.href = '/users'"
+        onkeypress="
+          if (event.key === 'Enter') {
+            window.location.href = '/users';
           }
         "
       >
         <div class="card-body">
           <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div
-                class="text-xs font-weight-bold text-primary text-uppercase mb-1"
-              >
-                Users
-              </div>
+            <div class="col">
+              <div class="card-label users">Users</div>
 
-              <h2 id="totalUsers" class="mb-0">0</h2>
+              <h2 id="totalUsers">0</h2>
             </div>
 
             <div class="col-auto">
-              <i class="fas fa-user-shield fa-3x text-primary"></i>
+              <i class="fas fa-user-shield dashboard-icon users"></i>
             </div>
           </div>
         </div>
@@ -92,31 +77,26 @@
     <!-- Loan Rates -->
     <div class="col-xl-3 col-md-6 mb-4">
       <div
-        class="card dashboard-card card-success h-100 py-2"
+        class="card dashboard-card card-success h-100"
         role="button"
         tabindex="0"
-        onclick="location.href = '/loan-rates'"
-        onkeydown="
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            location.href = '/loan-rates';
+        onclick="window.location.href = '/loan-rates'"
+        onkeypress="
+          if (event.key === 'Enter') {
+            window.location.href = '/loan-rates';
           }
         "
       >
         <div class="card-body">
           <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div
-                class="text-xs font-weight-bold text-success text-uppercase mb-1"
-              >
-                Loan Rates
-              </div>
+            <div class="col">
+              <div class="card-label loans">Loan Rates</div>
 
-              <h2 id="totalLoanRates" class="mb-0">0</h2>
+              <h2 id="totalLoanRates">0</h2>
             </div>
 
             <div class="col-auto">
-              <i class="fas fa-percent fa-3x text-success"></i>
+              <i class="fas fa-percent dashboard-icon loans"></i>
             </div>
           </div>
         </div>
@@ -126,31 +106,26 @@
     <!-- Denominations -->
     <div class="col-xl-3 col-md-6 mb-4">
       <div
-        class="card dashboard-card card-warning h-100 py-2"
+        class="card dashboard-card card-warning h-100"
         role="button"
         tabindex="0"
-        onclick="location.href = '/denominations'"
-        onkeydown="
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            location.href = '/denominations';
+        onclick="window.location.href = '/denominations'"
+        onkeypress="
+          if (event.key === 'Enter') {
+            window.location.href = '/denominations';
           }
         "
       >
         <div class="card-body">
           <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div
-                class="text-xs font-weight-bold text-warning text-uppercase mb-1"
-              >
-                Denominations
-              </div>
+            <div class="col">
+              <div class="card-label denomination">Denominations</div>
 
-              <h2 id="totalDenomination" class="mb-0">0</h2>
+              <h2 id="totalDenomination">0</h2>
             </div>
 
             <div class="col-auto">
-              <i class="fas fa-money-bill-wave fa-3x text-warning"></i>
+              <i class="fas fa-money-bill-wave dashboard-icon denomination"></i>
             </div>
           </div>
         </div>
@@ -159,12 +134,13 @@
   </div>
 
   <!-- Recent Members -->
-  <div class="card dashboard-table shadow mb-4">
-    <div class="card-header bg-danger py-3">
-      <h6 class="m-0 font-weight-bold text-white">
+  <div class="card dashboard-table glass-card shadow mb-4">
+    <div class="card-header glass-header">
+      <h5 class="m-0 font-weight-bold">
         <i class="fas fa-users mr-2"></i>
+
         Recent Members
-      </h6>
+      </h5>
     </div>
 
     <div class="card-body">
@@ -173,8 +149,11 @@
           <thead>
             <tr>
               <th>Employee ID</th>
+
               <th>Full Name</th>
+
               <th>Contact</th>
+
               <th>Registered Date</th>
             </tr>
           </thead>

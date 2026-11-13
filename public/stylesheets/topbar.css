@@ -1,134 +1,598 @@
-/* ==========================
+/* ==========================================================
+   5L COOP
+   TOPBAR.CSS
+   Modern Glass Topbar
+========================================================== */
+
+/* ==========================================
    TOPBAR
-========================== */
+========================================== */
 
 .topbar{
-    background: var(--topbar) !important;
-    border-bottom: 1px solid var(--border) !important;
+    position: sticky;
+    top: 0;
+    z-index: 1040;
+
+    height:76px;
+    padding:0 28px;
+
+    display:flex;
+    align-items:center;
+
+    background:var(--topbar);
+
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+
+    border-bottom:1px solid var(--border);
+
+    box-shadow:0 10px 35px rgba(0,0,0,.15);
+
+    transition:.35s ease;
 }
 
-/* ==========================
-   ALL TEXT
-========================== */
+/* Dark */
 
-.topbar,
-.topbar a,
-.topbar span,
-.topbar p,
-.topbar div,
-.topbar small,
-.topbar strong,
-.topbar i,
-.topbar .nav-link,
-.topbar .dropdown-toggle,
-.topbar .navbar-nav .nav-link{
-    color: var(--text) !important;
+html.dark .topbar{
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(18,18,18,.88),
+            rgba(12,12,12,.80)
+        );
+
 }
 
-/* ==========================
-   USER
-========================== */
+/* Light */
 
-#userDropdown,
-#userDropdown span,
-#userDropdown small,
-#userDropdown i{
-    color: var(--text) !important;
+/* LIGHT MODE */
+
+html:not(.dark) .topbar{
+
+    background:rgba(255,255,255,.62);
+
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+
+    border-bottom:1px solid rgba(255,255,255,.45);
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.08);
+
 }
 
-#userDropdown:hover,
-#userDropdown:hover span,
-#userDropdown:hover i{
-    color: var(--primary) !important;
-}
-
-/* ==========================
-   ICONS
-========================== */
-
-.topbar .fa,
-.topbar .fas,
-.topbar .far,
-.topbar .fab{
-    color: var(--text) !important;
-}
-
-.topbar .nav-link:hover .fa,
-.topbar .nav-link:hover .fas,
-.topbar .nav-link:hover .far,
-.topbar .nav-link:hover .fab{
-    color: var(--primary) !important;
-}
-
-/* ==========================
+/* ==========================================
    SEARCH
-========================== */
+========================================== */
 
-.navbar-search .form-control{
-    background: var(--card) !important;
-    color: var(--text) !important;
-    border: 1px solid var(--border) !important;
+.topbar .navbar-search{
+
+    width:420px;
+    max-width:100%;
+
 }
 
-.navbar-search .form-control::placeholder{
-    color:#999 !important;
+.topbar .input-group{
+
+    overflow:hidden;
+
+    border-radius:18px;
+
+    border:1px solid var(--border);
+
+    background:var(--glass);
+
+    backdrop-filter:blur(18px);
+
+    transition:.3s;
+
 }
 
-.navbar-search .btn{
-    background: var(--primary) !important;
-    border: none !important;
+.topbar .input-group:focus-within{
+
+    border-color:var(--primary);
+
+    box-shadow:
+        0 0 0 4px rgba(153,27,27,.15);
+
 }
 
-.navbar-search .btn:hover{
-    background: var(--primary-hover) !important;
+.topbar .form-control{
+
+    height:48px;
+
+    border:none;
+
+    background:transparent;
+
+    color:var(--text);
+
+    box-shadow:none!important;
+
 }
 
-/* ==========================
+.topbar .form-control::placeholder{
+
+    color:var(--text-muted);
+
+}
+
+.topbar .input-group-append .btn{
+
+    width:55px;
+
+    border:none;
+
+    background:var(--primary);
+
+    color:#fff;
+
+    transition:.3s;
+
+}
+
+.topbar .input-group-append .btn:hover{
+
+    background:var(--primary-hover);
+
+}
+
+/* ==========================================
+   NAV LINKS
+========================================== */
+
+.topbar .nav-link{
+
+    color:var(--text)!important;
+
+    transition:.3s;
+
+}
+
+.topbar .nav-link:hover{
+
+    color:var(--primary)!important;
+
+}
+
+.topbar .nav-link i{
+
+    font-size:18px;
+
+}
+
+/* ==========================================
+   ICON BUTTONS
+========================================== */
+
+/* ==========================================
+   ICON BUTTONS
+========================================== */
+
+/* Sidebar Buttons */
+
+#sidebarToggle,
+#sidebarToggleTop{
+
+    width:46px;
+    height:46px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:var(--glass);
+
+    border:1px solid var(--border);
+
+    color:var(--text);
+
+    cursor:pointer;
+
+    transition:all .3s ease;
+
+}
+
+#sidebarToggle:hover,
+#sidebarToggleTop:hover{
+
+    background:var(--primary);
+
+    border-color:var(--primary);
+
+    color:#fff;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 10px 25px rgba(153,27,27,.30);
+
+}
+
+/* Theme Button */
+
+#themeBtn{
+
+    width:48px;
+    height:48px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:var(--glass);
+
+    border:1px solid var(--border);
+
+    color:var(--text);
+
+    cursor:pointer;
+
+    transition:all .3s ease;
+
+}
+
+#themeBtn i{
+
+    font-size:18px;
+
+    transition:transform .35s ease;
+
+}
+
+#themeBtn:hover{
+
+    background:var(--primary);
+
+    border-color:var(--primary);
+
+    color:#fff;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 10px 25px rgba(153,27,27,.30);
+
+}
+
+#themeBtn:hover i{
+
+    transform:rotate(180deg);
+
+}
+
+#themeBtn:focus{
+
+    outline:none;
+
+    box-shadow:
+        0 0 0 3px rgba(153,27,27,.20);
+
+}
+
+#themeBtn:active{
+
+    transform:translateY(0);
+
+}
+
+/* ==========================================
+   USER
+========================================== */
+
+.topbar #fullname{
+
+    color:var(--text);
+
+    font-weight:600;
+
+}
+
+.topbar .img-profile{
+
+    width:44px;
+    height:44px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:2px solid var(--border);
+
+    transition:.3s;
+
+}
+
+.topbar .img-profile:hover{
+
+    border-color:var(--primary);
+
+    transform:scale(1.08);
+
+}
+
+/* ==========================================
+   BADGES
+========================================== */
+
+.badge-counter{
+
+    background:var(--danger)!important;
+
+    color:#fff;
+
+    font-size:10px;
+
+    font-weight:700;
+
+    min-width:18px;
+    height:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:20px;
+
+    box-shadow:
+        0 5px 12px rgba(239,68,68,.35);
+
+}
+
+/* ==========================================
    DROPDOWN
-========================== */
+========================================== */
+
+/* ==========================================
+   DROPDOWN
+========================================== */
 
 .topbar .dropdown-menu{
-    background: var(--card) !important;
-    border: 1px solid var(--border) !important;
+
+    min-width:240px;
+
+    margin-top:12px;
+
+    padding:8px;
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    background:var(--card) !important;
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    box-shadow:0 20px 45px rgba(0,0,0,.25);
+
+    overflow:hidden;
+
+    animation:dropdownFade .25s ease;
+
+    z-index:2000;
+
 }
+
+/* Dark Theme */
+
+html.dark .topbar .dropdown-menu{
+
+    background:rgba(20,20,20,.92) !important;
+
+}
+
+/* Light Theme */
+
+html:not(.dark) .topbar .dropdown-menu{
+
+    background:rgba(255,255,255,.95) !important;
+
+}
+
+/* Header */
 
 .topbar .dropdown-header{
-    background: var(--primary) !important;
-    color: #fff !important;
+
+    padding:10px 14px;
+
+    background:transparent;
+
+    color:var(--primary);
+
+    font-size:13px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+    text-transform:uppercase;
+
 }
+
+/* Items */
 
 .topbar .dropdown-item{
-    color: var(--text) !important;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:12px 14px;
+
+    border-radius:12px;
+
+    color:var(--text) !important;
+
+    transition:all .25s ease;
+
 }
+
+/* Icons */
 
 .topbar .dropdown-item i{
-    color: inherit !important;
+
+    width:18px;
+
+    text-align:center;
+
+    color:var(--primary);
+
+    transition:.25s;
+
 }
 
-.topbar .dropdown-item:hover{
-    background: var(--primary) !important;
+/* Hover */
+
+.topbar .dropdown-item:hover,
+.topbar .dropdown-item:focus{
+
+    background:var(--primary);
+
     color:#fff !important;
+
 }
 
-/* ==========================
-   REMOVE SB ADMIN COLORS
-========================== */
+.topbar .dropdown-item:hover i,
+.topbar .dropdown-item:focus i{
 
-.text-gray-100,
-.text-gray-200,
-.text-gray-300,
-.text-gray-400,
-.text-gray-500,
-.text-gray-600,
-.text-gray-700,
-.text-gray-800,
-.text-gray-900{
-    color: var(--text) !important;
+    color:#fff;
+
 }
 
-.border-left-primary,
-.border-left-success,
-.border-left-danger,
-.border-left-warning{
-    border-left-width: 5px !important;
+/* Active */
+
+.topbar .dropdown-item.active,
+.topbar .dropdown-item:active{
+
+    background:var(--primary);
+
+    color:#fff !important;
+
+}
+
+.topbar .dropdown-item.active i,
+.topbar .dropdown-item:active i{
+
+    color:#fff;
+
+}
+
+/* Divider */
+
+.topbar .dropdown-divider{
+
+    margin:8px 0;
+
+    border-color:var(--border);
+
+}
+
+/* Animation */
+
+@keyframes dropdownFade{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(-10px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* ==========================================
+   DIVIDER
+========================================== */
+
+.topbar-divider{
+
+    border-left:1px solid var(--border)!important;
+
+    height:38px;
+
+    margin:0 18px;
+
+}
+
+/* ==========================================
+   ALERT ICONS
+========================================== */
+
+.topbar .fa-bell,
+.topbar .fa-envelope{
+
+    transition:.3s;
+
+}
+
+.topbar .nav-link:hover .fa-bell,
+.topbar .nav-link:hover .fa-envelope{
+
+    transform:scale(1.12);
+
+    color:var(--primary);
+
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width:992px){
+
+    .topbar .navbar-search{
+
+        width:300px;
+
+    }
+
+}
+
+@media (max-width:768px){
+
+    .topbar{
+
+        padding:0 15px;
+
+        height:70px;
+
+    }
+
+    .topbar .navbar-search{
+
+        width:100%;
+
+    }
+
+    #fullname{
+
+        display:none;
+
+    }
+
+    .topbar-divider{
+
+        display:none;
+
+    }
+
 }

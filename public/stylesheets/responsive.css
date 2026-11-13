@@ -1,0 +1,435 @@
+/* =====================================================
+   RESPONSIVE.CSS
+   5L COOP GLASSMORPHISM
+   Responsive Layout
+===================================================== */
+
+/* =====================================================
+   Large Desktop (1600px+)
+===================================================== */
+
+@media (min-width:1600px){
+
+    .container-fluid{
+        padding:35px;
+    }
+
+    .dashboard-card{
+        min-height:180px;
+    }
+
+}
+
+/* =====================================================
+   Laptop (1200px)
+===================================================== */
+
+@media (max-width:1200px){
+
+    .sidebar{
+        width:240px;
+    }
+
+    #content-wrapper{
+        margin-left:240px;
+    }
+
+    .dashboard-card{
+        min-height:165px;
+    }
+
+    .profile-card{
+        margin-bottom:20px;
+    }
+
+}
+
+/* =====================================================
+   Tablet Landscape
+===================================================== */
+
+@media (max-width:992px){
+
+    .sidebar{
+
+        width:90px;
+    }
+
+    .sidebar .nav-item span,
+    .sidebar .brand-text,
+    .sidebar-heading{
+
+        display:none;
+    }
+
+    #content-wrapper{
+
+        margin-left:90px;
+    }
+
+    .topbar{
+
+        padding:0 15px;
+    }
+
+    .dashboard-title{
+
+        font-size:26px;
+    }
+
+    .dashboard-card{
+
+        margin-bottom:20px;
+    }
+
+    .profile-header{
+
+        text-align:center;
+    }
+
+}
+
+/* =====================================================
+   Tablet Portrait
+===================================================== */
+
+@media (max-width:768px){
+
+    body{
+        overflow-x:hidden;
+    }
+
+    .container-fluid{
+        padding:15px;
+    }
+
+    /* Sidebar */
+
+    .sidebar{
+
+        position:fixed;
+
+        left:-260px;
+
+        width:260px;
+
+        z-index:1200;
+
+        transition:.3s;
+    }
+
+    .sidebar.show{
+
+        left:0;
+    }
+    #content-wrapper{
+    flex:1;
+    min-width:0;
+}
+
+    /* Overlay */
+
+    .sidebar-overlay{
+
+        position:fixed;
+
+        inset:0;
+
+        background:rgba(0,0,0,.45);
+
+        opacity:0;
+
+        visibility:hidden;
+
+        transition:.3s;
+
+        z-index:1190;
+    }
+
+    .sidebar-overlay.show{
+
+        opacity:1;
+
+        visibility:visible;
+    }
+
+    /* Dashboard */
+
+    .dashboard-title{
+
+        font-size:24px;
+    }
+
+    .dashboard-card{
+
+        min-height:auto;
+    }
+
+    .dashboard-card h2{
+
+        font-size:30px;
+    }
+
+    /* Table */
+
+    .table{
+
+        min-width:700px;
+    }
+
+    .table-responsive{
+
+        overflow-x:auto;
+    }
+
+    /* Topbar */
+
+    .topbar{
+
+        flex-wrap:wrap;
+
+        height:auto;
+
+        padding:12px 15px;
+    }
+
+    /* Cards */
+
+    .card{
+
+        border-radius:18px;
+    }
+
+    /* Buttons */
+
+    .btn{
+
+        width:100%;
+    }
+
+    .action-buttons .btn{
+
+        width:36px;
+    }
+
+    /* Modal */
+
+    .modal-dialog{
+
+        margin:15px;
+    }
+
+    /* Profile */
+
+    .profile-header{
+
+        padding:30px 20px;
+    }
+
+    .profile-avatar{
+
+        width:90px;
+        height:90px;
+    }
+
+    #editActions{
+
+        flex-direction:column;
+    }
+
+    #btnEdit,
+    #btnSave,
+    #btnCancel{
+
+        width:100%;
+    }
+
+}
+
+/* =====================================================
+   Mobile
+===================================================== */
+
+@media (max-width:576px){
+
+    .container-fluid{
+
+        padding:12px;
+    }
+
+    .dashboard-title{
+
+        font-size:22px;
+    }
+
+    .dashboard-title i{
+
+        font-size:20px;
+    }
+
+    .dashboard-card{
+
+        text-align:center;
+    }
+
+    .dashboard-card .fa-3x{
+
+        font-size:2.2rem !important;
+
+        margin-top:15px;
+    }
+
+    .dashboard-card h2{
+
+        font-size:28px;
+    }
+
+    .card-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:10px;
+    }
+
+    .card-header h6{
+
+        font-size:15px;
+    }
+
+    .btn-refresh{
+
+        width:100%;
+    }
+
+    .table thead th,
+    .table tbody td{
+
+        padding:12px;
+
+        font-size:13px;
+    }
+
+    .modal-content{
+
+        border-radius:18px;
+    }
+
+    .modal-body{
+
+        padding:20px;
+    }
+
+    .login-card{
+
+        padding:30px 20px;
+    }
+
+    .login-logo{
+
+        width:80px;
+        height:80px;
+    }
+
+    .login-title{
+
+        font-size:24px;
+    }
+
+}
+
+/* =====================================================
+   Extra Small Phones
+===================================================== */
+
+@media (max-width:400px){
+
+    .dashboard-title{
+
+        font-size:20px;
+    }
+
+    .dashboard-card h2{
+
+        font-size:24px;
+    }
+
+    .topbar{
+
+        padding:10px;
+    }
+
+    .topbar img{
+
+        width:35px;
+    }
+
+    .profile-avatar{
+
+        width:75px;
+        height:75px;
+    }
+
+    .modal-title{
+
+        font-size:18px;
+    }
+
+}
+
+/* =====================================================
+   Landscape Phones
+===================================================== */
+
+@media (max-height:500px){
+
+    body{
+
+        overflow:auto;
+    }
+
+    .login-wrapper{
+
+        padding:20px;
+    }
+
+    .login-card{
+
+        margin:20px 0;
+    }
+
+}
+
+/* =====================================================
+   Print
+===================================================== */
+
+@media print{
+
+    .sidebar,
+    .topbar,
+    .btn,
+    .modal,
+    .swal2-container{
+
+        display:none !important;
+    }
+
+    #content-wrapper{
+
+        margin:0 !important;
+    }
+
+    .card{
+
+        border:1px solid #ccc;
+
+        box-shadow:none;
+
+        background:#fff !important;
+
+        color:#000 !important;
+    }
+
+}

@@ -1,29 +1,29 @@
 <div class="container-fluid">
-  <div class="custom-card shadow">
+  <div class="card shadow mb-4 member-savings-table">
     <!-- Header -->
-    <div class="custom-header">
-      <div class="header-title">
-        <i class="fas fa-piggy-bank"></i>
-        <span>Member Savings</span>
-      </div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="m-0 font-weight-bold text-white">
+        <i class="fas fa-piggy-bank mr-2"></i>
+        Member Savings
+      </h5>
 
-      <button type="button" class="btn btn-add" id="btnAdd">
-        <i class="fas fa-plus"></i>
-        Add Savings
+      <button type="button" id="btnAdd" class="btn btn-add">
+        <i class="fas fa-plus mr-1"></i>
+        Add Member Savings
       </button>
     </div>
 
     <!-- Body -->
-    <div class="custom-body">
+    <div class="card-body">
       <div class="table-responsive">
-        <table class="table custom-table mb-0" id="dataTable">
+        <table class="table table-hover mb-0" id="dataTable">
           <thead>
             <tr>
               <th>Member ID</th>
               <th>Member Name</th>
               <th>Current Balance</th>
               <th>Last Updated</th>
-              <th width="120">Action</th>
+              <th width="140" class="text-center">Action</th>
             </tr>
           </thead>
 

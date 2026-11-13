@@ -1,0 +1,330 @@
+/* ==========================================================
+   5L COOP
+   LAYOUT.CSS
+   Background • Wrapper • Glass Layout
+========================================================== */
+
+/* ==========================================================
+   HTML / BODY
+========================================================== */
+
+html,
+body{
+    width:100%;
+    min-height:100%;
+    margin:0;
+    padding:0;
+}
+
+body{
+
+    color:var(--text);
+
+    background:var(--body-bg) no-repeat center center fixed !important;
+    background-size:cover !important;
+
+    transition:
+        background .35s ease,
+        color .35s ease;
+
+    overflow-x:hidden;
+
+}
+
+/* ==========================================================
+   BACKGROUND OVERLAY
+========================================================== */
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+    inset:0;
+
+    pointer-events:none;
+    z-index:-1;
+
+    transition:background .35s ease;
+
+}
+
+/* Light */
+
+html:not(.dark) body::before{
+
+    background:rgba(255,255,255,.08);
+
+}
+
+/* Dark */
+
+html.dark body::before{
+
+    background:rgba(0,0,0,.30);
+
+}
+
+/* ==========================================================
+   SB ADMIN WRAPPER
+========================================================== */
+
+#wrapper{
+
+    display:flex;
+    min-height:100vh;
+
+    background:transparent !important;
+
+}
+
+#content-wrapper{
+
+    display:flex;
+    flex-direction:column;
+
+    flex:1;
+
+    min-height:100vh;
+    min-width:0;
+
+    background:transparent !important;
+
+}
+
+#content{
+
+    flex:1;
+
+    background:transparent !important;
+
+}
+
+.container-fluid{
+
+    padding:30px;
+
+    background:transparent !important;
+
+}
+
+.sticky-footer{
+
+    margin-top:auto;
+
+    background:transparent !important;
+
+}
+
+/* ==========================================================
+   GLASS CARD
+========================================================== */
+
+.card,
+.glass-card{
+
+    background:var(--glass);
+
+    backdrop-filter:blur(var(--blur));
+    -webkit-backdrop-filter:blur(var(--blur));
+
+    border:1px solid var(--glass-border);
+
+    border-radius:22px;
+
+    box-shadow:var(--shadow);
+
+    transition:
+        background .30s ease,
+        border-color .30s ease,
+        transform .30s ease,
+        box-shadow .30s ease;
+
+}
+
+.card:hover,
+.glass-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 24px 60px rgba(0,0,0,.25);
+
+}
+
+/* ==========================================================
+   CARD HEADER
+========================================================== */
+
+.glass-header{
+
+    padding:18px 22px;
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+
+    color:#fff;
+
+    border:none;
+
+}
+
+/* ==========================================================
+   CARD BODY
+========================================================== */
+
+.glass-body{
+
+    padding:25px;
+
+    background:transparent;
+
+}
+
+/* ==========================================================
+   PAGE TITLE
+========================================================== */
+
+.page-title,
+.dashboard-title{
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    font-size:28px;
+    font-weight:700;
+
+    color:var(--text);
+
+}
+
+.page-title i,
+.dashboard-title i{
+
+    color:var(--primary);
+
+}
+
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+.mb-section{
+
+    margin-bottom:30px;
+
+}
+
+.mt-section{
+
+    margin-top:30px;
+
+}
+
+.shadow-glass{
+
+    box-shadow:0 20px 60px rgba(0,0,0,.30);
+
+}
+
+hr{
+
+    border-color:var(--border);
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .container-fluid{
+
+        padding:18px;
+
+    }
+
+    .page-title,
+    .dashboard-title{
+
+        font-size:22px;
+
+    }
+
+}
+/* ==========================================================
+   DROPDOWN TEXT
+========================================================== */
+
+/* Light Mode */
+
+html:not(.dark) select,
+html:not(.dark) .custom-select{
+
+    color:#111827 !important;
+    background:#ffffff !important;
+
+}
+
+html:not(.dark) select option{
+
+    color:#111827 !important;
+    background:#ffffff !important;
+
+}
+
+/* Bootstrap select */
+
+html:not(.dark) .form-control{
+
+    color:#111827 !important;
+
+}
+
+/* Selected option */
+
+html:not(.dark) select:valid{
+
+    color:#111827 !important;
+
+}
+
+/* Placeholder option */
+
+html:not(.dark) select option[value=""]{
+
+    color:#6b7280;
+
+}
+/* ==========================================================
+   LIGHT MODE SELECT
+========================================================== */
+
+html:not(.dark) select,
+html:not(.dark) .custom-select,
+html:not(.dark) select.form-control{
+
+    background:#ffffff !important;
+    color:#111827 !important;
+    border:1px solid #d1d5db !important;
+
+}
+
+html:not(.dark) select option{
+
+    background:#ffffff !important;
+    color:#111827 !important;
+
+}
+
+/* Placeholder */
+
+html:not(.dark) select option[value=""]{
+
+    color:#6b7280 !important;
+
+}

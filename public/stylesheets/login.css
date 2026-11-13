@@ -1,29 +1,40 @@
 /* ==========================
-   THEME VARIABLES
+   LIGHT MODE
 ========================== */
-
 :root{
-    --card-color:#ffffff;
-    --text-color:#222222;
-    --text-secondary:#666666;
-    --label-color:#991b1b;
-    --input-bg:#ffffff;
-    --input-border:#dddddd;
-    --button:#991b1b;
-    --button-hover:#7f1d1d;
+    --card-color: rgba(255,255,255,.18);
+
+    --text-color: #111111;
+    --text-secondary: #444444;
+    --label-color: #111111;
+
+    --input-bg: rgba(255,255,255,.30);
+    --input-border: rgba(0,0,0,.15);
+
+    --placeholder-color: #666666;
+
+    --button: #991b1b;
+    --button-hover: #7f1d1d;
 }
 
-body.dark{
-    --card-color:#1f1f1f;
-    --text-color:#ffffff;
-    --text-secondary:#cfcfcf;
-    --label-color:#ffffff;
-    --input-bg:#2b2b2b;
-    --input-border:#555555;
-    --button:#b30000;
-    --button-hover:#d10000;
-}
+/* ==========================
+   DARK MODE
+========================== */
+html.dark{
+    --card-color: rgba(18,18,18,.35);
 
+    --text-color: #ffffff;
+    --text-secondary: #d8d8d8;
+    --label-color: #ffffff;
+
+    --input-bg: rgba(255,255,255,.08);
+    --input-border: rgba(255,255,255,.18);
+
+    --placeholder-color: rgba(255,255,255,.70);
+
+    --button: #b30000;
+    --button-hover: #d10000;
+}
 /* ==========================
    RESET
 ========================== */
@@ -35,43 +46,50 @@ body.dark{
     font-family:Arial, Helvetica, sans-serif;
 }
 
-html,
-body{
-    width:100%;
-    height:100%;
+/* =====================================
+   LOGIN LIGHT MODE
+===================================== */
+
+html:not(.dark) body#page-top .bg-layer,
+body#page-top:not(.dark) .bg-layer {
+    background-image: url("/images/login-light.jpg") !important;
 }
 
-
-body::before{
-    content:"";
-    position:fixed;
-    top:0;
-    left:0;
-    width:110%;
-    height:110%;
-
-    background:url("/images/background.jpg") center center/cover no-repeat;
-
-    animation:backgroundMove 25s ease-in-out infinite alternate;
-
-    transform-origin:center;
-
-    z-index:-2;
+html:not(.dark) body#page-top .bg-layer::after,
+body#page-top:not(.dark) .bg-layer::after {
+    background: transparent !important;
 }
 
+/* =====================================
+   LOGIN DARK MODE
+===================================== */
+
+html.dark body#page-top .bg-layer,
+body.dark .bg-layer {
+    background-image: url("/images/login-dark.jpg") !important;
+}
+
+html.dark body#page-top .bg-layer::after,
+body.dark .bg-layer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55) !important;
+}
+
+/* =====================================
+   THEME TRANSITION
+===================================== */
+
+.bg-layer {
+    transition: background-image 0.3s ease;
+}
+
+.login-container {
+    transition: background 0.3s ease, color 0.3s ease;
+}
 /* ==========================
-   BACKGROUND
-========================== */
-body{
-    min-height:100vh;
-    overflow:hidden;
-
-    background:url("/images/background.jpg") center center/cover no-repeat fixed;
-    color:var(--text-color);
-}
-
-/* ==========================
-   LOGIN CONTAINER
+   LOGIN CARD
 ========================== */
 
 .login-container{
@@ -80,30 +98,52 @@ body{
     left:50%;
     transform:translate(-50%, -50%);
 
-    width:380px;
+    width:400px;
     padding:40px;
 
-   background:var(--card-color);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
+    background:var(--card-color);
+
+    backdrop-filter:blur(22px) saturate(180%);
+    -webkit-backdrop-filter:blur(22px) saturate(180%);
+
+    border:1px solid rgba(255,255,255,.25);
+
+    border-radius:24px;
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.35),
+        inset 0 1px 1px rgba(255,255,255,.35);
+
+    overflow:hidden;
 
     color:var(--text-color);
 
-    border:1px solid rgba(255,255,255,.2);
-    border-radius:18px;
-
-    box-shadow:0 20px 45px rgba(0,0,0,.35);
-
-    z-index:100;
-
     animation:floatCard 5s ease-in-out infinite;
 
-    transition:
-        background-color .3s ease,
-        color .3s ease,
-        border-color .3s ease,
-        box-shadow .3s ease;
+    transition:.3s;
 }
+
+/* Glass Reflection */
+
+.login-container::before{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    border-radius:inherit;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.35),
+            rgba(255,255,255,.10),
+            transparent 70%
+        );
+
+    pointer-events:none;
+}
+
 /* ==========================
    LOGO
 ========================== */
@@ -114,11 +154,20 @@ body{
     height:auto;
     margin:0 auto 20px;
     object-fit:contain;
-    transition:transform .3s ease;
+
+    /* Approximate #991b1b */
+    filter: brightness(0.62) saturate(2.4) contrast(1.15);
+
+    transition: transform .3s ease, filter .3s ease;
 }
 
 .login-logo:hover{
-    transform:scale(1.05);
+    transform: scale(1.05);
+    filter: brightness(0.58) saturate(2.6) contrast(1.2);
+}
+
+html.dark .login-logo{
+    filter:none;
 }
 /* ==========================
    HEADER
@@ -130,13 +179,20 @@ body{
 }
 
 .login-header h2{
-    color:var(--label-color);
     margin-bottom:8px;
+    font-size:30px;
+    color:var(--text-color);
+    font-weight:700;
 }
 
 .login-header p{
-    color:var(--text-secondary);
+    color: var(--text-color);
     font-size:14px;
+    font-weight:500;
+}
+
+html.dark .login-header p{
+    color: var(--text-secondary);
 }
 
 /* ==========================
@@ -156,17 +212,21 @@ body{
 
 .input-group input{
     width:100%;
-    padding:12px;
+    padding:13px 15px;
 
     background:var(--input-bg);
-    color:var(--text-color);
 
     border:1px solid var(--input-border);
-    border-radius:7px;
+
+    border-radius:12px;
+
+    color:var(--text-color);
+
+    backdrop-filter:blur(10px);
 
     outline:none;
 
-    transition:all .3s ease;
+    transition:.3s;
 }
 
 .input-group input::placeholder{
@@ -174,7 +234,11 @@ body{
 }
 
 .input-group input:focus{
-    border-color:var(--button);
+    background:rgba(255,255,255,.22);
+
+    border-color:rgba(255,255,255,.65);
+
+    box-shadow:0 0 0 4px rgba(255,255,255,.08);
 }
 
 /* ==========================
@@ -194,8 +258,8 @@ body{
     top:50%;
     right:15px;
     transform:translateY(-50%);
-    cursor:pointer;
     color:var(--text-secondary);
+    cursor:pointer;
     transition:.3s;
 }
 
@@ -204,45 +268,18 @@ body{
 }
 
 /* ==========================
-   OPTIONS
-========================== */
-
-.options{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:25px;
-    font-size:13px;
-}
-
-.options label{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    color:var(--label-color);
-}
-
-.options a{
-    color:var(--button);
-    text-decoration:none;
-}
-
-.options a:hover{
-    color:var(--button-hover);
-}
-
-/* ==========================
    BUTTON
 ========================== */
 
 .login-btn{
     width:100%;
-    padding:13px;
+    padding:14px;
 
     border:none;
-    border-radius:7px;
+    border-radius:14px;
 
     background:var(--button);
+
     color:#fff;
 
     font-size:16px;
@@ -250,15 +287,17 @@ body{
 
     cursor:pointer;
 
-    transition:all .3s ease;
+    transition:.3s;
 }
 
 .login-btn:hover{
     background:var(--button-hover);
-    transform:translateY(-2px);
-    box-shadow:0 10px 20px rgba(153,27,27,.35);
-}
 
+    transform:translateY(-3px);
+
+    box-shadow:
+        0 12px 25px rgba(153,27,27,.45);
+}
 
 /* ==========================
    THEME BUTTON
@@ -272,25 +311,27 @@ body{
 }
 
 .theme-toggle button{
-    width:50px;
-    height:50px;
+    width:52px;
+    height:52px;
 
     border:none;
     border-radius:50%;
 
-    background:var(--button);
-    color:#fff;
+    background:rgba(255,255,255,.18);
 
-    font-size:18px;
+    backdrop-filter:blur(15px);
+
+    border:1px solid rgba(255,255,255,.25);
+
+    color:white;
 
     cursor:pointer;
 
-    transition:all .3s ease;
+    transition:.3s;
 }
 
 .theme-toggle button:hover{
-    background:var(--button-hover);
-    transform:rotate(180deg);
+    transform:rotate(180deg) scale(1.08);
 }
 
 .theme-toggle button i{
@@ -309,27 +350,10 @@ input:-webkit-autofill:focus{
 }
 
 /* ==========================
-   TRANSITIONS
-========================== */
-
-.login-container,
-.login-header h2,
-.login-header p,
-.input-group label,
-.input-group input,
-.password-wrapper span,
-.options label,
-.options a,
-.signup,
-.signup a{
-    transition:all .3s ease;
-}
-
-/* ==========================
    MOBILE
 ========================== */
 
-@media (max-width:450px){
+@media(max-width:450px){
 
     .login-container{
         width:90%;
@@ -337,6 +361,11 @@ input:-webkit-autofill:focus{
     }
 
 }
+
+/* ==========================
+   ANIMATIONS
+========================== */
+
 @keyframes backgroundMove{
 
     0%{
@@ -360,18 +389,88 @@ input:-webkit-autofill:focus{
     }
 
 }
+
 @keyframes floatCard{
 
     0%{
-        transform:translate(-50%, -50%);
+        transform:translate(-50%,-50%);
     }
 
     50%{
-        transform:translate(-50%, calc(-50% - 10px));
+        transform:translate(-50%,calc(-50% - 10px));
     }
 
     100%{
-        transform:translate(-50%, -50%);
+        transform:translate(-50%,-50%);
     }
 
+}
+/* ==========================================================
+   FORCE LOGIN BUTTON
+========================================================== */
+
+#loginBtn,
+button#loginBtn,
+button.login-btn,
+.login-btn{
+
+    width:100%;
+
+    background:var(--button) !important;
+    background-image:none !important;
+
+    color:#fff !important;
+
+    border:1px solid #991b1b !important;
+
+    border-radius:14px !important;
+
+    font-size:16px;
+    font-weight:700;
+
+    box-shadow:0 10px 24px rgba(153,27,27,.35);
+
+}
+
+#loginBtn:hover,
+button#loginBtn:hover,
+button.login-btn:hover,
+.login-btn:hover{
+
+    background:var(--button-hover) !important;
+    background-image:none !important;
+
+    border-color:#7f1d1d !important;
+
+    color:#fff !important;
+
+    transform:translateY(-2px);
+
+}
+
+#loginBtn:focus,
+#loginBtn:active{
+
+    background:#7f1d1d !important;
+    border-color:#7f1d1d !important;
+
+    color:#fff !important;
+
+}
+/* LIGHT MODE */
+html:not(.dark) body#page-top .bg-layer {
+    background-image: url("/images/login-light.jpg") !important;
+}
+
+/* DARK MODE */
+html.dark body#page-top .bg-layer {
+    background-image: url("/images/login-dark.jpg") !important;
+}
+
+/* DARK OVERLAY */
+html.dark body#page-top .bg-layer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
 }

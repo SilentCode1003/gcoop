@@ -8,6 +8,7 @@ router.get("/", function (req, res) {
   res.render("layout/main-layout", {
     body: "../pages/profile-page.ejs",
     title: "Profile",
+    pageStyle: "profile.css",
     pageScript: "../scripts/profile-script.ejs",
   });
 });

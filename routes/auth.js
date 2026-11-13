@@ -42,7 +42,7 @@ router.get("/", function (req, res, next) {
   res.render("layout/sub-layout", {
     body: "../pages/login-page.ejs",
     title: "5L | COOP",
-    pageStyle: "../stylesheets/login.css",
+    pageStyle: "login.css",
     pageScript: "../scripts/login-script.ejs",
     roleName: ""
   });
@@ -106,14 +106,20 @@ router.get("/refresh", async function (req, res) {
   }
 });
 
-router.post("/logout", async function (req, res) {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Cannot destroy session");
-    }
+router.get("/logout", function (req, res) {
 
-    res.sendStatus(204);
-  });
+    req.session.destroy((err) => {
+
+        if (err) {
+            console.error(err);
+            return res.redirect("/dashboard");
+        }
+
+        res.clearCookie("connect.sid");
+        res.redirect("/");
+
+    });
+
 });
 
 

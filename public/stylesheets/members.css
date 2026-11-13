@@ -1,120 +1,196 @@
-/* ==========================
-   MEMBERS PAGE TITLE
-========================== */
+/* ==========================================================
+   MEMBERS PAGE
+========================================================== */
+
+/* ==========================================================
+   PAGE TITLE
+========================================================== */
 
 .members-title{
-    color: var(--primary) !important;
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 25px;
-    text-transform: uppercase;
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    margin-bottom:24px;
+
+    color:var(--text);
+
+    font-size:30px;
+    font-weight:700;
 }
 
-/* ==========================
-   MEMBERS TABLE
-========================== */
-
-.members-table{
-    background: var(--card) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 12px;
-    overflow: hidden;
+.members-title i{
+    color:var(--primary);
 }
 
-.members-table .card-header{
-    background: var(--primary) !important;
-    color: #fff !important;
-    border: none !important;
-    padding: 16px 22px !important;
+/* ==========================================================
+   MEMBERS CARD
+========================================================== */
+
+.members-card{
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:var(--shadow);
+
 }
 
-.members-table .card-header h6{
-    color: #fff !important;
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
+.members-card .card-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:16px 24px;
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+
+    border:none;
+
 }
 
-.members-table .card-body{
-    background: var(--card) !important;
-    padding: 25px;
+.members-card .card-header h5,
+.members-card .card-header h6{
+
+    margin:0;
+
+    color:#fff;
+
+    font-size:18px;
+
+    font-weight:700;
+
 }
 
-.members-table table{
+.members-card .card-body{
+
+    padding:24px;
+
+    background:transparent;
+
+}
+
+/* ==========================================================
+   ADD BUTTON
+========================================================== */
+
+.members-card .card-header #btnAdd,
+.members-card .card-header .btn-add{
+
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    min-height:44px;
+    padding:0 22px !important;
+
+    background:#6b7280 !important;
+    color:#ffffff !important;
+
+    border:1px solid #6b7280 !important;
+    border-radius:12px !important;
+
+    font-size:14px;
+    font-weight:600;
+
+    box-shadow:0 10px 24px rgba(107,114,128,.30);
+
+    transition:all .25s ease;
+}
+
+.members-card .card-header #btnAdd i,
+.members-card .card-header .btn-add i{
+    color:#ffffff !important;
+}
+
+.members-card .card-header #btnAdd:hover,
+.members-card .card-header .btn-add:hover{
+
+    background:#4b5563 !important;
+
+    border-color:#4b5563 !important;
+
+    color:#ffffff !important;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 16px 34px rgba(75,85,99,.40);
+}
+
+.members-card .card-header #btnAdd:active,
+.members-card .card-header .btn-add:active{
+
+    transform:scale(.97);
+
+    background:#374151 !important;
+}
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.members-card table{
     margin-bottom:0;
 }
 
-.members-table th,
-.members-table td{
+.members-card th,
+.members-card td{
     text-align:center;
     vertical-align:middle;
 }
 
-/* ==========================
-   ADD MEMBER BUTTON
-========================== */
-
-.btn-add-member{
-    background: var(--primary) !important;
-    color:#fff !important;
-    border:none !important;
-    border-radius:6px;
-    padding:8px 18px;
+.members-card td:first-child{
+    font-weight:600;
 }
 
-.btn-add-member:hover{
-    background: var(--primary-hover) !important;
-}
-/* ==========================
-   CARD BORDER
-========================== */
-
-.card{
-    background: var(--card) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 10px;
+.members-card td:nth-child(2){
+    text-align:left;
 }
 
-/* Dashboard cards only */
-.dashboard-card{
-    border-top: none !important;
-    border-right: none !important;
-    border-bottom: none !important;
+.members-card th:last-child,
+.members-card td:last-child{
+    width:140px;
+    white-space:nowrap;
 }
 
-/* Keep colored left borders */
-.dashboard-card.border-left-danger{
-    border-left:5px solid #e74a3b !important;
+/* ==========================================================
+   EMPTY TABLE
+========================================================== */
+
+.members-card tbody td.dataTables_empty{
+
+    padding:40px;
+
+    text-align:center;
+
+    color:#9ca3af;
+
 }
 
-.dashboard-card.border-left-primary{
-    border-left:5px solid #4e73df !important;
+/* ==========================================================
+   DARK MODE
+========================================================== */
+
+html.dark .members-card{
+
+    background:rgba(22,22,22,.45);
+
+    border-color:rgba(255,255,255,.08);
+
 }
 
-.dashboard-card.border-left-success{
-    border-left:5px solid #1cc88a !important;
-}
+html.dark .members-card .card-body{
 
-.dashboard-card.border-left-warning{
-    border-left:5px solid #f6c23e !important;
-}
+    background:transparent;
 
-/* Members page */
-.members-card{
-    border-left:5px solid #e74a3b !important;
-}
-
-/* Users page */
-.users-card{
-    border-left:5px solid #4e73df !important;
-}
-
-/* Loan Rates page */
-.loan-card{
-    border-left:5px solid #1cc88a !important;
-}
-
-/* Denominations page */
-.denomination-card{
-    border-left:5px solid #f6c23e !important;
 }

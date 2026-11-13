@@ -1,57 +1,73 @@
-<script>
-  $(document).ready(function () {
 
+<script>
+$(document).ready(function () {
+
+    // =====================================
+    // GET LOGIN CREDENTIALS
+    // =====================================
     function getAcc() {
         return {
-            Username: $("#username").val().trim(),
-            Password: $("#password").val().trim(),
+            Username: ($("#username").val() || "").trim(),
+            Password: ($("#password").val() || "").trim()
         };
     }
 
-    $("#loginForm").on("submit", async function (e) {
-        e.preventDefault();
+    // =====================================
+    // LOGIN FORM SUBMISSION
+    // =====================================
+    $("#loginForm")
+        .off("submit.login")
+        .on("submit.login", async function (e) {
+            e.preventDefault();
 
-        const payload = getAcc();
+            const payload = getAcc();
 
-        try {
+            try {
+                const login = await queryUtility.Save(
+                    "/auth/login",
+                    payload
+                );
 
-            const login = await queryUtility.Save("/auth/login", payload);
+                if (login.success) {
+                    window.location.href = "/dashboard";
+                } else {
+                    alert(login.message);
+                }
 
-            if (login.success) {
-                window.location.href = "/dashboard";
-            } else {
-                alert(login.message);
+            } catch (err) {
+                if (err.responseJSON && err.responseJSON.message) {
+                    alert(err.responseJSON.message);
+                } else {
+                    alert("An error occurred while communicating with the server.");
+                }
             }
+        });
 
-        } catch (err) {
+    // =====================================
+    // SHOW / HIDE PASSWORD
+    // =====================================
+    $("#togglePassword")
+        .off("click.password")
+        .on("click.password", function () {
 
-            if (err.responseJSON && err.responseJSON.message) {
-                alert(err.responseJSON.message);
-            } else {
-                alert("An error occurred while communicating with the server.");
-            }
+            const input = $("#password");
+            const isPassword = input.attr("type") === "password";
 
-        }
+            input.attr("type", isPassword ? "text" : "password");
 
-    });
+            $(this).html(
+                isPassword
+                    ? '<i class="fas fa-eye-slash"></i>'
+                    : '<i class="fas fa-eye"></i>'
+            );
 
-    $("#togglePassword").click(function () {
+            $(this).attr(
+                "aria-label",
+                isPassword ? "Hide Password" : "Show Password"
+            );
+        });
 
-        const input = $("#password");
-
-        if (input.attr("type") === "password") {
-
-            input.attr("type","text");
-            $(this).html('<i class="fas fa-eye-slash"></i>');
-
-        } else {
-
-            input.attr("type","password");
-            $(this).html('<i class="fas fa-eye"></i>');
-
-        }
-
-    });
+    
 
 });
 </script>

@@ -167,20 +167,45 @@
       return valid;
     }
 
-    // ==========================
-    // ADD BUTTON
-    // ==========================
+   // ==========================
+// ADD BUTTON
+// ==========================
 
-    $("#btnAdd").click(function () {
-      openModal();
+$(document)
+    .off("click", "#btnAdd")
+    .on("click", "#btnAdd", async function (e) {
+
+        e.preventDefault();
+
+        try {
+
+            await openModal(null);
+
+        } catch (err) {
+
+            console.error(err);
+
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: errorMessage(err, "Unable to load members."),
+                confirmButtonColor: "#991b1b",
+            });
+
+        }
+
     });
 
     // ==========================
     // EDIT
     // ==========================
 
-    $("#savingsTable").on("click", ".btn-edit", function () {
-      openModal(savingsById[$(this).data("id")]);
+    $("#savingsTable").on("click", ".btn-edit", async function () {
+      const id = $(this).data("id");
+      const row = savingsById[id];
+      if (row) {
+        await openModal(row);
+      }
     });
 
     // ==========================

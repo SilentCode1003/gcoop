@@ -1,176 +1,177 @@
-/* ==========================
-   CARD
-========================== */
+/* ==========================================================
+   SAVINGS LEDGER PAGE
+========================================================== */
 
-.custom-card{
-    background:#fff;
-    border-radius:8px;
+/* ==========================================================
+   PAGE TITLE
+========================================================== */
+
+.savings-ledger-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    margin-bottom:24px;
+
+    color:var(--text);
+
+    font-size:30px;
+    font-weight:700;
+}
+
+.savings-ledger-title i{
+    color:var(--primary);
+}
+
+/* ==========================================================
+   SAVINGS LEDGER CARD
+========================================================== */
+
+.savings-ledger-table{
+
+    background:var(--card);
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    border:1px solid var(--border);
+    border-radius:18px;
+
     overflow:hidden;
-    box-shadow:0 .3rem 1rem rgba(0,0,0,.12);
+
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
 }
 
-/* ==========================
-   HEADER
-========================== */
-
-.custom-header{
-
-    background:#991b1b;
-    color:#fff;
+.savings-ledger-table .card-header{
 
     display:flex;
+    align-items:center;
     justify-content:space-between;
-    align-items:center;
 
-    padding:18px 24px;
+    padding:16px 24px;
+
+    border:none;
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
 }
 
-.header-title{
-    display:flex;
-    align-items:center;
-    gap:14px;
+.savings-ledger-table .card-header h5,
+.savings-ledger-table .card-header h6{
+
+    margin:0;
+
+    color:#fff;
 
     font-size:18px;
     font-weight:700;
 }
 
-.header-title i{
-    font-size:22px;
+.savings-ledger-table .card-body{
+
+    background:transparent;
+
+    padding:24px;
 }
 
-/* ==========================
-   BODY
-========================== */
-
-.custom-body{
-    padding:25px;
-}
-
-/* ==========================
-   ADD BUTTON
-========================== */
-
-.btn-add{
-
-    background:#000 !important;
-    color:#fff !important;
-    border:1px solid #000 !important;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-
-    padding:10px 20px;
-
-    border-radius:7px;
-
-    font-weight:600;
-    font-size:15px;
-
-    transition:.25s;
-}
-
-.btn-add:hover{
-    background:#222 !important;
-    border-color:#222 !important;
-}
-
-/* ==========================
+/* ==========================================================
    TABLE
-========================== */
+========================================================== */
 
-.custom-table{
-    width:100%;
-    border-collapse:collapse;
+.savings-ledger-table table{
+    margin-bottom:0;
 }
 
-.custom-table thead th{
-
-    background:#991b1b;
-    color:#fff;
-
-    border:none;
-
-    font-size:15px;
-    font-weight:600;
-
-    padding:16px;
+.savings-ledger-table th,
+.savings-ledger-table td{
+    text-align:center;
     vertical-align:middle;
 }
 
-.custom-table tbody td{
-
-    padding:18px 16px;
-
-    vertical-align:middle;
-
-    border-top:1px solid #eee;
+/* Adjust if your second column is the member name */
+.savings-ledger-table td:nth-child(2){
+    text-align:left;
 }
 
-.custom-table tbody tr:hover{
-    background:#fafafa;
-}
+/* ==========================================================
+   ADD BUTTON
+========================================================== */
 
-/* ==========================
-   ACTION BUTTONS
-========================== */
-
-.btn-edit,
-.btn-delete{
-
-    width:42px;
-    height:42px;
+.savings-ledger-table .card-header #btnAdd,
+.savings-ledger-table .card-header .btn-add{
 
     display:inline-flex;
     align-items:center;
     justify-content:center;
+    gap:8px;
 
-    border-radius:6px;
+    min-height:44px;
+    padding:0 22px !important;
+
+    background:#6b7280 !important;
+    color:#fff !important;
+
+    border:1px solid #6b7280 !important;
+    border-radius:12px !important;
+
+    font-size:14px;
+    font-weight:600;
+
+    box-shadow:0 10px 24px rgba(107,114,128,.30);
+
+    transition:all .25s ease;
 }
 
-.btn-edit{
-    background:#6c757d;
-    color:#fff;
+.savings-ledger-table .card-header #btnAdd i,
+.savings-ledger-table .card-header .btn-add i{
+    color:#fff !important;
 }
 
-.btn-delete{
-    background:#e74c3c;
-    color:#fff;
+.savings-ledger-table .card-header #btnAdd:hover,
+.savings-ledger-table .card-header .btn-add:hover{
+
+    background:#4b5563 !important;
+    border-color:#4b5563 !important;
+
+    color:#fff !important;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 16px 34px rgba(75,85,99,.40);
 }
 
-.btn-edit:hover{
-    background:#5a6268;
+.savings-ledger-table .card-header #btnAdd:active{
+
+    transform:scale(.97);
+
+    background:#374151 !important;
 }
 
-.btn-delete:hover{
-    background:#d62c1a;
+/* ==========================================================
+   LIGHT MODE
+========================================================== */
+
+html:not(.dark) .savings-ledger-table{
+
+    background:rgba(255,255,255,.18);
+
+    border:1px solid rgba(255,255,255,.20);
 }
-/* ==========================
+
+/* ==========================================================
    DARK MODE
-========================== */
+========================================================== */
 
-html.dark .custom-card{
-    background:#1f1f1f !important;
+html.dark .savings-ledger-table{
+
+    background:rgba(22,22,22,.38);
+
+    border-color:rgba(255,255,255,.08);
 }
 
-html.dark .custom-body{
-    background:#1f1f1f !important;
-}
-
-html.dark .custom-table{
-    background:#1f1f1f !important;
-    color:#fff !important;
-}
-
-html.dark .custom-table tbody,
-html.dark .custom-table tr,
-html.dark .custom-table td{
-    background:#1f1f1f !important;
-    color:#fff !important;
-    border-color:#303030 !important;
-}
-
-html.dark .custom-table tbody tr:hover td{
-    background:#292929 !important;
+html.dark .savings-ledger-table .card-body{
+    background:transparent;
 }

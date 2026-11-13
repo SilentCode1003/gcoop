@@ -1,5 +1,10 @@
+
 <!-- Bootstrap core JavaScript -->
 <script src="/vendor/jquery/jquery.min.js"></script>
+
+<!-- Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <!-- Core plugin JavaScript -->
@@ -9,142 +14,184 @@
 <script src="/javascripts/sb-admin-2.min.js"></script>
 
 <script>
-    const roleName = "<%= typeof roleName !== 'undefined' ? roleName : '' %>";
-</script>
 
-<script>
+// =====================================
+// ROLE NAME
+// =====================================
+const roleName = "<%= typeof roleName !== 'undefined' ? roleName : '' %>";
 
-  // ==========================
-  // AJAX Utility
-  // ==========================
+// =====================================
+// AJAX UTILITY
+// =====================================
+function Query(url, type, data = null) {
 
-  function Query(url, type, data = null) {
     return new Promise(function (resolve, reject) {
-      $.ajax({
-        url: url,
-        method: type,
-        dataType: "json",
 
-        contentType: ["POST", "PUT", "PATCH", "DELETE"].includes(type)
-          ? "application/json"
-          : undefined,
+        $.ajax({
+            url: url,
+            method: type,
+            dataType: "json",
 
-        data:
-          data && ["POST", "PUT", "PATCH", "DELETE"].includes(type)
-            ? JSON.stringify(data)
-            : undefined,
+            contentType: ["POST", "PUT", "PATCH", "DELETE"].includes(type)
+                ? "application/json"
+                : undefined,
 
-        success: resolve,
-        error: reject,
-      });
+            data: data && ["POST", "PUT", "PATCH", "DELETE"].includes(type)
+                ? JSON.stringify(data)
+                : undefined,
+
+            success: resolve,
+            error: reject
+        });
+
     });
-  }
+}
 
-  const queryUtility = {
-    Load(url) {
-      return Query(url, "GET");
-    },
+const queryUtility = {
+    Load: (url) => Query(url, "GET"),
+    Save: (url, data) => Query(url, "POST", data),
+    Update: (url, data) => Query(url, "PUT", data),
+    Delete: (url) => Query(url, "DELETE")
+};
 
-    Save(url, data) {
-      return Query(url, "POST", data);
-    },
+// =====================================
+// LOGOUT
+// =====================================
+$(document).on("click", "#logoutModal .btn-primary", async function (e) {
 
-    Update(url, data) {
-      return Query(url, "PUT", data);
-    },
-
-    Delete(url) {
-      return Query(url, "DELETE");
-    },
-  };
-
-  // ==========================
-  // Logout
-  // ==========================
-
-  $(document).on("click", "#logoutModal .btn-primary", async function (e) {
     e.preventDefault();
 
     try {
-      await queryUtility.Save("/auth/logout");
-      window.location.href = "/auth";
+
+        await queryUtility.Save("/auth/logout");
+
+        window.location.href = "/auth";
+
     } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Logout Failed",
-        text: err.responseJSON?.message || "Unable to logout.",
-      });
+
+        Swal.fire({
+            icon: "error",
+            title: "Logout Failed",
+            text: err.responseJSON?.message || "Unable to logout."
+        });
+
     }
-  });
 
-  // ==========================
-  // Theme
-  // ==========================
-  $(function () {
-    const html = $("html");
-    const body = $("body");
-    const btn = $("#themeBtn");
-    const icon = $("#themeBtn i");
+});
 
-    const theme = localStorage.getItem("theme") || "light";
+// =====================================
+// GLOBAL LIGHT / DARK THEME
+// =====================================
+$(function () {
+
+    const html = document.documentElement;
+    const body = document.body;
+
+    function updateThemeIcon() {
+
+        const isDark = html.classList.contains("dark");
+        const btn = $("#themeBtn");
+
+        btn.html(
+            isDark
+                ? '<i class="fas fa-sun"></i>'
+                : '<i class="fas fa-moon"></i>'
+        );
+
+        btn.attr("aria-pressed", String(isDark));
+
+        btn.attr(
+            "aria-label",
+            isDark ? "Switch to Light Mode" : "Switch to Dark Mode"
+        );
+    }
 
     function applyTheme(theme) {
-      if (theme === "dark") {
-        html.addClass("dark");
-        body.addClass("dark");
-        icon.removeClass("fa-moon").addClass("fa-sun");
-      } else {
-        html.removeClass("dark");
-        body.removeClass("dark");
-        icon.removeClass("fa-sun").addClass("fa-moon");
-      }
+
+        const isDark = theme === "dark";
+
+        html.classList.toggle("dark", isDark);
+        body.classList.toggle("dark", isDark);
+
+        updateThemeIcon();
     }
 
-    // Apply saved theme
-    applyTheme(theme);
+    // Load saved theme
+    let savedTheme = "light";
 
-    // Exit if no theme button exists
-    if (!btn.length) return;
+    try {
+        savedTheme = localStorage.getItem("theme") || "light";
+    } catch (error) {
+        console.warn("Unable to read saved theme.");
+    }
 
-    // Toggle Theme
-    btn.off("click").on("click", function () {
-      const dark = !html.hasClass("dark");
+    applyTheme(savedTheme);
 
-      applyTheme(dark ? "dark" : "light");
+    // Remove previous global handler and attach one handler
+    $(document)
+        .off("click.globalTheme", "#themeBtn")
+        .on("click.globalTheme", "#themeBtn", function (e) {
 
-      localStorage.setItem("theme", dark ? "dark" : "light");
+            e.preventDefault();
+
+            const newTheme = html.classList.contains("dark")
+                ? "light"
+                : "dark";
+
+            try {
+                localStorage.setItem("theme", newTheme);
+            } catch (error) {
+                console.warn("Unable to save theme.");
+            }
+
+            applyTheme(newTheme);
+
+            console.log("Current theme:", newTheme);
+
+        });
+
+});
+
+// =====================================
+// NAVBAR SEARCH
+// =====================================
+$(function () {
+
+    const $form = $(".navbar-search");
+    const $input = $form.find("input");
+    const $button = $form.find("button");
+
+    function filterTable() {
+
+        const q = $input.val().toLowerCase().trim();
+
+        $("#dataTable tbody tr").each(function () {
+
+            $(this).toggle(
+                $(this).text().toLowerCase().includes(q)
+            );
+
+        });
+    }
+
+    window.filterTable = filterTable;
+
+    $input.on("input", filterTable);
+    $button.on("click", filterTable);
+
+    $form.on("submit", function (e) {
+
+        e.preventDefault();
+
+        filterTable();
+
     });
-  });
 
-  const $form = $(".navbar-search");
-  const $input = $form.find("input");
-  const $button = $form.find("button");
+});
 
-  // Hide table rows that don't contain the typed text
-  function filterTable() {
-    const q = $input.val().toLowerCase().trim();
-
-    $("#dataTable tbody tr").each(function () {
-      $(this).toggle($(this).text().toLowerCase().includes(q));
-    });
-  }
-
-  // Exposed so each page can re-apply the filter after it reloads its table
-  window.filterTable = filterTable;
-
-  $input.on("input", filterTable);
-  $button.on("click", filterTable);
-
-  // Pressing Enter shouldn't reload the page
-  $form.on("submit", function (e) {
-    e.preventDefault();
-    filterTable();
-  });
-
-  // ==========================
+// =====================================
 // ROLE ACCESS
-// ==========================
-
+// =====================================
 $(function () {
 
     if (roleName === "Custodian") {

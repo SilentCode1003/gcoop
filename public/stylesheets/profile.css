@@ -1,0 +1,492 @@
+/* =====================================================
+   PROFILE.CSS
+   5L COOP GLASSMORPHISM PROFILE
+===================================================== */
+
+/* ==========================
+   Profile Container
+========================== */
+
+.profile-card{
+    background:var(--glass);
+    backdrop-filter:blur(var(--blur));
+    -webkit-backdrop-filter:blur(var(--blur));
+
+    border:1px solid var(--glass-border);
+    border-radius:22px;
+
+    box-shadow:var(--shadow);
+
+    overflow:hidden;
+}
+
+/* ==========================
+   Profile Header
+========================== */
+
+.profile-header{
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+
+    padding:35px;
+
+    text-align:center;
+
+    color:#fff;
+}
+
+.profile-header h3{
+
+    margin-top:15px;
+
+    margin-bottom:5px;
+
+    color:#fff !important;
+
+    font-weight:700;
+}
+
+.profile-header p{
+
+    color:rgba(255,255,255,.85);
+
+    margin:0;
+}
+
+/* ==========================
+   Avatar
+========================== */
+
+.profile-avatar{
+
+    width:130px;
+
+    height:130px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:5px solid rgba(255,255,255,.30);
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.25);
+
+    background:#fff;
+}
+
+/* Default avatar */
+
+.profile-avatar-placeholder{
+
+    width:130px;
+
+    height:130px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:rgba(255,255,255,.15);
+
+    border:4px solid rgba(255,255,255,.20);
+
+    font-size:60px;
+
+    color:#fff;
+
+    margin:auto;
+}
+
+/* ==========================
+   Body
+========================== */
+
+.profile-body{
+
+    padding:30px;
+}
+
+/* ==========================
+   Section Title
+========================== */
+
+.profile-section{
+
+    margin-bottom:30px;
+}
+
+.profile-section-title{
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:#fff;
+
+    margin-bottom:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+}
+
+.profile-section-title i{
+
+    color:var(--primary);
+}
+
+/* ==========================
+   Labels
+========================== */
+
+.profile-body label{
+
+    color:rgba(255,255,255,.80);
+
+    font-size:13px;
+
+    font-weight:600;
+
+    margin-bottom:5px;
+}
+
+/* ==========================
+   Inputs
+========================== */
+
+.profile-body .form-control,
+.profile-body .custom-select{
+
+    background:rgba(255,255,255,.10);
+
+    border:1px solid rgba(255,255,255,.12);
+
+    color:#fff;
+
+    border-radius:12px;
+
+    height:46px;
+
+    box-shadow:none;
+}
+
+.profile-body textarea{
+
+    min-height:120px;
+}
+
+.profile-body .form-control::placeholder{
+
+    color:rgba(255,255,255,.50);
+}
+
+.profile-body .form-control:focus,
+.profile-body .custom-select:focus{
+
+    background:rgba(255,255,255,.14);
+
+    border-color:var(--primary);
+
+    box-shadow:
+        0 0 0 4px rgba(153,27,27,.15);
+
+    color:#fff;
+}
+
+/* ==========================
+   Readonly Fields
+========================== */
+
+.profile-body .form-control:disabled,
+.profile-body .form-control[readonly]{
+
+    background:rgba(255,255,255,.06);
+
+    opacity:1;
+
+    color:#ddd;
+}
+
+/* ==========================
+   Buttons Area
+========================== */
+
+#editActions{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:12px;
+
+    margin-top:30px;
+
+    flex-wrap:wrap;
+}
+
+/* ==========================
+   Edit Button
+========================== */
+
+#btnEdit{
+
+    min-width:150px;
+
+    height:45px;
+
+    background:var(--primary);
+
+    border:none;
+
+    color:#fff;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    transition:.25s;
+}
+
+#btnEdit:hover{
+
+    background:var(--primary-hover);
+
+    transform:translateY(-2px);
+}
+
+/* ==========================
+   Save Button
+========================== */
+
+#btnSave{
+
+    min-width:150px;
+
+    height:45px;
+
+    background:#16a34a;
+
+    border:none;
+
+    color:#fff;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    transition:.25s;
+}
+
+#btnSave:hover{
+
+    background:#15803d;
+
+    transform:translateY(-2px);
+}
+
+/* ==========================
+   Cancel Button
+========================== */
+
+#btnCancel{
+
+    min-width:150px;
+
+    height:45px;
+
+    background:#6c757d;
+
+    border:none;
+
+    color:#fff;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    transition:.25s;
+}
+
+#btnCancel:hover{
+
+    background:#545b62;
+
+    transform:translateY(-2px);
+}
+
+/* ==========================
+   Icons
+========================== */
+
+#btnEdit i,
+#btnSave i,
+#btnCancel i{
+
+    margin-right:8px;
+}
+
+/* ==========================
+   Info Boxes
+========================== */
+
+.profile-info{
+
+    background:rgba(255,255,255,.08);
+
+    border:1px solid rgba(255,255,255,.10);
+
+    border-radius:15px;
+
+    padding:18px;
+
+    margin-bottom:15px;
+}
+
+.profile-info strong{
+
+    color:#fff;
+}
+
+.profile-info small{
+
+    color:rgba(255,255,255,.65);
+}
+
+/* ==========================
+   Divider
+========================== */
+
+.profile-divider{
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    margin:25px 0;
+}
+
+/* ==========================
+   Responsive
+========================== */
+
+@media(max-width:768px){
+
+    .profile-header{
+
+        padding:25px;
+    }
+
+    .profile-avatar,
+    .profile-avatar-placeholder{
+
+        width:100px;
+        height:100px;
+    }
+
+    .profile-body{
+
+        padding:20px;
+    }
+
+    #editActions{
+
+        justify-content:center;
+    }
+
+    #btnEdit,
+    #btnSave,
+    #btnCancel{
+
+        width:100%;
+    }
+
+}
+.profile-card{
+    background:#171313;
+    border:none;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 12px 35px rgba(0,0,0,.35);
+}
+
+.profile-header{
+    background:#991b1b;
+    color:#fff;
+    padding:18px 25px;
+    border:none;
+}
+
+.profile-header h5{
+    margin:0;
+    font-size:24px;
+    font-weight:700;
+}
+
+.profile-card .card-body{
+    padding:30px;
+}
+
+.profile-card label{
+    color:#fff;
+    font-weight:600;
+    margin-bottom:8px;
+}
+
+.profile-card .form-control{
+    height:56px;
+    border-radius:18px;
+    background:#2d2d2d;
+    border:1px solid #454545;
+    color:#fff;
+}
+
+.profile-card textarea.form-control{
+    height:120px;
+}
+
+.profile-card .form-control:focus{
+    background:#353535;
+    border-color:#991b1b;
+    color:#fff;
+    box-shadow:0 0 0 .2rem rgba(153,27,27,.25);
+}
+
+.profile-card .card-footer{
+    background:#171313;
+    border-top:1px solid rgba(255,255,255,.08);
+    padding:18px 30px;
+}
+
+.btn-save{
+    background:#991b1b;
+    color:#fff;
+    border:none;
+    min-width:150px;
+}
+
+.btn-save:hover{
+    background:#7f1d1d;
+    color:#fff;
+}
+
+.btn-cancel{
+    background:#6b7280;
+    color:#fff;
+    border:none;
+    min-width:150px;
+    margin-right:10px;
+}
+
+.btn-cancel:hover{
+    background:#4b5563;
+    color:#fff;
+}

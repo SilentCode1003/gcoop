@@ -1,240 +1,563 @@
-/* ==========================
+/* ==========================================================
+   5L COOP
+   SIDEBAR.CSS
+   Modern Glass Sidebar
+========================================================== */
+
+/* ======================================
    SIDEBAR
-========================== */
+====================================== */
 
 .sidebar{
-    background: var(--sidebar) !important;
-    width: 250px !important;
-    min-height: 100vh;
 
-    transition: background .3s ease,
-                color .3s ease,
-                border-color .3s ease;
+    width:260px !important;
+    min-height:100vh;
+
+    position:sticky;
+    top:0;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    background:var(--sidebar);
+
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+
+    border-right:1px solid var(--border);
+
+    box-shadow:
+        12px 0 45px rgba(0,0,0,.25);
+
+    transition:
+        width .35s ease,
+        background .35s ease;
+
 }
 
-/* ==========================
-   SIDEBAR BRAND
-========================== */
+/* Dark */
 
-.sidebar .sidebar-brand{
-    height: 80px;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    text-decoration: none;
+html.dark .sidebar{
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(18,18,18,.95),
+            rgba(8,8,8,.90)
+        );
+
 }
 
-.sidebar .sidebar-brand-icon{
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+/* Light */
+
+/* LIGHT MODE */
+
+html:not(.dark) .sidebar{
+
+    background:rgba(255,255,255,.62);
+
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+
+    border-right:1px solid rgba(255,255,255,.45);
+
+    box-shadow:
+        8px 0 35px rgba(0,0,0,.08);
+
 }
 
-.sidebar .sidebar-brand-icon img,
+/* Brand */
+
+html:not(.dark) .sidebar-brand{
+
+    border-bottom:1px solid rgba(0,0,0,.08);
+
+}
+
+html:not(.dark) .sidebar-brand-text{
+
+    color:#991b1b;
+
+}
+
+/* Heading */
+
+html:not(.dark) .sidebar-heading{
+
+    color:#7a7a7a !important;
+
+}
+
+/* Links */
+
+html:not(.dark) .sidebar .nav-link{
+
+    color:#444 !important;
+
+}
+
+html:not(.dark) .sidebar .nav-link i{
+
+    color:#991b1b;
+
+}
+
+/* Hover */
+
+html:not(.dark) .sidebar .nav-link:hover{
+
+    background:linear-gradient(
+        135deg,
+        #991b1b,
+        #b91c1c
+    );
+
+    color:#fff !important;
+
+    transform:translateX(5px);
+
+}
+
+html:not(.dark) .sidebar .nav-link:hover i{
+
+    color:#fff;
+
+}
+
+/* Active */
+
+html:not(.dark) .sidebar .nav-item.active .nav-link{
+
+    background:linear-gradient(
+        135deg,
+        #991b1b,
+        #b91c1c
+    );
+
+    color:#fff !important;
+
+    box-shadow:
+        0 12px 25px rgba(153,27,27,.22);
+
+}
+
+html:not(.dark) .sidebar .nav-item.active i{
+
+    color:#fff;
+
+}
+
+/* ======================================
+   BRAND
+====================================== */
+
+.sidebar-brand{
+
+    height:90px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+
+    text-decoration:none;
+
+    border-bottom:1px solid var(--border);
+
+    transition:.3s;
+
+}
+
+.sidebar-brand:hover{
+
+    text-decoration:none;
+
+}
+
 .sidebar-logo{
-    width: 45px !important;
-    height: 45px !important;
-    max-width: 45px !important;
-    max-height: 45px !important;
-    object-fit: contain;
-    display: block;
+
+    width:52px;
+    height:52px;
+    object-fit:contain;
+
+    transition:.35s;
 }
 
-.sidebar .sidebar-brand-text{
-    margin-left: 10px;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text) !important;
-    line-height: 1.2;
+.sidebar-brand:hover .sidebar-logo{
+
+    transform:rotate(-8deg) scale(1.08);
+
 }
 
-/* ==========================
-   SIDEBAR HEADING
-========================== */
+.sidebar-brand-text{
 
-.sidebar-heading{
-    color: var(--text) !important;
-    opacity: .75;
-    font-size: .75rem;
-    font-weight: 700;
-    text-transform: uppercase;
+    font-size:17px;
+    font-weight:800;
+    line-height:1.25;
+    letter-spacing:1px;
+
+    color:var(--text)!important;
+
+    text-align:left;
+
 }
 
-/* ==========================
-   SIDEBAR LINKS
-========================== */
-
-.sidebar .nav-item{
-    margin: 3px 8px;
-}
-
-.sidebar .nav-item .nav-link{
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 15px;
-    border-radius: 8px;
-    color: var(--text) !important;
-    text-decoration: none;
-    transition: all .3s ease;
-}
-
-.sidebar .nav-item .nav-link span{
-    color: var(--text) !important;
-    font-weight: 500;
-}
-
-.sidebar .nav-item .nav-link i{
-    width: 20px;
-    text-align: center;
-    font-size: 16px;
-    color: var(--text) !important;
-    transition: .3s;
-}
-
-.sidebar .nav-item .nav-link img{
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-    transition: .3s;
-}
-
-/* ==========================
-   HOVER
-========================== */
-
-.sidebar .nav-item .nav-link:hover{
-    background: var(--primary) !important;
-    color: #fff !important;
-}
-
-.sidebar .nav-item .nav-link:hover span,
-.sidebar .nav-item .nav-link:hover i{
-    color: #fff !important;
-}
-
-.sidebar .nav-item .nav-link:hover img{
-    filter: brightness(0) invert(1);
-}
-
-/* ==========================
-   ACTIVE
-========================== */
-
-.sidebar .nav-item.active .nav-link{
-    background: var(--primary) !important;
-    color: #fff !important;
-}
-
-.sidebar .nav-item.active .nav-link span,
-.sidebar .nav-item.active .nav-link i{
-    color: #fff !important;
-}
-
-.sidebar .nav-item.active .nav-link img{
-    filter: brightness(0) invert(1);
-}
-
-/* ==========================
+/* ======================================
    DIVIDER
-========================== */
+====================================== */
 
 .sidebar-divider{
-    border-color: var(--border) !important;
+
+    margin:18px 18px;
+    border-color:var(--border)!important;
+
 }
 
-/* ==========================
-   SIDEBAR TOGGLE
-========================== */
+/* ======================================
+   HEADINGS
+====================================== */
+
+.sidebar-heading{
+
+    padding:10px 22px;
+
+    font-size:11px;
+    font-weight:800;
+
+    letter-spacing:2px;
+    text-transform:uppercase;
+
+    color:var(--text-muted)!important;
+
+}
+
+/* ======================================
+   NAV ITEM
+====================================== */
+
+.sidebar .nav-item{
+
+    margin:6px 12px;
+
+}
+
+.sidebar .nav-link{
+
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+    height:50px;
+
+    padding:0 18px;
+
+    border-radius:16px;
+
+    color:var(--text)!important;
+
+    font-size:15px;
+    font-weight:600;
+
+    transition:all .28s ease;
+
+}
+
+/* ======================================
+   ICONS
+====================================== */
+
+.sidebar .nav-link i{
+
+    width:22px;
+
+    text-align:center;
+
+    font-size:17px;
+
+    color:var(--primary);
+
+    transition:.3s;
+
+}
+
+/* ======================================
+   HOVER
+====================================== */
+
+.sidebar .nav-link:hover{
+
+    transform:translateX(8px);
+
+    background:
+
+        linear-gradient(
+            90deg,
+            rgba(153,27,27,.18),
+            rgba(153,27,27,.08)
+        );
+
+    color:var(--primary)!important;
+
+}
+
+.sidebar .nav-link:hover i{
+
+    color:var(--primary);
+
+    transform:scale(1.15);
+
+}
+
+/* ======================================
+   ACTIVE
+====================================== */
+
+.sidebar .nav-item.active .nav-link{
+
+    background:
+
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-hover)
+        );
+
+    color:#fff!important;
+
+    box-shadow:
+
+        0 10px 25px rgba(153,27,27,.35);
+
+}
+
+.sidebar .nav-item.active i{
+
+    color:#fff;
+
+}
+
+/* Active indicator */
+
+.sidebar .nav-item.active{
+
+    position:relative;
+
+}
+
+.sidebar .nav-item.active::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:-12px;
+    top:10px;
+
+    width:4px;
+    height:30px;
+
+    background:var(--primary);
+
+    border-radius:10px;
+
+}
+
+/* ======================================
+   COLLAPSE
+====================================== */
+
+.sidebar .collapse-inner{
+
+    background:rgba(0,0,0,.18);
+
+    border-radius:14px;
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid var(--border);
+
+    margin-top:8px;
+
+}
+
+.sidebar .collapse-item{
+
+    border-radius:10px;
+
+    color:var(--text)!important;
+
+    margin:5px;
+
+    transition:.25s;
+
+}
+
+.sidebar .collapse-item:hover{
+
+    background:var(--primary);
+
+    color:#fff!important;
+
+}
+
+/* ======================================
+   FOOTER CARD
+====================================== */
+
+.sidebar-card{
+
+    margin:25px 18px;
+
+    padding:18px;
+
+    border-radius:18px;
+
+    text-align:center;
+
+    background:rgba(255,255,255,.06);
+
+    border:1px solid var(--border);
+
+    backdrop-filter:blur(15px);
+
+}
+
+.sidebar-card img{
+
+    width:75px;
+
+    margin-bottom:15px;
+
+}
+
+.sidebar-card strong{
+
+    color:var(--text);
+
+}
+
+.sidebar-card .span1{
+
+    color:var(--primary);
+
+}
+
+/* ======================================
+   TOGGLE BUTTON
+====================================== */
 
 #sidebarToggle{
-    background: var(--primary) !important;
-    border: none !important;
-    color: #fff !important;
+
+    width:42px;
+    height:42px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.08);
+
+    transition:.3s;
+
 }
 
 #sidebarToggle:hover{
-    background: var(--primary-hover) !important;
+
+    background:var(--primary);
+
+    transform:rotate(180deg);
+
 }
 
-/* ==========================
-   SIDEBAR FOOTER
-========================== */
+/* ======================================
+   SCROLLBAR
+====================================== */
 
-.sidebar-card{
-    background: transparent !important;
-    border: none !important;
-    text-align: center;
-    padding: 20px;
+.sidebar::-webkit-scrollbar{
+
+    width:8px;
+
 }
 
-.sidebar-card p{
-    color: var(--text) !important;
+.sidebar::-webkit-scrollbar-track{
+
+    background:transparent;
+
 }
 
-.sidebar-card .btn{
-    border-radius: 20px;
+.sidebar::-webkit-scrollbar-thumb{
+
+    background:rgba(153,27,27,.6);
+
+    border-radius:20px;
+
 }
 
-.sidebar-card-illustration{
-    width: 70px !important;
-    height: 70px !important;
-    object-fit: contain;
-    display: block;
-    margin: 10px auto;
+.sidebar::-webkit-scrollbar-thumb:hover{
+
+    background:var(--primary);
+
 }
 
-/* ==========================
-   COLLAPSED SIDEBAR
-========================== */
+/* ======================================
+   COLLAPSED
+====================================== */
 
 .sidebar.toggled{
-    width: 90px !important;
+
+    width:90px!important;
+
 }
 
 .sidebar.toggled .sidebar-brand-text,
 .sidebar.toggled .sidebar-heading,
-.sidebar.toggled .sidebar-card,
-.sidebar.toggled .nav-link span{
-    display: none;
+.sidebar.toggled .nav-link span,
+.sidebar.toggled .sidebar-card{
+
+    display:none;
+
 }
 
 .sidebar.toggled .nav-link{
-    justify-content: center;
-    padding: 12px;
+
+    justify-content:center;
+
+    padding:0;
+
 }
 
-.sidebar.toggled .nav-link i,
-.sidebar.toggled .nav-link img{
-    margin: 0;
+.sidebar.toggled .nav-link i{
+
+    margin:0;
+
+    font-size:20px;
+
 }
 
-/* ==========================
-   SCROLLBAR
-========================== */
+/* ======================================
+   MOBILE
+====================================== */
 
-.sidebar::-webkit-scrollbar{
-    width: 6px;
-}
+@media(max-width:768px){
 
-.sidebar::-webkit-scrollbar-track{
-    background: var(--sidebar);
-}
+    .sidebar{
 
-.sidebar::-webkit-scrollbar-thumb{
-    background: var(--primary);
-    border-radius: 10px;
-}
+        position:fixed;
 
-/* ==========================
-   REMOVE SB ADMIN ARROW
-========================== */
+        left:-260px;
 
-.sidebar .nav-link[data-toggle="collapse"]::after{
-    display: none !important;
+        width:260px!important;
+
+        z-index:1050;
+
+        transition:left .3s ease;
+
+    }
+
+    .sidebar.show{
+
+        left:0;
+
+    }
+
 }

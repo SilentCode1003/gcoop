@@ -1,0 +1,278 @@
+
+/* ==========================================================
+   5L COOP - ROUTES PAGE
+========================================================== */
+
+/* ==========================================================
+   PAGE TITLE
+========================================================== */
+
+.routes-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    color: var(--text);
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.routes-title i {
+    color: var(--primary);
+}
+
+/* ==========================================================
+   ROUTES CARD
+========================================================== */
+
+.routes-table {
+    background: var(--card);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, .15);
+}
+
+.routes-table .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border: none;
+    background: linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+}
+
+.routes-table .card-header h5,
+.routes-table .card-header h6 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.routes-table .card-body {
+    background: transparent;
+    padding: 24px;
+}
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.routes-table table {
+    margin-bottom: 0;
+}
+
+.routes-table th,
+.routes-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.routes-table td:nth-child(2) {
+    text-align: left;
+}
+
+/* ==========================================================
+   ADD ROUTE BUTTON
+========================================================== */
+
+.routes-table .card-header #btnAdd,
+.routes-table .card-header .btn-add {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 44px;
+    padding: 0 22px !important;
+
+    background: #6b7280 !important;
+    color: #fff !important;
+
+    border: 1px solid #6b7280 !important;
+    border-radius: 12px !important;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    box-shadow: 0 10px 24px rgba(107, 114, 128, .30);
+    transition: all .25s ease;
+}
+
+.routes-table .card-header #btnAdd i,
+.routes-table .card-header .btn-add i {
+    color: #fff !important;
+}
+
+.routes-table .card-header #btnAdd:hover,
+.routes-table .card-header .btn-add:hover {
+    background: #4b5563 !important;
+    border-color: #4b5563 !important;
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(75, 85, 99, .40);
+}
+
+.routes-table .card-header #btnAdd:active,
+.routes-table .card-header .btn-add:active {
+    transform: scale(.97);
+    background: #374151 !important;
+}
+
+/* ==========================================================
+   SAVE ROUTE BUTTON
+========================================================== */
+
+#btnSaveRoute,
+.btn-save-route {
+    background: linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    ) !important;
+
+    color: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+
+    box-shadow: 0 10px 24px rgba(153, 27, 27, .28);
+}
+
+#btnSaveRoute:hover,
+.btn-save-route:hover {
+    color: #fff !important;
+    box-shadow: 0 16px 34px rgba(153, 27, 27, .42);
+    transform: translateY(-2px);
+}
+
+#btnSaveRoute i {
+    color: #fff !important;
+}
+
+/* ==========================================================
+   LIGHT MODE
+========================================================== */
+
+html:not(.dark) .routes-table {
+    background: rgba(255, 255, 255, .18);
+    border: 1px solid rgba(255, 255, 255, .20);
+}
+
+/* ==========================================================
+   DARK MODE
+========================================================== */
+
+html.dark .routes-table {
+    background: rgba(22, 22, 22, .38);
+    border-color: rgba(255, 255, 255, .08);
+}
+
+html.dark .routes-table .card-body {
+    background: transparent;
+}
+
+/* ==========================================================
+   ROUTES MODAL BUTTONS - MATCH ADD ROLE SIZE
+========================================================== */
+
+#btnCancelRoute,
+#btnSaveRoute {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    flex: 0 0 150px !important;
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 768px) {
+    .routes-table .card-body {
+        padding: 16px;
+    }
+
+    #routesModal .modal-footer {
+        flex-wrap: wrap;
+    }
+}
+/* ==========================================
+   ROUTES MODAL BUTTON SIZE AND SPACING
+========================================== */
+
+#routesModal .routes-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+#routesModal .routes-footer button#btnCancelRoute,
+#routesModal .routes-footer button#btnSaveRoute {
+    width: 125px !important;
+    min-width: 125px !important;
+    max-width: 125px !important;
+
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+
+    flex: 0 0 125px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+}
+
+/* CANCEL */
+#routesModal .routes-footer #btnCancelRoute {
+    background: #6b7280 !important;
+    color: #fff !important;
+    border: 1px solid #6b7280 !important;
+}
+
+/* SAVE */
+#routesModal .routes-footer #btnSaveRoute {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border: 1px solid var(--primary) !important;
+}
+
+#routesModal .routes-footer #btnSaveRoute i {
+    color: #fff !important;
+    margin-right: 6px;
+}

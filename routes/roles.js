@@ -15,6 +15,7 @@ router.get("/", (req, res) => {
     res.render("layout/main-layout", {
         body: "../pages/roles-page.ejs",
         title: "Roles",
+         pageStyle: "roles.css",
         pageScript: "../scripts/roles-script.ejs",
         roleName: req.session.roleName
     });

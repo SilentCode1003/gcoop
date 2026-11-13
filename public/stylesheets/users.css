@@ -1,39 +1,172 @@
+/* ==========================================================
+   USERS PAGE
+========================================================== */
+
+/* ==========================================================
+   PAGE TITLE
+========================================================== */
+
 .users-title{
-    color: var(--primary);
-    font-size:32px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    color:var(--text);
+
+    font-size:30px;
     font-weight:700;
-    text-transform:uppercase;
 }
 
+.users-title i{
+    color:var(--primary);
+}
+
+/* ==========================================================
+   USERS CARD
+========================================================== */
+
 .users-table{
+
     background:var(--card);
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
     border:1px solid var(--border);
-    border-radius:12px;
+    border-radius:18px;
+
     overflow:hidden;
+
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
+
 }
 
 .users-table .card-header{
-    background:var(--primary);
-    color:#fff;
-    padding:16px 22px;
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+
+    border:none;
+
+    padding:16px 24px;
+
 }
 
 .users-table .card-header h6{
-    color:#fff;
+
     margin:0;
+
+    color:#fff;
+
+    font-size:18px;
+    font-weight:700;
+
 }
 
 .users-table .card-body{
-    background:var(--card);
-    padding:25px;
+
+    background:transparent;
+
+    padding:24px;
+
 }
 
-.btn-add-user{
-    background:var(--primary);
-    color:#fff;
-    border:none;
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.users-table table{
+    margin-bottom:0;
 }
 
-.btn-add-user:hover{
-    background:var(--primary-hover);
+.users-table th,
+.users-table td{
+    text-align:center;
+    vertical-align:middle;
+}
+
+/* ==========================================================
+   LIGHT MODE
+========================================================== */
+
+html:not(.dark) .users-table{
+
+    background:rgba(255,255,255,.18);
+
+    border:1px solid rgba(255,255,255,.20);
+
+}
+
+/* ==========================================================
+   DARK MODE
+========================================================== */
+
+html.dark .users-table{
+
+    background:rgba(22,22,22,.38);
+
+    border-color:rgba(255,255,255,.08);
+
+}
+
+html.dark .users-table .card-body{
+    background:transparent;
+}
+/* ==========================================================
+   USERS ADD BUTTON
+========================================================== */
+
+.users-table .card-header #btnAdd,
+.users-table .card-header .btn-add{
+
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    min-height:44px;
+    padding:0 22px !important;
+
+    background:#6b7280 !important;
+    color:#ffffff !important;
+
+    border:1px solid #6b7280 !important;
+    border-radius:12px !important;
+
+    font-size:14px;
+    font-weight:600;
+
+    box-shadow:0 10px 24px rgba(107,114,128,.30);
+
+    transition:all .25s ease;
+}
+
+.users-table .card-header #btnAdd i,
+.users-table .card-header .btn-add i{
+    color:#ffffff !important;
+}
+
+.users-table .card-header #btnAdd:hover,
+.users-table .card-header .btn-add:hover{
+
+    background:#4b5563 !important;
+
+    border-color:#4b5563 !important;
+
+    color:#ffffff !important;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 16px 34px rgba(75,85,99,.40);
+}
+
+.users-table .card-header #btnAdd:active,
+.users-table .card-header .btn-add:active{
+
+    transform:scale(.97);
+
+    background:#374151 !important;
 }

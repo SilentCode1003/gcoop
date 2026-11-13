@@ -207,11 +207,36 @@
     }
 
     // ==========================
-    // ADD
-    // ==========================
+// ADD
+// ==========================
 
-    $("#btnAdd").on("click", () => openModal(null));
-    console.log("Add clicked");
+$(document)
+    .off("click", "#btnAdd")
+    .on("click", "#btnAdd", async function (e) {
+
+        e.preventDefault();
+
+        try {
+
+            await openModal(null);
+
+        } catch (err) {
+
+            console.error(err);
+
+            Swal.fire({
+                icon: "error",
+                title: "Unable to open form",
+                text: errorMessage(
+                    err,
+                    "Unable to load members. Make sure member exists."
+                ),
+                confirmButtonColor: "#991b1b",
+            });
+
+        }
+
+    });
     // ==========================
     // EDIT
     // ==========================

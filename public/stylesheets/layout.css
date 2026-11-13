@@ -1,0 +1,486 @@
+/* ==========================================================
+   5L COOP
+   LAYOUT.CSS
+   Background • Wrapper • Glass Layout
+========================================================== */
+
+/* ==========================================================
+   HTML / BODY
+========================================================== */
+
+html,
+body{
+    width:100%;
+    min-height:100%;
+}
+
+body{
+
+    color:var(--text);
+
+    background-image:var(--body-bg) !important;
+    background-size:cover !important;
+    background-position:center center !important;
+    background-repeat:no-repeat !important;
+    background-attachment:fixed !important;
+
+    transition:
+        background .35s ease,
+        color .35s ease;
+
+}
+
+/* ==========================================================
+   BACKGROUND OVERLAY
+========================================================== */
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    pointer-events:none;
+
+    z-index:-1;
+
+    transition:background .35s ease;
+
+}
+
+html:not(.dark) body::before{
+
+    background:rgba(255,255,255,.08);
+
+}
+
+html.dark body::before{
+
+    background:rgba(0,0,0,.28);
+
+}
+/* ==========================================================
+   SB ADMIN LAYOUT
+========================================================== */
+
+#wrapper{
+
+    display:flex;
+
+    min-height:100vh;
+
+    background:transparent !important;
+
+}
+
+#wrapper #content-wrapper{
+
+    display:flex;
+
+    flex-direction:column;
+
+    flex:1;
+
+    min-width:0;
+
+    min-height:100vh;
+
+    background:transparent !important;
+
+    background-color:transparent !important;
+
+}
+
+#wrapper #content{
+
+    flex:1;
+
+    background:transparent !important;
+
+    background-color:transparent !important;
+
+}
+
+footer.sticky-footer{
+
+    margin-top:auto;
+
+    background:transparent !important;
+
+}
+
+/* ==========================================================
+   CONTAINER
+========================================================== */
+
+.container-fluid{
+
+    padding:30px;
+
+    background:transparent !important;
+
+}
+
+/* ==========================================================
+   GLASS CARD
+========================================================== */
+
+.card,
+.glass-card{
+
+    background:var(--glass);
+
+    backdrop-filter:blur(var(--blur));
+    -webkit-backdrop-filter:blur(var(--blur));
+
+    border:1px solid var(--glass-border);
+
+    border-radius:22px;
+
+    box-shadow:var(--shadow);
+
+    transition:
+        background .3s ease,
+        border-color .3s ease,
+        transform .3s ease,
+        box-shadow .3s ease;
+
+}
+
+.card:hover,
+.glass-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 25px 60px rgba(0,0,0,.28);
+
+}
+
+/* ==========================================================
+   GLASS HEADER
+========================================================== */
+
+.glass-header{
+
+    padding:18px 22px;
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+
+    color:#fff;
+
+    border:none;
+
+}
+
+/* ==========================================================
+   GLASS BODY
+========================================================== */
+
+.glass-body{
+
+    padding:25px;
+
+    background:transparent;
+
+}
+
+/* ==========================================================
+   PAGE TITLES
+========================================================== */
+
+.dashboard-title,
+.page-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    font-size:28px;
+
+    font-weight:700;
+
+    color:var(--text);
+
+}
+
+.dashboard-title i,
+.page-title i{
+
+    color:var(--primary);
+
+}
+
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+.mb-section{
+
+    margin-bottom:30px;
+
+}
+
+.mt-section{
+
+    margin-top:30px;
+
+}
+
+.shadow-glass{
+
+    box-shadow:0 20px 60px rgba(0,0,0,.30);
+
+}
+
+hr{
+
+    border-color:var(--border);
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .container-fluid{
+
+        padding:18px;
+
+    }
+
+    .dashboard-title,
+    .page-title{
+
+        font-size:22px;
+
+    }
+
+}
+/* ==========================================
+   FORCE PAGE BACKGROUND
+========================================== */
+
+html,
+body{
+    min-height:100%;
+    width:100%;
+}
+
+body{
+
+    background:var(--body-bg) !important;
+
+    background-position:center !important;
+    background-size:cover !important;
+    background-repeat:no-repeat !important;
+    background-attachment:fixed !important;
+
+    color:var(--text);
+
+    transition:
+        background .35s ease,
+        background-color .35s ease,
+        color .35s ease;
+
+}
+
+/* SB Admin wrappers */
+
+#wrapper,
+#content-wrapper,
+#content,
+.container-fluid,
+.sticky-footer{
+
+    background:transparent !important;
+
+}
+
+/* Light Overlay */
+
+html:not(.dark) body::before{
+
+    content:"";
+    position:fixed;
+    inset:0;
+    background:rgba(255,255,255,.08);
+    pointer-events:none;
+    z-index:-1;
+
+}
+
+/* Dark Overlay */
+
+html.dark body::before{
+
+    content:"";
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.30);
+    pointer-events:none;
+    z-index:-1;
+
+}
+/* ==========================================================
+   SELECT / DROPDOWN
+========================================================== */
+
+/* ==========================
+   LIGHT MODE
+========================== */
+
+html:not(.dark) select,
+html:not(.dark) .custom-select,
+html:not(.dark) select.form-control{
+
+    background:#ffffff !important;
+    color:#111827 !important;
+    border:1px solid #d1d5db !important;
+
+}
+
+html:not(.dark) select option{
+
+    background:#ffffff !important;
+    color:#111827 !important;
+
+}
+
+html:not(.dark) select option[value=""]{
+
+    color:#6b7280 !important;
+
+}
+
+/* ==========================
+   LIGHT MODE SELECT2
+========================== */
+
+html:not(.dark) .select2-container--default .select2-selection--single{
+
+    height:46px !important;
+    background:#ffffff !important;
+    border:1px solid #d1d5db !important;
+    border-radius:14px !important;
+
+}
+
+html:not(.dark) .select2-selection__rendered{
+
+    color:#111827 !important;
+    line-height:44px !important;
+
+}
+
+html:not(.dark) .select2-selection__placeholder{
+
+    color:#6b7280 !important;
+
+}
+
+html:not(.dark) .select2-selection__arrow b{
+
+    border-top-color:#111827 !important;
+
+}
+
+html:not(.dark) .select2-dropdown{
+
+    background:#ffffff !important;
+    border:1px solid #d1d5db !important;
+
+}
+
+html:not(.dark) .select2-results__option{
+
+    background:#ffffff !important;
+    color:#111827 !important;
+
+}
+
+html:not(.dark) .select2-results__option--highlighted{
+
+    background:#991b1b !important;
+    color:#ffffff !important;
+
+}
+
+/* ==========================
+   DARK MODE
+========================== */
+
+html.dark select,
+html.dark .custom-select,
+html.dark select.form-control{
+
+    background:#2b2b2b !important;
+    color:#ffffff !important;
+    border:1px solid #444 !important;
+
+}
+
+html.dark select option{
+
+    background:#2b2b2b !important;
+    color:#ffffff !important;
+
+}
+
+html.dark .select2-container--default .select2-selection--single{
+
+    height:46px !important;
+    background:#2b2b2b !important;
+    border:1px solid #444 !important;
+    border-radius:14px !important;
+
+}
+
+html.dark .select2-selection__rendered{
+
+    color:#ffffff !important;
+    line-height:44px !important;
+
+}
+
+html.dark .select2-selection__placeholder{
+
+    color:#9ca3af !important;
+
+}
+
+html.dark .select2-selection__arrow b{
+
+    border-top-color:#ffffff !important;
+
+}
+
+html.dark .select2-dropdown{
+
+    background:#2b2b2b !important;
+    border:1px solid #444 !important;
+
+}
+
+html.dark .select2-results__option{
+
+    background:#2b2b2b !important;
+    color:#ffffff !important;
+
+}
+
+html.dark .select2-results__option--highlighted{
+
+    background:#991b1b !important;
+    color:#ffffff !important;
+
+}

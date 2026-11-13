@@ -1,0 +1,201 @@
+/* ==========================================================
+   PERMISSIONS PAGE
+========================================================== */
+
+/* ==========================================================
+   PAGE TITLE
+========================================================== */
+
+.permissions-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    margin-bottom:24px;
+
+    color:var(--text);
+
+    font-size:30px;
+    font-weight:700;
+}
+
+.permissions-title i{
+    color:var(--primary);
+}
+
+/* ==========================================================
+   PERMISSIONS CARD
+========================================================== */
+
+.permissions-table{
+
+    background:var(--card);
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    border:1px solid var(--border);
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
+
+}
+
+.permissions-table .card-header{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:16px 24px;
+
+    border:none;
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+
+}
+
+.permissions-table .card-header h5,
+.permissions-table .card-header h6{
+
+    margin:0;
+
+    color:#fff;
+
+    font-size:18px;
+    font-weight:700;
+
+}
+
+.permissions-table .card-body{
+
+    background:transparent;
+
+    padding:24px;
+
+}
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.permissions-table table{
+    margin-bottom:0;
+}
+
+.permissions-table th,
+.permissions-table td{
+
+    text-align:center;
+    vertical-align:middle;
+
+}
+
+.permissions-table td:nth-child(2){
+    text-align:left;
+}
+
+/* ==========================================================
+   ADD BUTTON
+========================================================== */
+
+.permissions-table .card-header #btnAdd,
+.permissions-table .card-header .btn-add{
+
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    min-height:44px;
+    padding:0 22px !important;
+
+    background:#6b7280 !important;
+    color:#fff !important;
+
+    border:1px solid #6b7280 !important;
+    border-radius:12px !important;
+
+    font-size:14px;
+    font-weight:600;
+
+    box-shadow:0 10px 24px rgba(107,114,128,.30);
+
+    transition:all .25s ease;
+
+}
+
+.permissions-table .card-header #btnAdd i,
+.permissions-table .card-header .btn-add i{
+    color:#fff !important;
+}
+
+.permissions-table .card-header #btnAdd:hover,
+.permissions-table .card-header .btn-add:hover{
+
+    background:#4b5563 !important;
+    border-color:#4b5563 !important;
+
+    color:#fff !important;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 16px 34px rgba(75,85,99,.40);
+
+}
+
+.permissions-table .card-header #btnAdd:active,
+.permissions-table .card-header .btn-add:active{
+
+    transform:scale(.97);
+
+    background:#374151 !important;
+
+}
+
+/* ==========================================================
+   FORM CONTROLS
+========================================================== */
+
+.permissions-table .form-control,
+.permissions-table .custom-select{
+
+    border-radius:12px;
+
+}
+
+/* ==========================================================
+   LIGHT MODE
+========================================================== */
+
+html:not(.dark) .permissions-table{
+
+    background:rgba(255,255,255,.18);
+
+    border:1px solid rgba(255,255,255,.20);
+
+}
+
+/* ==========================================================
+   DARK MODE
+========================================================== */
+
+html.dark .permissions-table{
+
+    background:rgba(22,22,22,.38);
+
+    border-color:rgba(255,255,255,.08);
+
+}
+
+html.dark .permissions-table .card-body{
+
+    background:transparent;
+
+}
