@@ -38,7 +38,7 @@ router.post("/create-loanrate",async function (req, res) {
   if (error) {
     return res.status(400).json({ success: false, message: error });
   }
- const createloanRate = await Query("Insert into master_loan_rates (mlr_name, mlr_loan_rate, mlr_create_at) values (?,?,?)", [value.name, value.loanRate, new Date]);
+ const createloanRate = await Query("Insert into master_loan_rates (mlr_name, mlr_loan_rate, mlr_create_at) values (?,?,?)", [value.name, value.loanRate, new Date()]);
   res
     .status(201)
     .json({ success: true, message: "Loan Rate created.", data: createloanRate});
