@@ -114,6 +114,7 @@ router.get("/", function (req, res) {
     res.render("layout/main-layout", {
         body: "../pages/membersavings-page.ejs",
         title: "Member Savings",
+        pageStyle: "member-savings.css",
         pageScript: "../scripts/membersavings-script.ejs",
         roleName: req.session.roleName
     });

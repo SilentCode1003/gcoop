@@ -10,11 +10,9 @@
     display:flex;
     align-items:center;
     gap:12px;
-
     margin-bottom:24px;
 
     color:var(--text);
-
     font-size:30px;
     font-weight:700;
 }
@@ -28,7 +26,6 @@
 ========================================================== */
 
 .savings-ledger-table{
-
     background:var(--card);
 
     backdrop-filter:blur(18px);
@@ -43,10 +40,11 @@
 }
 
 .savings-ledger-table .card-header{
-
     display:flex;
     align-items:center;
     justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
 
     padding:16px 24px;
 
@@ -61,7 +59,6 @@
 
 .savings-ledger-table .card-header h5,
 .savings-ledger-table .card-header h6{
-
     margin:0;
 
     color:#fff;
@@ -71,9 +68,7 @@
 }
 
 .savings-ledger-table .card-body{
-
     background:transparent;
-
     padding:24px;
 }
 
@@ -91,73 +86,46 @@
     vertical-align:middle;
 }
 
-/* Adjust if your second column is the member name */
-.savings-ledger-table td:nth-child(2){
+/* Description Column */
+.savings-ledger-table td:nth-child(6){
     text-align:left;
 }
 
 /* ==========================================================
    ADD BUTTON
 ========================================================== */
-
-.savings-ledger-table .card-header #btnAdd,
-.savings-ledger-table .card-header .btn-add{
-
+.savings-ledger-table #btnLedgerAdd{
     display:inline-flex;
     align-items:center;
     justify-content:center;
     gap:8px;
 
     min-height:44px;
-    padding:0 22px !important;
+    padding:12px 22px;
 
     background:#6b7280 !important;
     color:#fff !important;
 
     border:1px solid #6b7280 !important;
-    border-radius:12px !important;
-
-    font-size:14px;
-    font-weight:600;
+    border-radius:12px;
 
     box-shadow:0 10px 24px rgba(107,114,128,.30);
-
-    transition:all .25s ease;
 }
 
-.savings-ledger-table .card-header #btnAdd i,
-.savings-ledger-table .card-header .btn-add i{
-    color:#fff !important;
-}
-
-.savings-ledger-table .card-header #btnAdd:hover,
-.savings-ledger-table .card-header .btn-add:hover{
-
+.savings-ledger-table #btnLedgerAdd:hover{
     background:#4b5563 !important;
     border-color:#4b5563 !important;
+}
 
+.savings-ledger-table #btnLedgerAdd i{
     color:#fff !important;
-
-    transform:translateY(-2px);
-
-    box-shadow:0 16px 34px rgba(75,85,99,.40);
 }
-
-.savings-ledger-table .card-header #btnAdd:active{
-
-    transform:scale(.97);
-
-    background:#374151 !important;
-}
-
 /* ==========================================================
    LIGHT MODE
 ========================================================== */
 
 html:not(.dark) .savings-ledger-table{
-
     background:rgba(255,255,255,.18);
-
     border:1px solid rgba(255,255,255,.20);
 }
 
@@ -166,9 +134,7 @@ html:not(.dark) .savings-ledger-table{
 ========================================================== */
 
 html.dark .savings-ledger-table{
-
     background:rgba(22,22,22,.38);
-
     border-color:rgba(255,255,255,.08);
 }
 

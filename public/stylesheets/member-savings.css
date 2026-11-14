@@ -10,11 +10,9 @@
     display:flex;
     align-items:center;
     gap:12px;
-
     margin-bottom:24px;
 
     color:var(--text);
-
     font-size:30px;
     font-weight:700;
 }
@@ -28,7 +26,6 @@
 ========================================================== */
 
 .member-savings-table{
-
     background:var(--card);
 
     backdrop-filter:blur(18px);
@@ -43,10 +40,11 @@
 }
 
 .member-savings-table .card-header{
-
     display:flex;
     align-items:center;
     justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
 
     padding:16px 24px;
 
@@ -61,7 +59,6 @@
 
 .member-savings-table .card-header h5,
 .member-savings-table .card-header h6{
-
     margin:0;
 
     color:#fff;
@@ -71,9 +68,7 @@
 }
 
 .member-savings-table .card-body{
-
     background:transparent;
-
     padding:24px;
 }
 
@@ -91,11 +86,37 @@
     vertical-align:middle;
 }
 
-/* Optional: align member name to the left */
+/* Member ID */
+.member-savings-table td:first-child{
+    font-weight:600;
+}
+
+/* Member Name */
 .member-savings-table td:nth-child(2){
     text-align:left;
 }
 
+/* Current Balance */
+.member-savings-table td:nth-child(3){
+    font-weight:600;
+}
+
+/* Transactions */
+.member-savings-table td:nth-child(4){
+    font-weight:600;
+}
+
+/* Last Updated */
+.member-savings-table td:nth-child(5){
+    white-space:nowrap;
+}
+
+/* Action */
+.member-savings-table th:last-child,
+.member-savings-table td:last-child{
+    width:140px;
+    white-space:nowrap;
+}
 /* ==========================================================
    ADD BUTTON
 ========================================================== */
@@ -103,7 +124,7 @@
 .member-savings-table .card-header #btnAdd,
 .member-savings-table .card-header .btn-add{
 
-    display:inline-flex;
+    display:inline-flex !important;
     align-items:center;
     justify-content:center;
     gap:8px;
@@ -112,13 +133,14 @@
     padding:0 22px !important;
 
     background:#6b7280 !important;
-    color:#fff !important;
+    color:#ffffff !important;
 
     border:1px solid #6b7280 !important;
     border-radius:12px !important;
 
     font-size:14px;
     font-weight:600;
+    white-space:nowrap;
 
     box-shadow:0 10px 24px rgba(107,114,128,.30);
 
@@ -127,7 +149,7 @@
 
 .member-savings-table .card-header #btnAdd i,
 .member-savings-table .card-header .btn-add i{
-    color:#fff !important;
+    color:#ffffff !important;
 }
 
 .member-savings-table .card-header #btnAdd:hover,
@@ -136,19 +158,37 @@
     background:#4b5563 !important;
     border-color:#4b5563 !important;
 
-    color:#fff !important;
+    color:#ffffff !important;
 
     transform:translateY(-2px);
 
     box-shadow:0 16px 34px rgba(75,85,99,.40);
 }
 
+.member-savings-table .card-header #btnAdd:hover i,
+.member-savings-table .card-header .btn-add:hover i{
+    color:#ffffff !important;
+}
+
+.member-savings-table .card-header #btnAdd:focus,
+.member-savings-table .card-header .btn-add:focus,
 .member-savings-table .card-header #btnAdd:active,
 .member-savings-table .card-header .btn-add:active{
 
-    transform:scale(.97);
-
     background:#374151 !important;
+    border-color:#374151 !important;
+    color:#ffffff !important;
+
+    box-shadow:none !important;
+
+    transform:scale(.97);
+}
+
+.member-savings-table .card-header #btnAdd:focus i,
+.member-savings-table .card-header .btn-add:focus i,
+.member-savings-table .card-header #btnAdd:active i,
+.member-savings-table .card-header .btn-add:active i{
+    color:#ffffff !important;
 }
 
 /* ==========================================================
@@ -156,9 +196,7 @@
 ========================================================== */
 
 html:not(.dark) .member-savings-table{
-
     background:rgba(255,255,255,.18);
-
     border:1px solid rgba(255,255,255,.20);
 }
 
@@ -167,9 +205,7 @@ html:not(.dark) .member-savings-table{
 ========================================================== */
 
 html.dark .member-savings-table{
-
     background:rgba(22,22,22,.38);
-
     border-color:rgba(255,255,255,.08);
 }
 

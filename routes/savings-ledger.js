@@ -193,6 +193,7 @@ router.get("/", function (req, res) {
     res.render("layout/main-layout", {
         body: "../pages/savingsledger-page.ejs",
         title: "Savings Ledger",
+         pageStyle: "savings-ledger.css",
         pageScript: "../scripts/savingsledger-script.ejs",
         roleName: req.session.roleName
     });
