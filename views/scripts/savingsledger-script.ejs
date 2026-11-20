@@ -1,463 +1,554 @@
 <script>
   $(document).ready(function () {
-    let ledgerById = {};
+    "use strict";
+
+    const API = "/savings-ledger";
+    const PAGE_SIZE = 10;
+
+    let transactions = [];
+    let currentPage = 1;
+    let searchTimer = null;
+
+    const CREDIT_TYPES = ["DEPOSIT", "INTEREST_PAYOUT"];
+    const DEBIT_TYPES = ["WITHDRAWAL", "PENALTY"];
+
+    const TYPE_LABELS = {
+      DEPOSIT: "Deposit",
+      WITHDRAWAL: "Withdrawal",
+      INTEREST_PAYOUT: "Interest Payout",
+      PENALTY: "Penalty",
+      ADJUSTMENT: "Adjustment",
+      TRANSFER: "Transfer",
+    };
 
     const Toast = Swal.mixin({
       toast: true,
       position: "top-end",
       showConfirmButton: false,
-      timer: 2500,
+      timer: 3000,
       timerProgressBar: true,
     });
 
-    function errorMessage(error, fallback) {
-      return (
-        error?.responseJSON?.message ||
-        error?.responseJSON?.error ||
-        error?.message ||
-        fallback
-      );
-    }
-
-    function esc(value) {
-      return String(value ?? "").replace(/[&<>"']/g, function (character) {
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, function (c) {
         return {
           "&": "&amp;",
           "<": "&lt;",
           ">": "&gt;",
           '"': "&quot;",
-          "'": "&#39;",
-        }[character];
+          "'": "&#039;",
+        }[c];
       });
     }
 
-    /* sl_id is a UUID string */
-    function isValidUUID(value) {
-      return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        String(value || "").trim(),
-      );
+    function number(value) {
+      const result = Number(value);
+      return Number.isFinite(result) ? result : 0;
     }
 
-    /* sl_savings_id is an INT (member_savings.ms_member_id) */
-    function isValidSavingsId(value) {
-      return /^\d+$/.test(String(value || "")) && Number(value) > 0;
-    }
-
-    function formatAmount(value) {
-      return Number(value || 0).toLocaleString("en-PH", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-    }
-
-    function formatType(value) {
-      return String(value || "")
-        .toLowerCase()
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, function (c) {
-          return c.toUpperCase();
-        });
-    }
-
-    function formatDate(value) {
-      if (!value) return "—";
-
-      const date = new Date(value);
-
-      if (Number.isNaN(date.getTime())) return "—";
-
+    function money(value) {
       return (
-        date.toLocaleDateString("en-PH", {
-          year: "numeric",
-          month: "short",
-          day: "2-digit",
-        }) +
-        " " +
-        date.toLocaleTimeString("en-PH", {
-          hour: "2-digit",
-          minute: "2-digit",
+        "PHP " +
+        number(value).toLocaleString("en-PH", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         })
       );
     }
 
-    function showTableMessage(message, className = "") {
-      $("#ledgerTable").html(`
-        <tr>
-          <td colspan="9" class="text-center ${className}">
-            ${esc(message)}
-          </td>
-        </tr>
-      `);
-    }
+    function dateText(value) {
+      if (!value) return "-";
 
-    async function loadSavingsIds(selectedId = "") {
-      const data = await queryUtility.Load("/savings-ledger/load-member");
+      const date = new Date(String(value).replace(" ", "T"));
 
-      const $select = $("#SavingsID");
+      if (Number.isNaN(date.getTime())) {
+        return String(value);
+      }
 
-      $select.empty().append(`<option value="">Select Member Savings</option>`);
-
-      if (!Array.isArray(data)) return;
-
-      data.forEach(function (item) {
-        const memberId = String(item.id ?? "").trim();
-
-        if (!memberId) return;
-
-        $select.append(
-          `<option value="${esc(memberId)}">Member #${esc(memberId)} — Balance ₱${formatAmount(item.balance)}</option>`,
-        );
+      return date.toLocaleString("en-PH", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
       });
-
-      if (selectedId) {
-        $select.val(String(selectedId));
-      }
     }
 
-    async function loadLedger() {
-      try {
-        showTableMessage("Loading savings ledger...", "text-muted");
-
-        const data = await queryUtility.Load("/savings-ledger/load-ledger");
-
-        $("#ledgerTable").empty();
-        ledgerById = {};
-
-        if (!Array.isArray(data) || data.length === 0) {
-          showTableMessage("No savings ledger records found.", "text-muted");
-          return;
-        }
-
-        data.forEach(function (item) {
-          const ledgerId = String(item.id || "").trim();
-
-          if (!ledgerId) return;
-
-          ledgerById[ledgerId] = item;
-
-          $("#ledgerTable").append(`
-            <tr>
-              <td>${esc(item.referenceNo)}</td>
-              <td>${esc(item.savingsId)}</td>
-              <td>${esc(formatType(item.transactionType))}</td>
-              <td>₱${formatAmount(item.amount)}</td>
-              <td>₱${formatAmount(item.balanceAfter)}</td>
-              <td>${esc(item.description || "")}</td>
-              <td>${esc(item.createdBy || "")}</td>
-              <td>${esc(formatDate(item.createdDate))}</td>
-
-              <td class="text-center">
-                <button
-                  type="button"
-                  class="btn btn-secondary btn-sm btn-edit"
-                  data-id="${esc(ledgerId)}"
-                  title="Edit"
-                >
-                  <i class="fas fa-edit"></i>
-                </button>
-
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm ml-2 btn-delete"
-                  data-id="${esc(ledgerId)}"
-                  title="Delete"
-                >
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
-            </tr>
-          `);
-        });
-      } catch (error) {
-        console.error("Load ledger error:", error);
-
-        showTableMessage(
-          errorMessage(error, "Unable to load savings ledger."),
-          "text-danger",
-        );
-      }
-    }
-
-    async function openModal(data = null) {
-      const form = $("#ledgerForm")[0];
-
-      if (!form) return;
-
-      form.reset();
-      $("#ledgerForm .form-control").removeClass("is-invalid");
-      $("#LedgerID").val("");
-      $("#autoFields").hide();
-      $("#SavingsID").prop("disabled", false);
-
-      try {
-        await loadSavingsIds(data ? String(data.savingsId ?? "") : "");
-      } catch (error) {
-        console.error("Load savings IDs error:", error);
-
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: errorMessage(error, "Unable to load savings accounts."),
-        });
-
-        return;
-      }
-
-      if (data) {
-        const ledgerId = String(data.id || "").trim();
-
-        if (!isValidUUID(ledgerId)) {
-          Swal.fire({
-            icon: "error",
-            title: "Invalid Ledger ID",
-            text: "The selected ledger record does not contain a valid UUID.",
-          });
-
-          return;
-        }
-
-        $("#ledgerModalLabel").html(`
-          <i class="fas fa-edit mr-2"></i>
-          Edit Savings Transaction
-        `);
-
-        $("#LedgerID").val(ledgerId);
-        $("#SavingsID").val(String(data.savingsId ?? ""));
-        $("#SavingsID").prop("disabled", true); // member can't change on edit
-        $("#TransactionType").val(data.transactionType || "");
-        $("#Amount").val(data.amount ?? "");
-        $("#Description").val(data.description || "");
-
-        $("#ReferenceNo").val(data.referenceNo || "");
-        $("#BalanceAfter").val("₱" + formatAmount(data.balanceAfter));
-        $("#autoFields").show();
-
-        $("#btnSave").html(`
-          <i class="fas fa-save mr-1"></i>
-          Update Transaction
-        `);
-      } else {
-        $("#ledgerModalLabel").html(`
-          <i class="fas fa-plus mr-2"></i>
-          New Transaction
-        `);
-
-        $("#btnSave").html(`
-          <i class="fas fa-save mr-1"></i>
-          Save Transaction
-        `);
-      }
-
-      $("#ledgerModal").modal("show");
-    }
-
-    function getFormData() {
+    function getFilters() {
       return {
-        savingsId: String($("#SavingsID").val() || "").trim(),
-        transactionType: String($("#TransactionType").val() || "").trim(),
-        amount: String($("#Amount").val() || "").trim(),
-        description: String($("#Description").val() || "").trim(),
+        q: $("#fSearch").val().trim(),
+        member: $("#fMember").val(),
+        type: $("#fType").val(),
+        from: $("#fFrom").val(),
+        to: $("#fTo").val(),
       };
     }
 
-    function validate(data) {
-      let valid = true;
+    function validDateRange() {
+      const filters = getFilters();
 
-      $("#ledgerForm .form-control").removeClass("is-invalid");
-
-      if (!isValidSavingsId(data.savingsId)) {
-        $("#SavingsID").addClass("is-invalid");
-        valid = false;
+      if (filters.from && filters.to && filters.from > filters.to) {
+        Toast.fire({
+          icon: "warning",
+          title: "Start date cannot be after end date.",
+        });
+        return false;
       }
 
-      const allowedTypes = [
-        "DEPOSIT",
-        "WITHDRAWAL",
-        "INTEREST_PAYOUT",
-        "PENALTY",
-        "ADJUSTMENT",
-        "TRANSFER",
-      ];
-
-      if (!allowedTypes.includes(data.transactionType)) {
-        $("#TransactionType").addClass("is-invalid");
-        valid = false;
-      }
-
-      const amountIsValid =
-        /^\d+(\.\d{1,2})?$/.test(data.amount) && Number(data.amount) > 0;
-
-      if (!amountIsValid) {
-        $("#Amount").addClass("is-invalid");
-        valid = false;
-      }
-
-      if (data.description.length > 1000) {
-        $("#Description").addClass("is-invalid");
-        valid = false;
-      }
-
-      return valid;
+      return true;
     }
 
-    // ==========================
-    // EVENTS
-    // ==========================
+    function directionOf(row) {
+      const type = String(row.transactionType || "").toUpperCase();
 
-    $(document).on("click", "#btnLedgerAdd", function () {
-      openModal(null);
+      if (CREDIT_TYPES.includes(type)) return "credit";
+      if (DEBIT_TYPES.includes(type)) return "debit";
+
+      if (row.previousBalance !== null && row.previousBalance !== undefined) {
+        const difference =
+          number(row.balanceAfter) - number(row.previousBalance);
+
+        if (difference > 0) return "credit";
+        if (difference < 0) return "debit";
+      }
+
+      if (number(row.amount) < 0) return "debit";
+
+      return "neutral";
+    }
+
+    function typeLabel(type) {
+      const key = String(type || "").toUpperCase();
+
+      return TYPE_LABELS[key] || key.replace(/_/g, " ");
+    }
+
+    function badge(type) {
+      const key = String(type || "").toUpperCase();
+      let cssClass = "neutral";
+
+      if (CREDIT_TYPES.includes(key)) cssClass = "credit";
+      if (DEBIT_TYPES.includes(key)) cssClass = "debit";
+
+      return `
+            <span class="type-badge ${cssClass}">
+                ${escapeHTML(typeLabel(key))}
+            </span>
+        `;
+    }
+
+    /* LOAD MEMBERS */
+
+    function loadMembers() {
+      $.ajax({
+        url: API + "/load-member",
+        method: "GET",
+        dataType: "json",
+      })
+        .done(function (response) {
+          const members = Array.isArray(response)
+            ? response
+            : response.data || [];
+
+          const select = $("#fMember");
+
+          select.empty().append('<option value="">All Members</option>');
+
+          members.forEach(function (member) {
+            select.append($("<option>").val(member.id).text(member.name));
+          });
+        })
+        .fail(function (xhr) {
+          console.error(xhr.responseText);
+
+          Toast.fire({
+            icon: "error",
+            title: xhr.responseJSON?.message || "Unable to load members.",
+          });
+        });
+    }
+
+    /* LOAD TRANSACTIONS */
+
+    function loadLedger() {
+      if (!validDateRange()) return;
+
+      $("#ledgerTable").html(`
+            <tr>
+                <td colspan="8" class="text-center py-5">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                    Loading transactions...
+                </td>
+            </tr>
+        `);
+
+      $.ajax({
+        url: API + "/load-ledger",
+        method: "GET",
+        data: getFilters(),
+        dataType: "json",
+      })
+        .done(function (response) {
+          const rows = Array.isArray(response) ? response : response.data || [];
+
+          transactions = rows.map(function (row) {
+            return {
+              ...row,
+              amount: number(row.amount),
+              balanceAfter: number(row.balanceAfter),
+              previousBalance:
+                row.previousBalance == null
+                  ? null
+                  : number(row.previousBalance),
+            };
+          });
+
+          currentPage = 1;
+          updateSummary();
+          renderTable();
+        })
+        .fail(function (xhr) {
+          console.error(xhr.responseText);
+
+          transactions = [];
+          updateSummary();
+
+          $("#ledgerTable").html(`
+                <tr>
+                    <td colspan="8" class="text-center text-danger py-5">
+                        ${escapeHTML(
+                          xhr.responseJSON?.message ||
+                            "Unable to load savings ledger.",
+                        )}
+                    </td>
+                </tr>
+            `);
+
+          updatePagination(0, 0, 0);
+        });
+    }
+
+    /* SUMMARY */
+
+    function getTotals() {
+      let credits = 0;
+      let debits = 0;
+
+      transactions.forEach(function (row) {
+        const direction = directionOf(row);
+        const amount = Math.abs(number(row.amount));
+
+        if (direction === "credit") credits += amount;
+        if (direction === "debit") debits += amount;
+      });
+
+      return {
+        count: transactions.length,
+        credits,
+        debits,
+        net: credits - debits,
+      };
+    }
+
+    function updateSummary() {
+      const summary = getTotals();
+
+      $("#statCount").text(summary.count);
+      $("#statCredits").text(money(summary.credits));
+      $("#statDebits").text(money(summary.debits));
+
+      $("#statNet")
+        .text((summary.net >= 0 ? "+" : "-") + money(Math.abs(summary.net)))
+        .removeClass("amt-credit amt-debit")
+        .addClass(summary.net >= 0 ? "amt-credit" : "amt-debit");
+
+      $("#recordCount").text(
+        summary.count + (summary.count === 1 ? " Record" : " Records"),
+      );
+    }
+
+    /* TABLE */
+
+    function renderTable() {
+      const total = transactions.length;
+
+      if (!total) {
+        $("#ledgerTable").html(`
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <i class="fas fa-folder-open fa-2x text-muted mb-3 d-block"></i>
+                        <strong>No transactions found</strong>
+                        <div class="small text-muted mt-1">
+                            Try changing your search or filters.
+                        </div>
+                    </td>
+                </tr>
+            `);
+
+        currentPage = 1;
+        updatePagination(0, 0, 0);
+        return;
+      }
+
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const end = Math.min(start + PAGE_SIZE, total);
+
+      let html = "";
+
+      transactions.slice(start, end).forEach(function (row) {
+        const direction = directionOf(row);
+
+        const amountClass =
+          direction === "credit"
+            ? "amt-credit"
+            : direction === "debit"
+              ? "amt-debit"
+              : "";
+
+        const sign =
+          direction === "credit" ? "+" : direction === "debit" ? "-" : "";
+
+        html += `
+                <tr>
+                    <td>${escapeHTML(row.referenceNo || "-")}</td>
+                    <td>${escapeHTML(dateText(row.createdDate))}</td>
+                    <td>
+                        <strong>${escapeHTML(row.memberName || "Unknown")}</strong>
+                        <br>
+                        <small class="text-muted">
+                            ${escapeHTML(row.employeeId || "-")}
+                        </small>
+                    </td>
+                    <td>${badge(row.transactionType)}</td>
+                    <td class="text-right ${amountClass}">
+                        ${sign}${money(Math.abs(number(row.amount)))}
+                    </td>
+                    <td class="text-right">
+                        <strong>${money(row.balanceAfter)}</strong>
+                    </td>
+                    <td>${escapeHTML(row.description || "-")}</td>
+                    <td>${escapeHTML(row.createdBy || "System")}</td>
+                </tr>
+            `;
+      });
+
+      $("#ledgerTable").html(html);
+      updatePagination(start, end, total);
+    }
+
+    /* PAGINATION */
+
+    function updatePagination(start, end, total) {
+      const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+      $("#pageInfo").text(
+        total
+          ? `Showing ${start + 1} to ${end} of ${total} transactions`
+          : "No transactions available",
+      );
+
+      $("#paginationInfo").text(
+        total
+          ? `Showing ${start + 1}–${end} of ${total} records`
+          : "Showing 0 records",
+      );
+
+      $("#pageNumber").text(`${currentPage} / ${pages}`);
+
+      $("#btnPrev").prop("disabled", currentPage <= 1);
+      $("#btnNext").prop("disabled", currentPage >= pages);
+    }
+
+    $("#btnPrev").on("click", function () {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+      }
     });
 
-    $("#ledgerTable").on("click", ".btn-edit", function () {
-      const ledgerId = String($(this).attr("data-id") || "").trim();
+    $("#btnNext").on("click", function () {
+      const pages = Math.ceil(transactions.length / PAGE_SIZE);
 
-      if (!isValidUUID(ledgerId)) {
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: "Invalid Ledger ID.",
-        });
-
-        return;
+      if (currentPage < pages) {
+        currentPage++;
+        renderTable();
       }
-
-      const ledger = ledgerById[ledgerId];
-
-      if (!ledger) {
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: "Ledger record was not found.",
-        });
-
-        return;
-      }
-
-      openModal(ledger);
     });
 
-    $("#ledgerForm").on("submit", async function (event) {
-      event.preventDefault();
+    /* SEARCH AND FILTERS */
 
-      const ledgerId = String($("#LedgerID").val() || "").trim();
-      const isEdit = ledgerId !== "";
-      const payload = getFormData();
+    $("#fSearch").on("input", function () {
+      clearTimeout(searchTimer);
 
-      if (isEdit && !isValidUUID(ledgerId)) {
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: "Invalid Ledger ID.",
+      searchTimer = setTimeout(loadLedger, 350);
+    });
+
+    $("#fMember, #fType, #fFrom, #fTo").on("change", loadLedger);
+
+    $("#btnClear").on("click", function () {
+      clearTimeout(searchTimer);
+
+      $("#fSearch, #fFrom, #fTo").val("");
+      $("#fMember, #fType").val("");
+
+      loadLedger();
+
+      Toast.fire({
+        icon: "success",
+        title: "Filters cleared.",
+      });
+    });
+
+    /* GENERATE PDF WITH CONFIRMATION */
+
+    $("#btnReport").on("click", async function () {
+      if (!validDateRange()) return;
+
+      if (transactions.length === 0) {
+        Toast.fire({
+          icon: "warning",
+          title: "There are no transactions to include in the report.",
         });
-
         return;
       }
 
-      if (!validate(payload)) return;
+      const filters = getFilters();
+
+      const filterDescriptions = [];
+
+      if (filters.q) filterDescriptions.push("Search: " + filters.q);
+      if (filters.member) filterDescriptions.push("Selected member");
+      if (filters.type)
+        filterDescriptions.push("Type: " + typeLabel(filters.type));
+      if (filters.from) filterDescriptions.push("From: " + filters.from);
+      if (filters.to) filterDescriptions.push("To: " + filters.to);
+
+      const filterSummary = filterDescriptions.length
+        ? filterDescriptions.join(" • ")
+        : "All transactions";
 
       const confirmation = await Swal.fire({
-        title: isEdit ? "Update Transaction?" : "Create Transaction?",
-        text: isEdit
-          ? "Are you sure you want to update this transaction? Balances will be recalculated."
-          : "Are you sure you want to create this transaction?",
-        icon: "question",
+        icon: "warning",
+        title: "Generate Savings Ledger Report?",
+        html: `
+                <div style="text-align:left; font-size:13px; line-height:1.8;">
+                    <p>
+                        You are about to generate a PDF report
+                        containing <strong>${transactions.length}</strong>
+                        transaction(s).
+                    </p>
+
+                    <div style="
+                        padding:12px;
+                        border-radius:9px;
+                        background:rgba(167,25,32,.08);
+                        border-left:4px solid #a71920;
+                        margin-top:12px;
+                    ">
+                        <strong style="color:#a71920;">
+                            Applied filters
+                        </strong>
+                        <div style="margin-top:5px;">
+                            ${escapeHTML(filterSummary)}
+                        </div>
+                    </div>
+
+                    <p style="margin-top:12px; color:#888;">
+                        Please verify the selected filters before
+                        generating the official report.
+                    </p>
+                </div>
+            `,
         showCancelButton: true,
-        confirmButtonText: isEdit ? "Yes, update" : "Yes, create",
+        confirmButtonText: '<i class="fas fa-file-pdf mr-1"></i> Generate PDF',
         cancelButtonText: "Cancel",
-        confirmButtonColor: "#4e73df",
-        cancelButtonColor: "#858796",
+        reverseButtons: true,
+        focusCancel: true,
+        confirmButtonColor: "#a71920",
+        cancelButtonColor: "#555",
       });
 
-      if (!confirmation.isConfirmed) return;
+      if (!confirmation.isConfirmed) {
+        return;
+      }
 
-      Swal.fire({
-        title: isEdit ? "Updating..." : "Creating...",
-        allowOutsideClick: false,
-        didOpen: function () {
-          Swal.showLoading();
-        },
-      });
+      const $button = $(this);
+      const originalHTML = $button.html();
+
+      $button
+        .prop("disabled", true)
+        .html('<i class="fas fa-spinner fa-spin"></i>');
 
       try {
-        if (isEdit) {
-          await queryUtility.Update(
-            "/savings-ledger/update-ledger/" + encodeURIComponent(ledgerId),
-            payload,
-          );
-        } else {
-          await queryUtility.Save("/savings-ledger/create-ledger", payload);
+        const query = $.param(filters);
+
+        const response = await fetch(`${API}/generate-report?${query}`, {
+          method: "GET",
+          credentials: "same-origin",
+        });
+
+        if (!response.ok) {
+          let message = "Unable to generate PDF report.";
+
+          try {
+            const body = await response.json();
+            message = body.message || message;
+          } catch (error) {
+            // Response did not contain JSON.
+          }
+
+          throw new Error(message);
         }
 
-        $("#ledgerModal").modal("hide");
+        const blob = await response.blob();
 
-        await loadLedger();
+        if (!blob.size || blob.type !== "application/pdf") {
+          throw new Error("The server did not return a valid PDF file.");
+        }
 
-        Swal.close();
+        const disposition = response.headers.get("Content-Disposition") || "";
 
-        Toast.fire({
+        const match = disposition.match(/filename="?([^"]+)"?/i);
+
+        const filename = match ? match[1] : "5L_Savings_Ledger_Report.pdf";
+
+        const downloadURL = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = downloadURL;
+        link.download = filename;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(function () {
+          URL.revokeObjectURL(downloadURL);
+        }, 1500);
+
+        await Swal.fire({
           icon: "success",
-          title: isEdit
-            ? "Transaction updated successfully."
-            : "Transaction created successfully.",
+          title: "PDF Report Generated",
+          text: "Your 5L Savings Ledger report has been downloaded.",
+          confirmButtonColor: "#a71920",
         });
       } catch (error) {
-        console.error("Create/update ledger error:", error);
+        console.error("PDF generation error:", error);
 
         Swal.fire({
           icon: "error",
-          title: isEdit ? "Update Failed" : "Create Failed",
-          text: errorMessage(error, "Something went wrong. Please try again."),
+          title: "PDF Generation Failed",
+          text: error.message || "Please try again.",
+          confirmButtonColor: "#a71920",
         });
+      } finally {
+        $button.prop("disabled", false).html(originalHTML);
       }
     });
 
-    $("#ledgerTable").on("click", ".btn-delete", async function () {
-      const ledgerId = String($(this).attr("data-id") || "").trim();
+    /* INITIAL LOAD */
 
-      if (!isValidUUID(ledgerId)) {
-        Swal.fire({
-          icon: "error",
-          title: "Delete Failed",
-          text: "Invalid Ledger ID.",
-        });
-
-        return;
-      }
-
-      const confirmation = await Swal.fire({
-        title: "Delete Transaction?",
-        text: "This action cannot be undone. Balances will be recalculated.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#d33",
-      });
-
-      if (!confirmation.isConfirmed) return;
-
-      try {
-        await queryUtility.Delete(
-          "/savings-ledger/delete-ledger/" + encodeURIComponent(ledgerId),
-        );
-
-        await loadLedger();
-
-        Toast.fire({
-          icon: "success",
-          title: "Transaction deleted successfully.",
-        });
-      } catch (error) {
-        console.error("Delete ledger error:", error);
-
-        Swal.fire({
-          icon: "error",
-          title: "Delete Failed",
-          text: errorMessage(error, "Unable to delete transaction."),
-        });
-      }
-    });
-
+    loadMembers();
     loadLedger();
   });
 </script>

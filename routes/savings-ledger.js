@@ -1,24 +1,13 @@
-var express = require("express");
-var router = express.Router();
-const crypto = require("crypto");
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+const PDFDocument = require("pdfkit");
 
 const { Query } = require("../database/config/db.js");
 
-/*
- * member_savings:  ms_id (UUID), ms_member_id (INT),
- *                  ms_current_balance, ms_update_at
- * savings_ledger:  sl_id (UUID), sl_savings_id (INT -> member_savings.ms_member_id),
- *                  sl_transaction_type, sl_amount, sl_balance_after,
- *                  sl_reference_no (UNIQUE), sl_description,
- *                  sl_create_by (INT -> master_users.mu_id), sl_create_date
- *
- * member_savings.ms_current_balance is the source of truth.
- */
+const router = express.Router();
 
-const UUID_REGEX =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-const allowedTypes = [
+const ALLOWED_TYPES = [
     "DEPOSIT",
     "WITHDRAWAL",
     "INTEREST_PAYOUT",
@@ -27,520 +16,869 @@ const allowedTypes = [
     "TRANSFER"
 ];
 
-// ==========================
-// HELPERS
-// ==========================
+const COLORS = {
+    red: "#A71920",
+    darkRed: "#7F1118",
+    darkerRed: "#4F0B10",
+    gold: "#C6A15B",
+    black: "#202020",
+    text: "#292929",
+    muted: "#707070",
+    light: "#F5F5F5",
+    border: "#E5E5E5",
+    green: "#16834A",
+    debit: "#C9363E",
+    white: "#FFFFFF"
+};
 
-const round2 = (n) => Math.round(Number(n) * 100) / 100;
+/* =========================================
+   FILTER VALIDATION
+========================================= */
 
-function isValidUUID(value) {
-    return UUID_REGEX.test(String(value || "").trim());
-}
+function cleanFilters(query) {
+    const filters = {
+        q: String(query.q || "").trim().slice(0, 100),
+        member: query.member ? Number(query.member) : null,
+        type: String(query.type || "").toUpperCase(),
+        from: String(query.from || ""),
+        to: String(query.to || "")
+    };
 
-function validateLedger(body) {
-    const savingsId = Number(body.savingsId);
-    const type = String(body.transactionType || "").trim();
-    const amount = Number(body.amount);
-    const description = String(body.description || "").trim();
-
-    if (!Number.isInteger(savingsId) || savingsId <= 0) {
-        return { error: "Valid Savings ID is required." };
+    if (
+        filters.member !== null &&
+        (!Number.isInteger(filters.member) || filters.member <= 0)
+    ) {
+        throw new Error("Invalid member filter.");
     }
 
-    if (!allowedTypes.includes(type)) {
-        return { error: "Invalid transaction type." };
+    if (
+        filters.type &&
+        !ALLOWED_TYPES.includes(filters.type)
+    ) {
+        throw new Error("Invalid transaction type.");
     }
 
-    if (!Number.isFinite(amount) || amount <= 0) {
-        return { error: "Amount must be greater than zero." };
-    }
+    function validDate(value) {
+        if (!value) return true;
 
-    if (round2(amount) !== amount) {
-        return { error: "Amount can only have up to 2 decimal places." };
-    }
-
-    if (description.length > 1000) {
-        return { error: "Description cannot exceed 1,000 characters." };
-    }
-
-    return { value: { savingsId, type, amount, description } };
-}
-
-function getSignedAmount(type, amount) {
-    switch (type) {
-        case "DEPOSIT":
-        case "INTEREST_PAYOUT":
-        case "ADJUSTMENT":
-        case "TRANSFER":
-            return Number(amount);
-
-        case "WITHDRAWAL":
-        case "PENALTY":
-            return -Number(amount);
-
-        default:
-            throw new Error("Invalid transaction type.");
-    }
-}
-
-// Format: P + YYYYMM + - + 4 digits  (e.g. P202611-0001)
-async function generateReferenceNo() {
-    const now = new Date();
-    const prefix =
-        "P" +
-        now.getFullYear() +
-        String(now.getMonth() + 1).padStart(2, "0") +
-        "-";
-
-    const rows = await Query(
-        `SELECT sl_reference_no
-         FROM savings_ledger
-         WHERE sl_reference_no LIKE ?
-         ORDER BY sl_reference_no DESC
-         LIMIT 1`,
-        [prefix + "%"]
-    );
-
-    let next = 1;
-
-    if (rows.length) {
-        const last = parseInt(
-            String(rows[0].sl_reference_no).split("-")[1],
-            10
-        );
-
-        if (Number.isInteger(last)) {
-            next = last + 1;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return false;
         }
+
+        const date = new Date(value + "T00:00:00");
+
+        return (
+            !Number.isNaN(date.getTime()) &&
+            date.toISOString().slice(0, 10) === value
+        );
     }
 
-    return prefix + String(next).padStart(4, "0");
+    if (!validDate(filters.from) || !validDate(filters.to)) {
+        throw new Error("Invalid date filter.");
+    }
+
+    if (
+        filters.from &&
+        filters.to &&
+        filters.from > filters.to
+    ) {
+        throw new Error("Start date cannot be after end date.");
+    }
+
+    return filters;
 }
 
-// ---- member balance (source of truth) ----
+/* =========================================
+   SQL FILTER BUILDER
+========================================= */
 
-async function getMemberBalance(memberId) {
-    const rows = await Query(
-        `SELECT ms_current_balance
-         FROM member_savings
-         WHERE ms_member_id = ?`,
-        [memberId]
-    );
+function buildWhere(filters) {
+    const conditions = [];
+    const params = [];
 
-    return rows.length ? Number(rows[0].ms_current_balance) : null;
+    if (filters.member) {
+        conditions.push("sl.sl_savings_id = ?");
+        params.push(filters.member);
+    }
+
+    if (filters.type) {
+        conditions.push("sl.sl_transaction_type = ?");
+        params.push(filters.type);
+    }
+
+    if (filters.from) {
+        conditions.push("sl.sl_create_date >= ?");
+        params.push(filters.from + " 00:00:00");
+    }
+
+    if (filters.to) {
+        conditions.push(
+            "sl.sl_create_date < DATE_ADD(?, INTERVAL 1 DAY)"
+        );
+        params.push(filters.to);
+    }
+
+    if (filters.q) {
+        const search = "%" + filters.q + "%";
+
+        conditions.push(`
+            (
+                sl.sl_reference_no LIKE ?
+                OR sl.sl_description LIKE ?
+                OR mm.mm_fullname LIKE ?
+                OR mm.mm_employee_id LIKE ?
+            )
+        `);
+
+        params.push(search, search, search, search);
+    }
+
+    return {
+        sql: conditions.length
+            ? "WHERE " + conditions.join(" AND ")
+            : "",
+        params
+    };
 }
 
-async function setMemberBalance(memberId, balance) {
-    await Query(
-        `UPDATE member_savings
-         SET ms_current_balance = ?,
-             ms_update_at = ?
-         WHERE ms_member_id = ?`,
-        [round2(balance), new Date(), memberId]
-    );
+/* =========================================
+   GET LEDGER DATA
+========================================= */
+
+async function getLedgerRows(filters) {
+    const where = buildWhere(filters);
+
+    const sql = `
+        SELECT
+            sl.sl_id AS id,
+            sl.sl_savings_id AS memberId,
+
+            mm.mm_employee_id AS employeeId,
+            mm.mm_fullname AS memberName,
+
+            sl.sl_transaction_type AS transactionType,
+            sl.sl_amount AS amount,
+            sl.sl_balance_after AS balanceAfter,
+
+            sl.sl_reference_no AS referenceNo,
+            sl.sl_description AS description,
+
+            COALESCE(mu.mu_fullname, 'System') AS createdBy,
+
+            sl.sl_create_date AS createdDate,
+
+            (
+                SELECT previous.sl_balance_after
+                FROM savings_ledger previous
+
+                WHERE previous.sl_savings_id = sl.sl_savings_id
+
+                AND (
+                    previous.sl_create_date < sl.sl_create_date
+                    OR (
+                        previous.sl_create_date = sl.sl_create_date
+                        AND previous.sl_id < sl.sl_id
+                    )
+                )
+
+                ORDER BY
+                    previous.sl_create_date DESC,
+                    previous.sl_id DESC
+
+                LIMIT 1
+            ) AS previousBalance
+
+        FROM savings_ledger sl
+
+        INNER JOIN master_members mm
+            ON mm.mm_id = sl.sl_savings_id
+
+        LEFT JOIN master_users mu
+            ON mu.mu_id = sl.sl_create_by
+
+        ${where.sql}
+
+        ORDER BY
+            sl.sl_create_date DESC,
+            sl.sl_id DESC
+    `;
+
+    const rows = await Query(sql, where.params);
+
+    return Array.isArray(rows) ? rows : [];
 }
 
-// ---- ledger rows at/after a given row (same member) ----
+/* =========================================
+   HELPERS
+========================================= */
 
-function afterClause(includeSelf) {
-    return `(sl_create_date > ?
-             OR (sl_create_date = ?
-                 AND sl_reference_no ${includeSelf ? ">=" : ">"} ?))`;
+function getDirection(row) {
+    const type = String(row.transactionType || "").toUpperCase();
+
+    if (["DEPOSIT", "INTEREST_PAYOUT"].includes(type)) {
+        return "credit";
+    }
+
+    if (["WITHDRAWAL", "PENALTY"].includes(type)) {
+        return "debit";
+    }
+
+    if (row.previousBalance !== null && row.previousBalance !== undefined) {
+        const difference =
+            Number(row.balanceAfter || 0) -
+            Number(row.previousBalance || 0);
+
+        if (difference > 0) return "credit";
+        if (difference < 0) return "debit";
+    }
+
+    if (Number(row.amount || 0) < 0) {
+        return "debit";
+    }
+
+    return "neutral";
 }
 
-function afterParams(memberId, row) {
-    return [
-        memberId,
-        row.sl_create_date,
-        row.sl_create_date,
-        row.sl_reference_no
-    ];
+function formatMoney(value) {
+    return "PHP " + Number(value || 0).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 }
 
-// Lowest sl_balance_after among the affected rows (or null if none)
-async function getAffectedMin(memberId, row, includeSelf) {
-    const rows = await Query(
-        `SELECT MIN(sl_balance_after) AS minBalance
-         FROM savings_ledger
-         WHERE sl_savings_id = ?
-           AND ${afterClause(includeSelf)}`,
-        afterParams(memberId, row)
-    );
+function formatDate(value) {
+    if (!value) return "-";
 
-    return rows[0] && rows[0].minBalance !== null
-        ? Number(rows[0].minBalance)
-        : null;
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return String(value);
+    }
+
+    return date.toLocaleString("en-PH", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 }
 
-// Shift sl_balance_after of the affected rows by delta
-async function shiftAffected(memberId, row, delta, includeSelf) {
-    if (delta === 0) return;
+/* =========================================
+   PAGE
+========================================= */
 
-    await Query(
-        `UPDATE savings_ledger
-         SET sl_balance_after = sl_balance_after + ?
-         WHERE sl_savings_id = ?
-           AND ${afterClause(includeSelf)}`,
-        [delta, ...afterParams(memberId, row)]
-    );
-}
-
-// ==========================
-// PAGE
-// ==========================
-
-router.get("/", function (req, res) {
+router.get("/", (req, res) => {
     res.render("layout/main-layout", {
-        body: "../pages/savingsledger-page.ejs",
         title: "Savings Ledger",
-         pageStyle: "savings-ledger.css",
+        body: "../pages/savingsledger-page.ejs",
+        pageStyle: "savings-ledger.css",
         pageScript: "../scripts/savingsledger-script.ejs",
-        roleName: req.session.roleName
+        roleName: req.session?.roleName
     });
 });
 
-// ==========================
-// LOAD MEMBER SAVINGS (dropdown)
-// ==========================
+/* =========================================
+   LOAD MEMBERS
+========================================= */
 
-router.get("/load-member", async function (req, res) {
+router.get("/load-member", async (req, res) => {
     try {
-        const data = await Query(
-            `SELECT
-                ms_member_id AS id,
-                ms_current_balance AS balance
-             FROM member_savings
-             ORDER BY ms_member_id ASC`
-        );
+        const sql = `
+            SELECT
+                mm_id AS id,
+                mm_fullname AS name
+            FROM master_members
+            ORDER BY mm_fullname ASC
+        `;
 
-        res.json(data);
-    } catch (err) {
-        console.error("Load Savings IDs:", err);
+        const rows = await Query(sql, []);
+
+        res.json(Array.isArray(rows) ? rows : []);
+
+    } catch (error) {
+        console.error("Load members error:", error);
 
         res.status(500).json({
-            success: false,
-            message: "Unable to load savings IDs."
+            message: "Unable to load members."
         });
     }
 });
 
-// ==========================
-// LOAD LEDGER
-// ==========================
+/* =========================================
+   LOAD LEDGER
+========================================= */
 
-router.get("/load-ledger", async function (req, res) {
+router.get("/load-ledger", async (req, res) => {
     try {
-        const data = await Query(
-            `SELECT
-                sl.sl_id               AS id,
-                sl.sl_savings_id       AS savingsId,
-                sl.sl_transaction_type AS transactionType,
-                sl.sl_amount           AS amount,
-                sl.sl_balance_after    AS balanceAfter,
-                sl.sl_reference_no     AS referenceNo,
-                sl.sl_description      AS description,
-                sl.sl_create_by        AS createdById,
-                mu.mu_fullname         AS createdBy,
-                sl.sl_create_date      AS createdDate
-             FROM savings_ledger sl
-             LEFT JOIN master_users mu
-                    ON mu.mu_id = sl.sl_create_by
-             ORDER BY sl.sl_create_date DESC, sl.sl_reference_no DESC`
-        );
+        const filters = cleanFilters(req.query);
+        const rows = await getLedgerRows(filters);
 
-        res.json(data);
-    } catch (err) {
-        console.error("Load Ledger:", err);
+        res.json(rows);
 
-        res.status(500).json({
-            success: false,
-            message: "Unable to load savings ledger."
+    } catch (error) {
+        console.error("Load ledger error:", error);
+
+        res.status(400).json({
+            message: error.message || "Unable to load transactions."
         });
     }
 });
 
-// ==========================
-// CREATE
-// ==========================
+/* =========================================
+   GENERATE PDF REPORT
+   PDFKIT BACKEND GENERATION
+========================================= */
 
-router.post("/create-ledger", async function (req, res) {
+router.get("/generate-report", async (req, res) => {
     try {
-        const { error, value } = validateLedger(req.body);
+        const filters = cleanFilters(req.query);
+        const rows = await getLedgerRows(filters);
 
-        if (error) {
-            return res.status(400).json({ success: false, message: error });
-        }
-
-        // Must match your actual session property.
-        const createdBy = Number(req.session.userId);
-
-        if (!Number.isInteger(createdBy) || createdBy <= 0) {
-            return res.status(401).json({
-                success: false,
-                message: "User session is invalid. Please log in again."
+        if (!rows.length) {
+            return res.status(404).json({
+                message: "No transactions found for the selected filters."
             });
         }
 
-        const user = await Query(
-            `SELECT mu_id FROM master_users WHERE mu_id = ?`,
-            [createdBy]
+        const filename =
+            `5L_Savings_Ledger_Report_${new Date()
+                .toISOString()
+                .slice(0, 10)}.pdf`;
+
+        /* LOGO LOCATION */
+
+        const logoPath = path.join(
+            __dirname,
+            "..",
+            "public",
+            "images",
+            "logo.png"
         );
 
-        if (!user.length) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid created-by user."
-            });
-        }
+        /* PDF DOCUMENT */
 
-        const currentBalance = await getMemberBalance(value.savingsId);
+        const doc = new PDFDocument({
+            size: "A4",
+            layout: "landscape",
+            margins: {
+                top: 35,
+                bottom: 42,
+                left: 35,
+                right: 35
+            },
+            bufferPages: true,
+            info: {
+                Title: "5L Savings Ledger Report",
+                Author: "5L Solutions Coop",
+                Subject: "Savings Ledger Transaction Report"
+            }
+        });
 
-        if (currentBalance === null) {
-            return res.status(400).json({
-                success: false,
-                message: "Savings account not found."
-            });
-        }
-
-        const balanceAfter = round2(
-            currentBalance + getSignedAmount(value.type, value.amount)
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${filename}"`
         );
 
-        if (balanceAfter < 0) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Insufficient balance. Current balance is ₱" +
-                    currentBalance.toFixed(2) + "."
-            });
+        doc.on("error", error => {
+            console.error("PDFKit error:", error);
+
+            if (!res.destroyed) {
+                res.destroy(error);
+            }
+        });
+
+        doc.pipe(res);
+
+        const pageWidth = doc.page.width;
+        const pageHeight = doc.page.height;
+
+        /* =====================================
+           SUMMARY CALCULATIONS
+        ===================================== */
+
+        let credits = 0;
+        let debits = 0;
+
+        rows.forEach(row => {
+            const amount = Math.abs(Number(row.amount || 0));
+            const direction = getDirection(row);
+
+            if (direction === "credit") credits += amount;
+            if (direction === "debit") debits += amount;
+        });
+
+        const net = credits - debits;
+
+        /* =====================================
+           REPORT HEADER
+        ===================================== */
+
+        function drawHeader() {
+            doc.save();
+
+            doc.rect(0, 0, pageWidth, 100)
+                .fill(COLORS.red);
+
+            doc.rect(0, 100, pageWidth, 5)
+                .fill(COLORS.gold);
+
+            /* 5L LOGO */
+
+            if (fs.existsSync(logoPath)) {
+                try {
+                    doc.image(logoPath, 35, 19, {
+                        fit: [75, 62],
+                        align: "center",
+                        valign: "center"
+                    });
+                } catch (error) {
+                    console.error("Logo embedding error:", error);
+
+                    drawFallbackLogo();
+                }
+            } else {
+                console.warn("5L logo not found:", logoPath);
+                drawFallbackLogo();
+            }
+
+            function drawFallbackLogo() {
+                doc.roundedRect(39, 22, 66, 55, 8)
+                    .lineWidth(2)
+                    .strokeColor(COLORS.white)
+                    .stroke();
+
+                doc.fillColor(COLORS.white)
+                    .font("Helvetica-Bold")
+                    .fontSize(22)
+                    .text("5L", 39, 38, {
+                        width: 66,
+                        align: "center"
+                    });
+            }
+
+            /* BRAND */
+
+            doc.fillColor(COLORS.white)
+                .font("Helvetica-Bold")
+                .fontSize(18)
+                .text("5L SOLUTIONS COOP", 125, 27);
+
+            doc.font("Helvetica")
+                .fontSize(11)
+                .text("SAVINGS LEDGER TRANSACTION REPORT", 125, 52);
+
+            doc.fillColor("#F5D9A0")
+                .fontSize(8)
+                .text("OFFICIAL FINANCIAL TRANSACTION RECORD", 125, 72);
+
+            /* RIGHT HEADER */
+
+            doc.fillColor(COLORS.white)
+                .font("Helvetica-Bold")
+                .fontSize(9)
+                .text("OFFICIAL REPORT", pageWidth - 230, 31, {
+                    width: 195,
+                    align: "right"
+                });
+
+            doc.font("Helvetica")
+                .fontSize(8)
+                .text(
+                    "Generated: " + new Date().toLocaleString("en-PH"),
+                    pageWidth - 260,
+                    51,
+                    {
+                        width: 225,
+                        align: "right"
+                    }
+                );
+
+            doc.restore();
         }
 
-        const ledgerId = crypto.randomUUID();
-        const referenceNo = await generateReferenceNo();
+        /* =====================================
+           REPORT FOOTER
+        ===================================== */
 
-        await Query(
-            `INSERT INTO savings_ledger (
-                sl_id,
-                sl_savings_id,
-                sl_transaction_type,
-                sl_amount,
-                sl_balance_after,
-                sl_reference_no,
-                sl_description,
-                sl_create_by,
-                sl_create_date
+        function drawFooters() {
+            const range = doc.bufferedPageRange();
+
+            for (
+                let page = range.start;
+                page < range.start + range.count;
+                page++
+            ) {
+                doc.switchToPage(page);
+
+                doc.save();
+
+                doc.moveTo(35, pageHeight - 30)
+                    .lineTo(pageWidth - 35, pageHeight - 30)
+                    .lineWidth(1)
+                    .strokeColor(COLORS.gold)
+                    .stroke();
+
+                doc.fillColor(COLORS.muted)
+                    .font("Helvetica-Bold")
+                    .fontSize(7)
+                    .text(
+                        "5L SOLUTIONS COOP",
+                        35,
+                        pageHeight - 21
+                    );
+
+                doc.font("Helvetica")
+                    .text(
+                        "CONFIDENTIAL FINANCIAL RECORD",
+                        pageWidth / 2 - 90,
+                        pageHeight - 21,
+                        {
+                            width: 180,
+                            align: "center"
+                        }
+                    );
+
+                doc.text(
+                    `Page ${page + 1} of ${range.count}`,
+                    pageWidth - 100,
+                    pageHeight - 21,
+                    {
+                        width: 65,
+                        align: "right"
+                    }
+                );
+
+                doc.restore();
+            }
+        }
+
+        /* =====================================
+           START FIRST PAGE
+        ===================================== */
+
+        drawHeader();
+
+        let y = 120;
+
+        /* SUMMARY TITLE */
+
+        doc.fillColor(COLORS.text)
+            .font("Helvetica-Bold")
+            .fontSize(10)
+            .text("REPORT SUMMARY", 36, y);
+
+        y += 20;
+
+        /* SUMMARY CARDS */
+
+        const cards = [
+            {
+                label: "TRANSACTIONS",
+                value: String(rows.length),
+                color: COLORS.red
+            },
+            {
+                label: "TOTAL CREDITS",
+                value: formatMoney(credits),
+                color: COLORS.green
+            },
+            {
+                label: "TOTAL DEBITS",
+                value: formatMoney(debits),
+                color: COLORS.debit
+            },
+            {
+                label: "NET CHANGE",
+                value:
+                    (net >= 0 ? "+" : "-") +
+                    formatMoney(Math.abs(net)),
+                color: COLORS.gold
+            }
+        ];
+
+        const cardGap = 12;
+        const cardWidth = (pageWidth - 72 - cardGap * 3) / 4;
+        const cardHeight = 44;
+
+        cards.forEach((card, index) => {
+            const x = 36 + index * (cardWidth + cardGap);
+
+            doc.roundedRect(
+                x,
+                y,
+                cardWidth,
+                cardHeight,
+                6
+            ).fill("#F3F4F3");
+
+            doc.rect(x, y, 5, cardHeight)
+                .fill(card.color);
+
+            doc.fillColor(COLORS.muted)
+                .font("Helvetica-Bold")
+                .fontSize(7)
+                .text(card.label, x + 13, y + 9);
+
+            doc.fillColor(card.color)
+                .font("Helvetica-Bold")
+                .fontSize(12)
+                .text(card.value, x + 13, y + 23, {
+                    width: cardWidth - 22,
+                    ellipsis: true
+                });
+        });
+
+        y += 59;
+
+        /* =====================================
+           FILTER SUMMARY
+        ===================================== */
+
+        const filterParts = [];
+
+        if (filters.q) {
+            filterParts.push("Search: " + filters.q);
+        }
+
+        if (filters.member) {
+            const selected = rows.find(
+                row => Number(row.memberId) === filters.member
+            );
+
+            filterParts.push(
+                "Member: " + (selected?.memberName || filters.member)
+            );
+        }
+
+        if (filters.type) {
+            filterParts.push(
+                "Type: " + filters.type.replace(/_/g, " ")
+            );
+        }
+
+        if (filters.from) {
+            filterParts.push("From: " + filters.from);
+        }
+
+        if (filters.to) {
+            filterParts.push("To: " + filters.to);
+        }
+
+        const filterText = filterParts.length
+            ? filterParts.join(" | ")
+            : "All transactions";
+
+        doc.roundedRect(
+            36,
+            y,
+            pageWidth - 72,
+            30,
+            5
+        ).fill("#F8EEEE");
+
+        doc.fillColor(COLORS.red)
+            .font("Helvetica-Bold")
+            .fontSize(7)
+            .text("APPLIED FILTERS", 47, y + 10);
+
+        doc.fillColor(COLORS.text)
+            .font("Helvetica")
+            .fontSize(8)
+            .text(filterText, 130, y + 10, {
+                width: pageWidth - 180,
+                ellipsis: true
+            });
+
+        y += 45;
+
+        /* =====================================
+           TRANSACTION TABLE
+        ===================================== */
+
+        const columns = [
+            { title: "REFERENCE NO.", width: 91 },
+            { title: "DATE", width: 105 },
+            { title: "MEMBER", width: 105 },
+            { title: "TYPE", width: 86 },
+            { title: "AMOUNT", width: 90 },
+            { title: "BALANCE AFTER", width: 96 },
+            { title: "DESCRIPTION", width: 155 },
+            { title: "CREATED BY", width: 88 }
+        ];
+
+        const tableWidth = columns.reduce(
+            (sum, column) => sum + column.width,
+            0
+        );
+
+        const tableX = (pageWidth - tableWidth) / 2;
+        const rowHeight = 27;
+
+        function drawTableHeader() {
+            doc.rect(
+                tableX,
+                y,
+                tableWidth,
+                25
+            ).fill(COLORS.darkerRed);
+
+            let x = tableX;
+
+            columns.forEach((column, index) => {
+                doc.fillColor(COLORS.white)
+                    .font("Helvetica-Bold")
+                    .fontSize(6.5)
+                    .text(
+                        column.title,
+                        x + 4,
+                        y + 9,
+                        {
+                            width: column.width - 8,
+                            align:
+                                index === 4 || index === 5
+                                    ? "right"
+                                    : "left",
+                            lineBreak: false
+                        }
+                    );
+
+                x += column.width;
+            });
+
+            y += 25;
+        }
+
+        drawTableHeader();
+
+        /* TABLE DATA */
+
+        rows.forEach((row, index) => {
+            if (y + rowHeight > pageHeight - 48) {
+                doc.addPage({
+                    size: "A4",
+                    layout: "landscape",
+                    margins: {
+                        top: 35,
+                        bottom: 42,
+                        left: 35,
+                        right: 35
+                    }
+                });
+
+                drawHeader();
+                y = 120;
+                drawTableHeader();
+            }
+
+            if (index % 2 === 0) {
+                doc.rect(
+                    tableX,
+                    y,
+                    tableWidth,
+                    rowHeight
+                ).fill("#F7F7F7");
+            }
+
+            doc.save();
+
+            doc.rect(
+                tableX,
+                y,
+                tableWidth,
+                rowHeight
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                ledgerId,
-                value.savingsId,
-                value.type,
-                value.amount,
-                balanceAfter,
-                referenceNo,
-                value.description || null,
-                createdBy,
-                new Date()
-            ]
-        );
+            .strokeColor(COLORS.border)
+            .lineWidth(.4)
+            .stroke();
 
-        await setMemberBalance(value.savingsId, balanceAfter);
+            const direction = getDirection(row);
 
-        res.status(201).json({
-            success: true,
-            message: "Savings transaction created successfully.",
-            data: { id: ledgerId, referenceNo, balanceAfter }
-        });
-    } catch (err) {
-        console.error("Create Ledger:", err);
+            const amountColor =
+                direction === "credit"
+                    ? COLORS.green
+                    : direction === "debit"
+                        ? COLORS.debit
+                        : COLORS.text;
 
-        res.status(500).json({
-            success: false,
-            message: "Unable to create savings transaction."
-        });
-    }
-});
+            const sign =
+                direction === "credit"
+                    ? "+"
+                    : direction === "debit"
+                        ? "-"
+                        : "";
 
-// ==========================
-// UPDATE
-// ==========================
+            const values = [
+                row.referenceNo || "-",
+                formatDate(row.createdDate),
+                row.memberName || "-",
+                String(row.transactionType || "-").replace(/_/g, " "),
+                sign + formatMoney(Math.abs(Number(row.amount || 0))),
+                formatMoney(row.balanceAfter),
+                row.description || "-",
+                row.createdBy || "System"
+            ];
 
-router.put("/update-ledger/:id", async function (req, res) {
-    try {
-        const id = String(req.params.id || "").trim();
+            let x = tableX;
 
-        if (!isValidUUID(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid Ledger ID."
+            values.forEach((value, columnIndex) => {
+                const column = columns[columnIndex];
+
+                doc.fillColor(
+                    columnIndex === 4 ? amountColor : COLORS.text
+                )
+                .font(
+                    columnIndex === 4
+                        ? "Helvetica-Bold"
+                        : "Helvetica"
+                )
+                .fontSize(6.5)
+                .text(
+                    String(value).replace(/\s+/g, " "),
+                    x + 4,
+                    y + 9,
+                    {
+                        width: column.width - 8,
+                        height: 10,
+                        ellipsis: true,
+                        lineBreak: false,
+                        align:
+                            columnIndex === 4 ||
+                            columnIndex === 5
+                                ? "right"
+                                : "left"
+                    }
+                );
+
+                x += column.width;
             });
-        }
 
-        const { error, value } = validateLedger(req.body);
+            doc.restore();
 
-        if (error) {
-            return res.status(400).json({ success: false, message: error });
-        }
+            y += rowHeight;
+        });
 
-        const existing = await Query(
-            `SELECT sl_id, sl_savings_id, sl_transaction_type, sl_amount,
-                    sl_reference_no, sl_create_date
-             FROM savings_ledger
-             WHERE sl_id = ?`,
-            [id]
-        );
+        /* =====================================
+           FINISH PDF
+        ===================================== */
 
-        if (!existing.length) {
-            return res.status(404).json({
-                success: false,
-                message: "Transaction not found."
-            });
-        }
+        drawFooters();
 
-        const row = existing[0];
-        const memberId = Number(row.sl_savings_id);
+        doc.end();
 
-        if (value.savingsId !== memberId) {
-            return res.status(400).json({
-                success: false,
+    } catch (error) {
+        console.error("Generate PDF report error:", error);
+
+        if (!res.headersSent) {
+            res.status(400).json({
                 message:
-                    "The member cannot be changed. Delete this transaction and create a new one instead."
+                    error.message ||
+                    "Unable to generate PDF report."
             });
+        } else if (!res.destroyed) {
+            res.destroy(error);
         }
-
-        const oldSigned = getSignedAmount(
-            row.sl_transaction_type,
-            row.sl_amount
-        );
-        const newSigned = getSignedAmount(value.type, value.amount);
-        const delta = round2(newSigned - oldSigned);
-
-        const currentBalance = await getMemberBalance(memberId);
-
-        if (currentBalance === null) {
-            return res.status(400).json({
-                success: false,
-                message: "Savings account not found."
-            });
-        }
-
-        const newMemberBalance = round2(currentBalance + delta);
-        const minAffected = await getAffectedMin(memberId, row, true);
-
-        if (
-            newMemberBalance < 0 ||
-            (minAffected !== null && round2(minAffected + delta) < 0)
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "This change would make the balance negative."
-            });
-        }
-
-        await Query(
-            `UPDATE savings_ledger
-             SET
-                sl_transaction_type = ?,
-                sl_amount = ?,
-                sl_description = ?
-             WHERE sl_id = ?`,
-            [value.type, value.amount, value.description || null, id]
-        );
-
-        // this row and every later row move by the same difference
-        await shiftAffected(memberId, row, delta, true);
-        await setMemberBalance(memberId, newMemberBalance);
-
-        res.json({
-            success: true,
-            message: "Savings transaction updated successfully."
-        });
-    } catch (err) {
-        console.error("Update Ledger:", err);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to update savings transaction."
-        });
-    }
-});
-
-// ==========================
-// DELETE
-// ==========================
-
-router.delete("/delete-ledger/:id", async function (req, res) {
-    try {
-        const id = String(req.params.id || "").trim();
-
-        if (!isValidUUID(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid Ledger ID."
-            });
-        }
-
-        const existing = await Query(
-            `SELECT sl_id, sl_savings_id, sl_transaction_type, sl_amount,
-                    sl_reference_no, sl_create_date
-             FROM savings_ledger
-             WHERE sl_id = ?`,
-            [id]
-        );
-
-        if (!existing.length) {
-            return res.status(404).json({
-                success: false,
-                message: "Transaction not found."
-            });
-        }
-
-        const row = existing[0];
-        const memberId = Number(row.sl_savings_id);
-
-        const delta = round2(
-            -getSignedAmount(row.sl_transaction_type, row.sl_amount)
-        );
-
-        const currentBalance = await getMemberBalance(memberId);
-
-        if (currentBalance === null) {
-            return res.status(400).json({
-                success: false,
-                message: "Savings account not found."
-            });
-        }
-
-        const newMemberBalance = round2(currentBalance + delta);
-        const minAffected = await getAffectedMin(memberId, row, false);
-
-        if (
-            newMemberBalance < 0 ||
-            (minAffected !== null && round2(minAffected + delta) < 0)
-        ) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Cannot delete: it would make the balance negative."
-            });
-        }
-
-        // shift later rows first (the row itself is excluded), then delete it
-        await shiftAffected(memberId, row, delta, false);
-        await Query(`DELETE FROM savings_ledger WHERE sl_id = ?`, [id]);
-        await setMemberBalance(memberId, newMemberBalance);
-
-        res.json({
-            success: true,
-            message: "Savings transaction deleted successfully."
-        });
-    } catch (err) {
-        console.error("Delete Ledger:", err);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to delete savings transaction."
-        });
     }
 });
 

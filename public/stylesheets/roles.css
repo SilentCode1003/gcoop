@@ -149,3 +149,160 @@ html.dark .roles-table .card-body{
 .roles-table .card-header #btnAdd i{
     color:#fff !important;
 }
+
+  .rp-section-title {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ---------- role buttons ---------- */
+  .role-btn {
+    position: relative;
+    min-width: 200px;
+    padding: 0.8rem 1.5rem;
+    margin: 0 0.75rem 0.75rem 0;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    color: inherit;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+
+  .role-btn:hover {
+    border-color: rgba(220, 38, 38, 0.75);
+  }
+
+  .role-btn.active {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35);
+  }
+
+  .role-check {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 26px;
+    height: 22px;
+    border-radius: 0 8px 0 8px;
+    background: #22c55e;
+    color: #fff;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- module cards ---------- */
+  .perm-card {
+    height: 100%;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+
+  .perm-card.changed {
+    border-color: rgba(245, 158, 11, 0.85);
+  }
+
+  .perm-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    background: linear-gradient(135deg, #7f1d1d, #b91c1c);
+    color: #fff;
+  }
+
+  .perm-card-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+
+  .btn-module-toggle {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.6rem;
+    text-transform: uppercase;
+  }
+
+  .btn-module-toggle:hover {
+    background: #fff;
+    color: #7f1d1d;
+  }
+
+  .perm-card-body {
+    padding: 0.75rem;
+  }
+
+  .perm-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .perm-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .perm-row.checked {
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .perm-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .perm-badge {
+    min-width: 54px;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .perm-badge.view {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .perm-badge.write {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .perm-badge.all {
+    background: #ffedd5;
+    color: #9a3412;
+  }
+
+  .perm-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .perm-check {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #22c55e;
+  }

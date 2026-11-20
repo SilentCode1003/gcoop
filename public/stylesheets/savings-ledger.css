@@ -1,143 +1,856 @@
-/* ==========================================================
-   SAVINGS LEDGER PAGE
-========================================================== */
+/* =========================================
+   SAVINGS LEDGER
+========================================= */
 
-/* ==========================================================
-   PAGE TITLE
-========================================================== */
-
-.savings-ledger-title{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:24px;
-
-    color:var(--text);
-    font-size:30px;
-    font-weight:700;
+.savings-ledger-page {
+    color: var(--text);
 }
 
-.savings-ledger-title i{
-    color:var(--primary);
+.ledger-page-heading {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 24px;
 }
 
-/* ==========================================================
-   SAVINGS LEDGER CARD
-========================================================== */
-
-.savings-ledger-table{
-    background:var(--card);
-
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-
-    border:1px solid var(--border);
-    border-radius:18px;
-
-    overflow:hidden;
-
-    box-shadow:0 12px 35px rgba(0,0,0,.15);
+.ledger-heading-icon {
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 23px;
+    box-shadow: 0 7px 18px rgba(0, 0, 0, .14);
 }
 
-.savings-ledger-table .card-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:12px;
+.ledger-page-heading h2 {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text);
+}
 
-    padding:16px 24px;
+.ledger-page-heading p {
+    font-size: 13px;
+    margin: 5px 0 0;
+    color: var(--muted, #888);
+}
 
-    border:none;
+/* MAIN CARD */
 
-    background:linear-gradient(
+.savings-ledger-table {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, .13);
+}
+
+.savings-ledger-table .card-header {
+    padding: 18px 24px;
+    border: 0;
+    background: linear-gradient(
         135deg,
         var(--primary),
         var(--primary-hover)
     );
 }
 
-.savings-ledger-table .card-header h5,
-.savings-ledger-table .card-header h6{
-    margin:0;
-
-    color:#fff;
-
-    font-size:18px;
-    font-weight:700;
+.ledger-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
 }
 
-.savings-ledger-table .card-body{
-    background:transparent;
-    padding:24px;
+.ledger-header-title {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    color: #fff;
 }
 
-/* ==========================================================
-   TABLE
-========================================================== */
-
-.savings-ledger-table table{
-    margin-bottom:0;
+.ledger-header-title > i {
+    font-size: 25px;
+    color: #f2d28b;
 }
 
-.savings-ledger-table th,
-.savings-ledger-table td{
-    text-align:center;
-    vertical-align:middle;
+.ledger-header-title h5 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
 }
 
-/* Description Column */
-.savings-ledger-table td:nth-child(6){
-    text-align:left;
+.ledger-header-title small {
+    display: block;
+    margin-top: 3px;
+    color: rgba(255, 255, 255, .75);
+    font-size: 11px;
 }
 
-/* ==========================================================
-   ADD BUTTON
-========================================================== */
-.savings-ledger-table #btnLedgerAdd{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
+/* PDF BUTTON */
 
-    min-height:44px;
-    padding:12px 22px;
+.btn-pdf {
+    width: 43px;
+    height: 43px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
 
-    background:#6b7280 !important;
-    color:#fff !important;
+    background: rgba(255, 255, 255, .12);
+    color: #f2d28b;
 
-    border:1px solid #6b7280 !important;
-    border-radius:12px;
+    border: 1px solid rgba(242, 210, 139, .75);
 
-    box-shadow:0 10px 24px rgba(107,114,128,.30);
+    font-size: 18px;
+    cursor: pointer;
+
+    transition: all .22s ease;
 }
 
-.savings-ledger-table #btnLedgerAdd:hover{
-    background:#4b5563 !important;
-    border-color:#4b5563 !important;
+.btn-pdf:hover {
+    background: #f2d28b;
+    color: #174b20;
+    border-color: #f2d28b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, .2);
 }
 
-.savings-ledger-table #btnLedgerAdd i{
-    color:#fff !important;
-}
-/* ==========================================================
-   LIGHT MODE
-========================================================== */
-
-html:not(.dark) .savings-ledger-table{
-    background:rgba(255,255,255,.18);
-    border:1px solid rgba(255,255,255,.20);
+.btn-pdf:focus {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(242, 210, 139, .22);
 }
 
-/* ==========================================================
-   DARK MODE
-========================================================== */
-
-html.dark .savings-ledger-table{
-    background:rgba(22,22,22,.38);
-    border-color:rgba(255,255,255,.08);
+.btn-pdf:disabled {
+    opacity: .65;
+    cursor: wait;
+    transform: none;
 }
 
-html.dark .savings-ledger-table .card-body{
-    background:transparent;
+/* CARD BODY */
+
+.savings-ledger-table .card-body {
+    padding: 24px;
+    background: transparent;
+}
+
+.ledger-summary-row {
+    margin-bottom: 8px;
+}
+
+/* SUMMARY CARDS */
+
+.ledger-stat {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    height: 100%;
+    min-height: 92px;
+    padding: 16px;
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+
+    transition: all .25s ease;
+}
+
+.ledger-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+}
+
+.stat-icon {
+    width: 43px;
+    height: 43px;
+    min-width: 43px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+    font-size: 17px;
+}
+
+.stat-total .stat-icon {
+    color: #b58a35;
+    background: rgba(197, 160, 85, .15);
+}
+
+.stat-credit .stat-icon {
+    color: #16a34a;
+    background: rgba(22, 163, 74, .12);
+}
+
+.stat-debit .stat-icon {
+    color: #dc2626;
+    background: rgba(220, 38, 38, .12);
+}
+
+.stat-net .stat-icon {
+    color: #b58a35;
+    background: rgba(197, 160, 85, .15);
+}
+
+.ledger-stat .label {
+    color: var(--muted, #888);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+}
+
+.ledger-stat .value {
+    margin-top: 5px;
+    color: var(--text);
+    font-size: clamp(14px, 1.4vw, 20px);
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.amt-credit {
+    color: #16a34a !important;
+}
+
+.amt-debit {
+    color: #dc2626 !important;
+}
+
+/* FILTER SECTION */
+
+.ledger-filter-section {
+    padding: 19px;
+    margin: 8px 0 25px;
+
+    border: 1px solid var(--border);
+    border-radius: 15px;
+
+    background: rgba(128, 128, 128, .045);
+}
+
+.ledger-filter-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 17px;
+}
+
+.ledger-filter-heading > div {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.ledger-filter-heading i {
+    color: var(--primary);
+    margin-right: 7px;
+}
+
+.btn-clear-filter {
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+
+    border-radius: 9px;
+    padding: 8px 13px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    transition: all .2s ease;
+}
+
+.btn-clear-filter:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.ledger-filter-section label {
+    display: block;
+    margin-bottom: 7px;
+
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* INPUTS */
+
+.ledger-input-group {
+    position: relative;
+}
+
+.ledger-input-group > i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    color: var(--primary);
+    font-size: 12px;
+
+    z-index: 2;
+    pointer-events: none;
+}
+
+.ledger-input-group .form-control {
+    width: 100%;
+    height: 42px;
+
+    padding: 8px 12px 8px 35px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: var(--card);
+    color: var(--text);
+
+    font-size: 12px;
+    box-shadow: none;
+
+    transition: all .2s ease;
+}
+
+.ledger-input-group .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(22, 110, 48, .12);
+    outline: 0;
+}
+
+.ledger-input-group .form-control::placeholder {
+    color: var(--muted, #999);
+    opacity: .8;
+}
+
+/* TABLE HEADING */
+
+.ledger-table-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    margin-bottom: 13px;
+}
+
+.ledger-table-heading h6 {
+    margin: 0 0 5px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.ledger-table-heading h6 i {
+    color: var(--primary);
+}
+
+.ledger-table-heading small {
+    color: var(--muted, #888);
+    font-size: 11px;
+}
+
+.ledger-record-count {
+    padding: 7px 12px;
+
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    background: rgba(128, 128, 128, .06);
+    color: var(--text);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.ledger-record-count i {
+    color: var(--primary);
+    margin-right: 5px;
+}
+
+/* TABLE */
+
+.ledger-table-container {
+    width: 100%;
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.ledger-table-container .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#savingsLedgerTable {
+    width: 100%;
+    min-width: 1050px;
+
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    color: var(--text);
+}
+
+#savingsLedgerTable thead th {
+    padding: 15px 12px;
+
+    background: rgba(128, 128, 128, .09);
+    color: var(--text);
+
+    border: 0;
+    border-bottom: 1px solid var(--border);
+
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+#savingsLedgerTable tbody td {
+    padding: 13px 12px;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--text);
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+#savingsLedgerTable tbody tr:first-child td {
+    border-top: 0;
+}
+
+#savingsLedgerTable tbody tr {
+    transition: background .2s ease;
+}
+
+#savingsLedgerTable tbody tr:hover {
+    background: rgba(128, 128, 128, .07);
+}
+
+#savingsLedgerTable td:first-child,
+#savingsLedgerTable td:nth-child(2),
+#savingsLedgerTable td:nth-child(5),
+#savingsLedgerTable td:nth-child(6) {
+    white-space: nowrap;
+}
+
+#savingsLedgerTable td:first-child,
+#savingsLedgerTable td:nth-child(5),
+#savingsLedgerTable td:nth-child(6) {
+    font-weight: 700;
+}
+
+#savingsLedgerTable td:nth-child(3) {
+    min-width: 145px;
+}
+
+#savingsLedgerTable td:nth-child(7) {
+    min-width: 150px;
+    max-width: 230px;
+    overflow-wrap: anywhere;
+}
+
+#savingsLedgerTable td:nth-child(8) {
+    min-width: 110px;
+}
+
+/* TRANSACTION BADGES */
+
+.type-badge {
+    display: inline-block;
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.type-badge.credit {
+    background: rgba(22, 163, 74, .13);
+    color: #16a34a;
+}
+
+.type-badge.debit {
+    background: rgba(220, 38, 38, .13);
+    color: #dc2626;
+}
+
+.type-badge.neutral {
+    background: rgba(180, 140, 50, .15);
+    color: #b58a35;
+}
+
+/* PAGINATION */
+
+.ledger-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    margin-top: 20px;
+}
+
+.pagination-info {
+    color: var(--muted, #888);
+    font-size: 11px;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pagination-controls span {
+    min-width: 50px;
+    text-align: center;
+
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.btn-page {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+
+    border: 1px solid var(--border);
+    border-radius: 9px;
+
+    background: var(--card);
+    color: var(--text);
+
+    transition: all .2s ease;
+}
+
+.btn-page:hover:not(:disabled) {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.btn-page:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+/* LIGHT MODE */
+
+html:not(.dark) .savings-ledger-table {
+    background: rgba(255, 255, 255, .92);
+    border-color: rgba(0, 0, 0, .08);
+}
+
+html:not(.dark) .ledger-filter-section {
+    background: rgba(22, 110, 48, .025);
+}
+
+html:not(.dark) #savingsLedgerTable thead th {
+    background: #f4f7f3;
+    color: #344438;
+}
+
+html:not(.dark) #savingsLedgerTable tbody td {
+    color: #343b35;
+}
+
+html:not(.dark) .ledger-stat {
+    background: #fff;
+}
+
+/* DARK MODE */
+
+html.dark .savings-ledger-table {
+    background: rgba(22, 22, 22, .55);
+    border-color: rgba(255, 255, 255, .09);
+}
+
+html.dark .ledger-filter-section {
+    background: rgba(255, 255, 255, .025);
+}
+
+html.dark .ledger-stat {
+    background: rgba(255, 255, 255, .025);
+}
+
+html.dark #savingsLedgerTable thead th {
+    background: rgba(255, 255, 255, .07);
+    color: #f3f4f6;
+}
+
+html.dark #savingsLedgerTable tbody td {
+    color: #e5e7eb;
+}
+
+html.dark .ledger-input-group .form-control {
+    background: #202020;
+    color: #fff;
+}
+
+html.dark .ledger-record-count {
+    background: rgba(255, 255, 255, .04);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 767px) {
+    .ledger-page-heading h2 {
+        font-size: 21px;
+    }
+
+    .ledger-page-heading p {
+        font-size: 11px;
+    }
+
+    .savings-ledger-table .card-body {
+        padding: 14px;
+    }
+
+    .savings-ledger-table .card-header {
+        padding: 15px;
+    }
+
+    .ledger-stat {
+        min-height: 78px;
+        padding: 11px;
+        gap: 9px;
+    }
+
+    .stat-icon {
+        width: 35px;
+        height: 35px;
+        min-width: 35px;
+        font-size: 14px;
+    }
+
+    .ledger-stat .label {
+        font-size: 9px;
+    }
+
+    .ledger-stat .value {
+        font-size: 14px;
+    }
+
+    .ledger-filter-section {
+        padding: 13px;
+    }
+
+    .ledger-filter-heading {
+        align-items: flex-start;
+    }
+
+    .ledger-pagination,
+    .ledger-table-heading {
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 420px) {
+    .ledger-filter-heading {
+        flex-direction: column;
+    }
+
+    .btn-clear-filter {
+        width: 100%;
+    }
+}
+
+/* =========================================
+   SAVINGS LEDGER - 5L RED THEME
+========================================= */
+
+.savings-ledger-page {
+    --ledger-red: #a71920;
+    --ledger-red-dark: #7f1118;
+    --ledger-red-light: #d52b32;
+    --ledger-gold: #c6a15b;
+    --ledger-green: #16a34a;
+    --ledger-danger: #dc3545;
+}
+
+/* Page heading */
+
+.ledger-heading-icon {
+    background: linear-gradient(
+        135deg,
+        #bd2028,
+        #851219
+    ) !important;
+    color: #fff !important;
+    box-shadow: 0 7px 20px rgba(167, 25, 32, .25);
+}
+
+/* Main card header */
+
+.savings-ledger-table .card-header {
+    background: linear-gradient(
+        110deg,
+        #a71920,
+        #86151b
+    ) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+
+.ledger-header-title > i {
+    color: #fff !important;
+}
+
+/* PDF button */
+
+.btn-pdf {
+    background: rgba(255, 255, 255, .08) !important;
+    border: 1px solid rgba(255, 255, 255, .55) !important;
+    color: #fff !important;
+    border-radius: 12px !important;
+    transition: all .2s ease;
+}
+
+.btn-pdf:hover {
+    background: #fff !important;
+    border-color: #fff !important;
+    color: #a71920 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, .2);
+}
+
+.btn-pdf:disabled {
+    opacity: .6;
+    cursor: wait;
+    transform: none;
+}
+
+/* Filter and table icons */
+
+.ledger-filter-heading i,
+.ledger-table-heading h6 i,
+.ledger-record-count i {
+    color: #d52b32 !important;
+}
+
+.ledger-input-group > i {
+    color: #d52b32 !important;
+}
+
+.ledger-input-group .form-control:focus {
+    border-color: #a71920 !important;
+    box-shadow: 0 0 0 3px rgba(167, 25, 32, .15) !important;
+}
+
+/* Clear filters */
+
+.btn-clear-filter:hover {
+    background: #a71920 !important;
+    border-color: #a71920 !important;
+    color: #fff !important;
+}
+
+/* Table header */
+
+#savingsLedgerTable thead th {
+    background: #292526 !important;
+    color: #fff !important;
+}
+
+#savingsLedgerTable tbody tr:hover {
+    background: rgba(167, 25, 32, .09) !important;
+}
+
+/* Pagination */
+
+.btn-page:hover:not(:disabled) {
+    background: #a71920 !important;
+    border-color: #a71920 !important;
+    color: #fff !important;
+}
+
+/* Summary cards */
+
+.stat-total .stat-icon,
+.stat-net .stat-icon {
+    color: #c6a15b !important;
+    background: rgba(198, 161, 91, .13) !important;
+}
+
+.stat-credit .stat-icon {
+    color: #16a34a !important;
+    background: rgba(22, 163, 74, .13) !important;
+}
+
+.stat-debit .stat-icon {
+    color: #dc3545 !important;
+    background: rgba(220, 53, 69, .13) !important;
+}
+
+/* Keep financial meaning */
+
+.amt-credit {
+    color: #16a34a !important;
+}
+
+.amt-debit {
+    color: #dc3545 !important;
+}
+
+/* Dark theme */
+
+html.dark .ledger-filter-section {
+    border-color: rgba(255, 255, 255, .08);
+}
+
+html.dark .ledger-input-group .form-control:focus {
+    border-color: #d52b32 !important;
+}
+
+html.dark #savingsLedgerTable thead th {
+    background: #292526 !important;
+}
+
+/* Light theme */
+
+html:not(.dark) .ledger-heading-icon {
+    background: linear-gradient(
+        135deg,
+        #bd2028,
+        #851219
+    ) !important;
+}
+
+html:not(.dark) #savingsLedgerTable thead th {
+    background: #851219 !important;
+}
+
+html:not(.dark) .ledger-input-group .form-control:focus {
+    border-color: #a71920 !important;
+}
+
+/* Mobile */
+
+@media (max-width: 767px) {
+    .btn-pdf {
+        width: 40px;
+        height: 40px;
+    }
 }

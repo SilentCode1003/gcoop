@@ -1,119 +1,132 @@
-<div class="container-fluid">
-  <!-- Savings Ledger Card -->
-  <div class="card shadow mb-4 savings-ledger-table">
-    <div
-      class="card-header d-flex justify-content-between align-items-center flex-wrap"
-    >
-      <h5 class="m-0 font-weight-bold text-white">
-        <i class="fas fa-book mr-2"></i>
-        Savings Ledger
-      </h5>
+<div class="container-fluid savings-ledger-page">
+  <div class="ledger-page-heading">
+    <div class="ledger-heading-icon">
+      <i class="fas fa-book"></i>
+    </div>
+    <div>
+      <h2>Savings Ledger</h2>
+      <p>Monitor, review, and generate savings transaction reports.</p>
+    </div>
+  </div>
 
-      <button type="button" id="btnLedgerAdd" class="btn btn-add">
-        <i class="fas fa-plus mr-1"></i>
-        New Transaction
+  <div class="card shadow mb-4 savings-ledger-table">
+    <div class="card-header ledger-card-header">
+      <div class="ledger-header-title">
+        <i class="fas fa-piggy-bank"></i>
+        <div>
+          <h5>Savings Ledger</h5>
+          <small>Transaction Management</small>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        id="btnReport"
+        class="btn btn-pdf"
+        title="Generate PDF Report"
+        aria-label="Generate PDF Report"
+      >
+        <i class="fas fa-file-pdf"></i>
       </button>
     </div>
 
     <div class="card-body">
-      <div class="table-responsive">
-        <table id="savingsLedgerTable" class="table table-hover mb-0">
-          <thead>
-            <tr>
-              <th>Reference No.</th>
-              <th>Member ID</th>
-              <th>Transaction Type</th>
-              <th>Amount</th>
-              <th>Balance After</th>
-              <th>Description</th>
-              <th>Created By</th>
-              <th>Created Date</th>
-              <th class="text-center">Action</th>
-            </tr>
-          </thead>
+      <!-- SUMMARY CARDS -->
+      <div class="row ledger-summary-row">
+        <div class="col-xl-3 col-md-6 col-6 mb-3">
+          <div class="ledger-stat stat-total">
+            <div class="stat-icon">
+              <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div>
+              <div class="label">Transactions</div>
+              <div class="value" id="statCount">0</div>
+            </div>
+          </div>
+        </div>
 
-          <tbody id="ledgerTable">
-            <tr>
-              <td colspan="9" class="text-center text-muted">
-                Loading savings ledger...
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="col-xl-3 col-md-6 col-6 mb-3">
+          <div class="ledger-stat stat-credit">
+            <div class="stat-icon">
+              <i class="fas fa-arrow-down"></i>
+            </div>
+            <div>
+              <div class="label">Total Credits</div>
+              <div class="value" id="statCredits">PHP 0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 col-6 mb-3">
+          <div class="ledger-stat stat-debit">
+            <div class="stat-icon">
+              <i class="fas fa-arrow-up"></i>
+            </div>
+            <div>
+              <div class="label">Total Debits</div>
+              <div class="value" id="statDebits">PHP 0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 col-6 mb-3">
+          <div class="ledger-stat stat-net">
+            <div class="stat-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div>
+              <div class="label">Net Change</div>
+              <div class="value" id="statNet">PHP 0.00</div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
-<!-- ==========================================================
-     SAVINGS LEDGER MODAL
-========================================================== -->
+      <!-- FILTER SECTION -->
+      <div class="ledger-filter-section">
+        <div class="ledger-filter-heading">
+          <div>
+            <i class="fas fa-filter"></i>
+            <span>Search and Filters</span>
+          </div>
 
-<div
-  class="modal fade"
-  id="ledgerModal"
-  tabindex="-1"
-  aria-labelledby="ledgerModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <form id="ledgerForm" novalidate>
-        <div class="modal-header">
-          <h5 class="modal-title" id="ledgerModalLabel">
-            <i class="fas fa-book mr-2"></i>
-            New Transaction
-          </h5>
-
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
+          <button type="button" id="btnClear" class="btn btn-clear-filter">
+            <i class="fas fa-undo mr-1"></i>
+            Clear Filters
           </button>
         </div>
 
-        <div class="modal-body">
-          <input type="hidden" id="LedgerID" name="ledgerId" />
-
-          <!-- Member Savings -->
-
-          <div class="form-group">
-            <label for="SavingsID">
-              Member Savings
-              <span class="text-danger"></span>
-            </label>
-
-            <select
-              id="SavingsID"
-              name="savingsId"
-              class="form-control"
-              required
-            >
-              <option value="">Select Member Savings</option>
-            </select>
-
-            <div class="invalid-feedback">
-              Please select a member savings account.
+        <div class="row">
+          <div class="col-xl-3 col-md-6 mb-3">
+            <label for="fSearch">Search Transactions</label>
+            <div class="ledger-input-group">
+              <i class="fas fa-search"></i>
+              <input
+                type="search"
+                id="fSearch"
+                class="form-control"
+                placeholder="Reference, member, description..."
+                autocomplete="off"
+              />
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="TransactionType">
-                Transaction Type
-                <span class="text-danger"></span>
-              </label>
+          <div class="col-xl-2 col-md-6 mb-3">
+            <label for="fMember">Member</label>
+            <div class="ledger-input-group">
+              <i class="fas fa-user"></i>
+              <select id="fMember" class="form-control">
+                <option value="">All Members</option>
+              </select>
+            </div>
+          </div>
 
-              <select
-                id="TransactionType"
-                name="transactionType"
-                class="form-control"
-                required
-              >
-                <option value="">Select Transaction Type</option>
+          <div class="col-xl-2 col-md-4 mb-3">
+            <label for="fType">Transaction Type</label>
+            <div class="ledger-input-group">
+              <i class="fas fa-exchange-alt"></i>
+              <select id="fType" class="form-control">
+                <option value="">All Types</option>
                 <option value="DEPOSIT">Deposit</option>
                 <option value="WITHDRAWAL">Withdrawal</option>
                 <option value="INTEREST_PAYOUT">Interest Payout</option>
@@ -121,90 +134,90 @@
                 <option value="ADJUSTMENT">Adjustment</option>
                 <option value="TRANSFER">Transfer</option>
               </select>
-
-              <div class="invalid-feedback">
-                Please select a transaction type.
-              </div>
-            </div>
-
-            <div class="form-group col-md-6">
-              <label for="Amount">
-                Amount
-                <span class="text-danger"></span>
-              </label>
-
-              <input
-                type="number"
-                id="Amount"
-                name="amount"
-                class="form-control"
-                placeholder="Enter transaction amount"
-                min="0.01"
-                step="0.01"
-                required
-              />
-
-              <div class="invalid-feedback">
-                Enter a valid amount greater than zero.
-              </div>
             </div>
           </div>
 
-          <!-- Edit Only -->
-
-          <div class="form-row" id="autoFields" style="display: none">
-            <div class="form-group col-md-6">
-              <label for="ReferenceNo">Reference No.</label>
-
-              <input
-                type="text"
-                id="ReferenceNo"
-                class="form-control"
-                readonly
-              />
-            </div>
-
-            <div class="form-group col-md-6">
-              <label for="BalanceAfter">Balance After</label>
-
-              <input
-                type="text"
-                id="BalanceAfter"
-                class="form-control"
-                readonly
-              />
+          <div class="col-xl-2 col-md-4 mb-3">
+            <label for="fFrom">Start Date</label>
+            <div class="ledger-input-group">
+              <i class="fas fa-calendar-alt"></i>
+              <input type="date" id="fFrom" class="form-control" />
             </div>
           </div>
 
-          <div class="form-group mb-0">
-            <label for="Description">Description</label>
-
-            <textarea
-              id="Description"
-              name="description"
-              class="form-control"
-              rows="4"
-              maxlength="1000"
-              placeholder="Enter description (optional)"
-            ></textarea>
-
-            <div class="invalid-feedback">
-              Description cannot exceed 1,000 characters.
+          <div class="col-xl-2 col-md-4 mb-3">
+            <label for="fTo">End Date</label>
+            <div class="ledger-input-group">
+              <i class="fas fa-calendar-check"></i>
+              <input type="date" id="fTo" class="form-control" />
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-cancel" data-dismiss="modal">
-            Cancel
+      <!-- TABLE HEADER -->
+      <div class="ledger-table-heading">
+        <div>
+          <h6>
+            <i class="fas fa-list-alt mr-2"></i>
+            Transaction Records
+          </h6>
+          <small id="pageInfo">Loading transactions...</small>
+        </div>
+
+        <div class="ledger-record-count">
+          <i class="fas fa-database"></i>
+          <span id="recordCount">0 Records</span>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="ledger-table-container">
+        <div class="table-responsive">
+          <table id="savingsLedgerTable" class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Reference No.</th>
+                <th>Date</th>
+                <th>Member</th>
+                <th>Type</th>
+                <th class="text-right">Amount</th>
+                <th class="text-right">Balance After</th>
+                <th>Description</th>
+                <th>Created By</th>
+              </tr>
+            </thead>
+
+            <tbody id="ledgerTable">
+              <tr>
+                <td colspan="8" class="text-center py-5">
+                  <i class="fas fa-spinner fa-spin mr-2"></i>
+                  Loading savings ledger...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="ledger-pagination">
+        <div class="pagination-info">
+          <span id="paginationInfo">Showing 0 records</span>
+        </div>
+
+        <div class="pagination-controls">
+          <button type="button" id="btnPrev" class="btn btn-page">
+            <i class="fas fa-chevron-left"></i>
           </button>
 
-          <button type="submit" class="btn btn-save" id="btnSave">
-            <i class="fas fa-save mr-1"></i>
-            Save Transaction
+          <span id="pageNumber">1 / 1</span>
+
+          <button type="button" id="btnNext" class="btn btn-page">
+            <i class="fas fa-chevron-right"></i>
           </button>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </div>

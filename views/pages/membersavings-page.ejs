@@ -1,34 +1,51 @@
+<!-- ==========================================================
+     MEMBER SAVINGS PAGE
+========================================================== -->
+
 <div class="container-fluid">
-  <div class="card shadow mb-4 member-savings-table">
-    <div class="card-header d-flex justify-content-between align-items-center">
+  <!-- ======================================================
+         MEMBER SAVINGS TABLE
+    ======================================================= -->
+
+  <div class="card shadow mb-4 savings-ledger-table member-savings-table">
+    <!-- CARD HEADER -->
+    <div
+      class="card-header d-flex justify-content-between align-items-center flex-wrap"
+    >
       <h5 class="m-0 font-weight-bold text-white">
         <i class="fas fa-piggy-bank mr-2"></i>
         Member Savings
       </h5>
 
-      <button type="button" id="btnAdd" class="btn btn-add">
-        <i class="fas fa-plus mr-1"></i>
-        New Savings Account
-      </button>
+      <input
+        type="search"
+        id="msSearch"
+        class="form-control"
+        style="max-width: 280px"
+        placeholder="Search member..."
+        autocomplete="off"
+      />
     </div>
 
+    <!-- CARD BODY -->
     <div class="card-body">
       <div class="table-responsive">
         <table id="memberSavingsTable" class="table table-hover mb-0">
           <thead>
             <tr>
               <th>Member ID</th>
+              <th>Employee ID</th>
               <th>Member Name</th>
-              <th>Current Balance</th>
-              <th>Transactions</th>
+              <th class="text-right">Current Balance</th>
+              <th class="text-center">Transactions</th>
               <th>Last Updated</th>
-              <th class="text-center">Action</th>
+              <th class="text-center" width="120">Action</th>
             </tr>
           </thead>
 
           <tbody id="savingsTable">
             <tr>
-              <td colspan="6" class="text-center text-muted">
+              <td colspan="7" class="text-center text-muted">
                 Loading member savings...
               </td>
             </tr>
@@ -39,22 +56,25 @@
   </div>
 </div>
 
-<!-- MEMBER SAVINGS MODAL -->
+<!-- ==========================================================
+     NEW TRANSACTION MODAL
+========================================================== -->
+
 <div
   class="modal fade"
-  id="savingsModal"
+  id="transactModal"
   tabindex="-1"
-  role="dialog"
-  aria-labelledby="savingsModalLabel"
+  aria-labelledby="transactModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form id="savingsForm" novalidate>
+      <form id="transactForm" novalidate>
+        <!-- HEADER -->
         <div class="modal-header">
-          <h5 class="modal-title" id="savingsModalLabel">
-            <i class="fas fa-plus mr-2"></i>
-            New Savings Account
+          <h5 class="modal-title" id="transactModalLabel">
+            <i class="fas fa-exchange-alt mr-2"></i>
+            New Transaction
           </h5>
 
           <button
@@ -67,50 +87,105 @@
           </button>
         </div>
 
+        <!-- BODY -->
         <div class="modal-body">
-          <!-- member_savings.ms_id (UUID) -->
-          <input type="hidden" id="SavingsRecordID" value="" />
+          <input type="hidden" id="MemberID" />
 
-          <div class="form-group">
-            <label for="MemberID">
-              Member <span class="text-danger"></span>
-            </label>
+          <!-- MEMBER INFORMATION -->
+          <div class="form-row">
+            <div class="form-group col-md-7">
+              <label for="MemberName"> Member </label>
 
-            <select id="MemberID" class="form-control" required>
-              <option value="">Select Member</option>
-            </select>
-
-            <div class="invalid-feedback">Please select a member.</div>
-          </div>
-
-          <div class="form-group mb-0">
-            <label for="Balance" id="BalanceLabel">
-              Opening Balance <span class="text-danger"></span>
-            </label>
-
-            <input
-              type="number"
-              id="Balance"
-              class="form-control"
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-              inputmode="decimal"
-              value="0"
-              required
-            />
-
-            <div class="invalid-feedback">
-              Enter a valid balance (zero or greater).
+              <input
+                type="text"
+                id="MemberName"
+                class="form-control"
+                readonly
+              />
             </div>
 
-            <small class="form-text text-muted" id="BalanceHint">
-              An opening balance above zero is also recorded as a deposit in the
-              Savings Ledger.
-            </small>
+            <div class="form-group col-md-5">
+              <label for="CurrentBalance"> Current Balance </label>
+
+              <input
+                type="text"
+                id="CurrentBalance"
+                class="form-control"
+                readonly
+              />
+            </div>
           </div>
+
+          <!-- TRANSACTION DETAILS -->
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="TransactionType">
+                Transaction Type
+                <span class="text-danger">*</span>
+              </label>
+
+              <select id="TransactionType" class="form-control" required>
+                <option value="">Select Transaction Type</option>
+
+                <option value="DEPOSIT">Deposit (+)</option>
+
+                <option value="WITHDRAWAL">Withdrawal (-)</option>
+
+                <option value="INTEREST_PAYOUT">Interest Payout (+)</option>
+
+                <option value="PENALTY">Penalty (-)</option>
+
+                <option value="ADJUSTMENT">Adjustment (+)</option>
+
+                <option value="TRANSFER">Transfer (+)</option>
+              </select>
+
+              <div class="invalid-feedback">
+                Please select a transaction type.
+              </div>
+            </div>
+
+            <div class="form-group col-md-6">
+              <label for="Amount">
+                Amount
+                <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="number"
+                id="Amount"
+                class="form-control"
+                placeholder="0.00"
+                min="0.01"
+                step="0.01"
+                inputmode="decimal"
+                required
+              />
+
+              <div class="invalid-feedback">
+                Enter a valid amount greater than zero.
+              </div>
+            </div>
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="form-group">
+            <label for="Description"> Description </label>
+
+            <textarea
+              id="Description"
+              class="form-control"
+              rows="3"
+              maxlength="1000"
+              placeholder="Enter description (optional)"
+            ></textarea>
+          </div>
+
+          <!-- BALANCE PREVIEW -->
+          <div class="mb-0" id="balancePreview"></div>
         </div>
 
+        <!-- FOOTER -->
         <div class="modal-footer">
           <button type="button" class="btn btn-cancel" data-dismiss="modal">
             Cancel
@@ -118,10 +193,168 @@
 
           <button type="submit" class="btn btn-save" id="btnSave">
             <i class="fas fa-save mr-1"></i>
-            Save Account
+            Save Transaction
           </button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================
+     TRANSACTION HISTORY MODAL
+========================================================== -->
+
+<div
+  class="modal fade"
+  id="historyModal"
+  tabindex="-1"
+  aria-labelledby="historyModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <!-- ==================================================
+                 HISTORY HEADER
+            =================================================== -->
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="historyModalLabel">
+          <i class="fas fa-history"></i>
+
+          <span>Transaction History</span>
+
+          <small class="ml-2" id="historyMemberName"></small>
+        </h5>
+
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- ==================================================
+                 HISTORY BODY
+            =================================================== -->
+
+      <div class="modal-body">
+        <!-- ==============================================
+                     SUMMARY CARDS
+                =============================================== -->
+
+        <div class="history-summary">
+          <!-- CURRENT BALANCE -->
+          <div class="summary-box">
+            <div class="summary-label">
+              <i class="fas fa-wallet mr-1"></i>
+
+              Current Balance
+            </div>
+
+            <div class="summary-value" id="historyBalance">₱0.00</div>
+          </div>
+
+          <!-- TOTAL IN -->
+          <div class="summary-box in">
+            <div class="summary-label">
+              <i class="fas fa-arrow-down mr-1"></i>
+
+              Total In
+            </div>
+
+            <div class="summary-value" id="historyTotalIn">₱0.00</div>
+          </div>
+
+          <!-- TOTAL OUT -->
+          <div class="summary-box out">
+            <div class="summary-label">
+              <i class="fas fa-arrow-up mr-1"></i>
+
+              Total Out
+            </div>
+
+            <div class="summary-value" id="historyTotalOut">₱0.00</div>
+          </div>
+        </div>
+
+        <!-- ==============================================
+                     HISTORY TOOLBAR
+                =============================================== -->
+
+        <div class="history-toolbar">
+          <!-- TRANSACTION COUNT -->
+          <span class="text-muted small" id="historyCount">
+            0 transactions
+          </span>
+
+          <!-- TRANSACTION FILTER -->
+          <select id="historyFilter" class="form-control form-control-sm">
+            <option value="">All transaction types</option>
+
+            <option value="DEPOSIT">Deposit</option>
+
+            <option value="WITHDRAWAL">Withdrawal</option>
+
+            <option value="INTEREST_PAYOUT">Interest Payout</option>
+
+            <option value="PENALTY">Penalty</option>
+
+            <option value="ADJUSTMENT">Adjustment</option>
+
+            <option value="TRANSFER">Transfer</option>
+          </select>
+        </div>
+
+        <!-- ==============================================
+                     TRANSACTION HISTORY TABLE
+                =============================================== -->
+
+        <div class="history-table-wrap">
+          <table class="table table-hover table-sm">
+            <!-- TABLE HEADER -->
+            <thead>
+              <tr>
+                <th>Date</th>
+
+                <th>Reference No.</th>
+
+                <th>Type</th>
+
+                <th class="text-right">Amount</th>
+
+                <th class="text-right">Balance After</th>
+
+                <th>Description</th>
+              </tr>
+            </thead>
+
+            <!-- TABLE BODY -->
+            <tbody id="historyTable">
+              <tr>
+                <td colspan="6" class="text-center text-muted">
+                  Loading transactions...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ==================================================
+                 HISTORY FOOTER
+            =================================================== -->
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">
+          <i class="fas fa-times mr-1"></i>
+
+          Close
+        </button>
+      </div>
     </div>
   </div>
 </div>

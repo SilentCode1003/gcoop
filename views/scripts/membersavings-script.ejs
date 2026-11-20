@@ -1,6 +1,20 @@
 <script>
   $(document).ready(function () {
-    let savingsById = {};
+    const SIGN = {
+      DEPOSIT: 1,
+      INTEREST_PAYOUT: 1,
+      ADJUSTMENT: 1,
+      TRANSFER: 1,
+      WITHDRAWAL: -1,
+      PENALTY: -1,
+    };
+
+    let savings = [];
+    let byMember = {};
+    let searchTimer = null;
+
+    let historyRows = [];
+    let historyRequest = 0;
 
     const Toast = Swal.mixin({
       toast: true,
@@ -10,44 +24,39 @@
       timerProgressBar: true,
     });
 
-    function errorMessage(error, fallback) {
-      return (
-        error?.responseJSON?.message ||
-        error?.responseJSON?.error ||
-        error?.message ||
-        fallback
+    const errorMessage = (error, fallback) =>
+      error?.responseJSON?.message ||
+      error?.responseJSON?.error ||
+      error?.message ||
+      fallback;
+
+    const esc = (value) =>
+      String(value ?? "").replace(
+        /[&<>"']/g,
+        (c) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[c],
       );
-    }
 
-    function esc(value) {
-      return String(value ?? "").replace(/[&<>"']/g, function (character) {
-        return {
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        }[character];
-      });
-    }
-
-    /* ms_id is a UUID string */
-    function isValidUUID(value) {
-      return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        String(value || "").trim(),
-      );
-    }
-
-    /* ms_member_id is an INT */
-    function isValidMemberId(value) {
-      return /^\d+$/.test(String(value || "")) && Number(value) > 0;
-    }
+    const round2 = (n) => Math.round(Number(n) * 100) / 100;
 
     function formatAmount(value) {
       return Number(value || 0).toLocaleString("en-PH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });
+    }
+
+    function formatType(value) {
+      return String(value || "")
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
     }
 
     function formatDate(value) {
@@ -74,41 +83,79 @@
     function showTableMessage(message, className = "") {
       $("#savingsTable").html(`
         <tr>
-          <td colspan="6" class="text-center ${className}">
-            ${esc(message)}
-          </td>
+          <td colspan="7" class="text-center ${className}">${esc(message)}</td>
         </tr>
       `);
     }
 
-    /*
-     * Members who already have a savings account are hidden,
-     * except the member of the record being edited.
-     */
-    async function loadMembers(selectedId = "") {
-      const data = await queryUtility.Load("/member-savings/load-members");
+    // ==========================
+    // RENDER
+    // ==========================
 
-      const $select = $("#MemberID");
+    function render() {
+      const term = String($("#msSearch").val() || "")
+        .trim()
+        .toLowerCase();
 
-      $select.empty().append(`<option value="">Select Member</option>`);
+      const list = savings.filter(function (item) {
+        if (!term) return true;
 
-      if (!Array.isArray(data)) return;
-
-      data.forEach(function (item) {
-        const memberId = String(item.id ?? "").trim();
-
-        if (!memberId) return;
-
-        if (item.hasSavings && memberId !== String(selectedId)) return;
-
-        $select.append(
-          `<option value="${esc(memberId)}">${esc(item.name || "Member")} (#${esc(memberId)})</option>`,
+        return (
+          String(item.memberName || "")
+            .toLowerCase()
+            .includes(term) ||
+          String(item.employeeId || "")
+            .toLowerCase()
+            .includes(term) ||
+          String(item.memberId).includes(term)
         );
       });
 
-      if (selectedId) {
-        $select.val(String(selectedId));
+      if (!list.length) {
+        showTableMessage(
+          savings.length
+            ? "No members match your search."
+            : "No members found.",
+          "text-muted",
+        );
+        return;
       }
+
+      const $tbody = $("#savingsTable").empty();
+
+      list.forEach(function (item) {
+        $tbody.append(`
+          <tr>
+            <td>${esc(item.memberId)}</td>
+            <td>${esc(item.employeeId || "—")}</td>
+            <td>${esc(item.memberName || "—")}</td>
+            <td class="text-right font-weight-bold">₱${formatAmount(item.balance)}</td>
+            <td class="text-center">${esc(item.transactionCount)}</td>
+            <td>${esc(formatDate(item.updatedAt))}</td>
+            <td class="text-center">
+              <button
+                type="button"
+                class="btn btn-add btn-sm btn-icon btn-transact"
+                data-id="${esc(item.memberId)}"
+                title="New transaction"
+                aria-label="New transaction"
+              >
+                <i class="fas fa-exchange-alt"></i>
+              </button>
+
+              <button
+                type="button"
+                class="btn btn-sm btn-icon btn-history ml-1"
+                data-id="${esc(item.memberId)}"
+                title="Transaction history"
+                aria-label="Transaction history"
+              >
+                <i class="fas fa-history"></i>
+              </button>
+            </td>
+          </tr>
+        `);
+      });
     }
 
     async function loadSavings() {
@@ -117,54 +164,14 @@
 
         const data = await queryUtility.Load("/member-savings/load-savings");
 
-        $("#savingsTable").empty();
-        savingsById = {};
+        savings = Array.isArray(data) ? data : [];
+        byMember = {};
 
-        if (!Array.isArray(data) || data.length === 0) {
-          showTableMessage("No member savings records found.", "text-muted");
-          return;
-        }
-
-        data.forEach(function (item) {
-          const savingsId = String(item.id || "").trim();
-
-          if (!savingsId) return;
-
-          savingsById[savingsId] = item;
-
-          const hasTransactions = Number(item.transactionCount) > 0;
-
-          $("#savingsTable").append(`
-            <tr>
-              <td>${esc(item.memberId)}</td>
-              <td>${esc(item.memberName || "—")}</td>
-              <td>₱${formatAmount(item.balance)}</td>
-              <td>${esc(item.transactionCount)}</td>
-              <td>${esc(formatDate(item.updatedAt))}</td>
-
-              <td class="text-center">
-                <button
-                  type="button"
-                  class="btn btn-secondary btn-sm btn-edit"
-                  data-id="${esc(savingsId)}"
-                  title="Edit"
-                >
-                  <i class="fas fa-edit"></i>
-                </button>
-
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm ml-2 btn-delete"
-                  data-id="${esc(savingsId)}"
-                  title="${hasTransactions ? "Has ledger transactions" : "Delete"}"
-                  ${hasTransactions ? "disabled" : ""}
-                >
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
-            </tr>
-          `);
+        savings.forEach(function (item) {
+          byMember[String(item.memberId)] = item;
         });
+
+        render();
       } catch (error) {
         console.error("Load member savings error:", error);
 
@@ -175,120 +182,69 @@
       }
     }
 
-    async function openModal(data = null) {
-      const form = $("#savingsForm")[0];
+    // ==========================
+    // TRANSACTION MODAL
+    // ==========================
 
-      if (!form) return;
+    function updatePreview() {
+      const member = byMember[String($("#MemberID").val())];
+      const type = String($("#TransactionType").val() || "");
+      const amount = Number($("#Amount").val());
 
-      form.reset();
-      $("#savingsForm .form-control").removeClass("is-invalid");
-      $("#SavingsRecordID").val("");
-      $("#MemberID").prop("disabled", false);
-      $("#Balance").prop("disabled", false).val("0");
+      const $preview = $("#balancePreview");
 
-      try {
-        await loadMembers(data ? String(data.memberId ?? "") : "");
-      } catch (error) {
-        console.error("Load members error:", error);
-
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: errorMessage(error, "Unable to load members."),
-        });
-
+      if (!member || !SIGN[type] || !Number.isFinite(amount) || amount <= 0) {
+        $preview.empty();
         return;
       }
 
-      if (data) {
-        const savingsId = String(data.id || "").trim();
+      const after = round2(Number(member.balance) + SIGN[type] * amount);
 
-        if (!isValidUUID(savingsId)) {
-          Swal.fire({
-            icon: "error",
-            title: "Invalid Savings ID",
-            text: "The selected record does not contain a valid UUID.",
-          });
-
-          return;
-        }
-
-        const locked = Number(data.transactionCount) > 0;
-
-        $("#savingsModalLabel").html(`
-          <i class="fas fa-edit mr-2"></i>
-          Edit Savings Account
-        `);
-
-        $("#SavingsRecordID").val(savingsId);
-        $("#MemberID").val(String(data.memberId ?? ""));
-        $("#Balance").val(data.balance ?? "0");
-
-        $("#BalanceLabel").html(
-          `Current Balance <span class="text-danger">*</span>`,
-        );
-
-        if (locked) {
-          // Balance can only change through the Savings Ledger,
-          // but the member can still be corrected.
-          $("#Balance").prop("disabled", true);
-
-          $("#BalanceHint").text(
-            "This account has ledger transactions, so the balance can only be changed in the Savings Ledger. You can still reassign the account to another member (its transactions move with it).",
-          );
-        } else {
-          $("#BalanceHint").text(
-            "No ledger transactions yet, so the member and balance can still be corrected.",
-          );
-        }
-
-        $("#btnSave")
-          .html(`<i class="fas fa-save mr-1"></i> Update Account`)
-          .prop("disabled", false);
-      } else {
-        $("#savingsModalLabel").html(`
-          <i class="fas fa-plus mr-2"></i>
-          New Savings Account
-        `);
-
-        $("#BalanceLabel").html(
-          `Opening Balance <span class="text-danger">*</span>`,
-        );
-
-        $("#BalanceHint").text(
-          "An opening balance above zero is also recorded as a deposit in the Savings Ledger.",
-        );
-
-        $("#btnSave")
-          .html(`<i class="fas fa-save mr-1"></i> Save Account`)
-          .prop("disabled", false);
-      }
-
-      $("#savingsModal").modal("show");
+      $preview.html(
+        after < 0
+          ? `<span class="text-danger"><i class="fas fa-exclamation-triangle mr-1"></i>Insufficient balance — this would leave −₱${formatAmount(Math.abs(after))}.</span>`
+          : `<span class="text-muted">Balance after this transaction:</span> <strong>₱${formatAmount(after)}</strong>`,
+      );
     }
 
-    function getFormData() {
-      return {
-        memberId: String($("#MemberID").val() || "").trim(),
-        balance: String($("#Balance").val() || "").trim(),
-      };
+    function openModal(memberId) {
+      const member = byMember[String(memberId)];
+
+      if (!member) return;
+
+      $("#transactForm")[0].reset();
+      $("#transactForm .form-control").removeClass("is-invalid");
+      $("#balancePreview").empty();
+
+      $("#MemberID").val(member.memberId);
+      $("#MemberName").val(
+        `${member.memberName || "Member"} (#${member.memberId})`,
+      );
+      $("#CurrentBalance").val("₱" + formatAmount(member.balance));
+
+      $("#transactModal").modal("show");
     }
 
     function validate(data) {
       let valid = true;
 
-      $("#savingsForm .form-control").removeClass("is-invalid");
+      $("#transactForm .form-control").removeClass("is-invalid");
 
-      if (!isValidMemberId(data.memberId)) {
-        $("#MemberID").addClass("is-invalid");
+      if (!SIGN[data.transactionType]) {
+        $("#TransactionType").addClass("is-invalid");
         valid = false;
       }
 
-      const balanceIsValid =
-        /^\d+(\.\d{1,2})?$/.test(data.balance) && Number(data.balance) >= 0;
+      const amountIsValid =
+        /^\d+(\.\d{1,2})?$/.test(data.amount) && Number(data.amount) > 0;
 
-      if (!balanceIsValid) {
-        $("#Balance").addClass("is-invalid");
+      if (!amountIsValid) {
+        $("#Amount").addClass("is-invalid");
+        valid = false;
+      }
+
+      if (data.description.length > 1000) {
+        $("#Description").addClass("is-invalid");
         valid = false;
       }
 
@@ -296,159 +252,227 @@
     }
 
     // ==========================
+    // HISTORY MODAL
+    // ==========================
+
+    function showHistoryMessage(message, className = "") {
+      $("#historyTable").html(`
+        <tr>
+          <td colspan="6" class="text-center ${className}">${esc(message)}</td>
+        </tr>
+      `);
+    }
+
+    function renderHistory() {
+      const filter = String($("#historyFilter").val() || "");
+
+      const list = filter
+        ? historyRows.filter((row) => row.type === filter)
+        : historyRows;
+
+      $("#historyCount").text(
+        filter
+          ? `Showing ${list.length} of ${historyRows.length} transactions`
+          : `${historyRows.length} transaction${historyRows.length === 1 ? "" : "s"}`,
+      );
+
+      if (!list.length) {
+        showHistoryMessage(
+          historyRows.length
+            ? "No transactions match this filter."
+            : "No transactions yet.",
+          "text-muted",
+        );
+        return;
+      }
+
+      const $tbody = $("#historyTable").empty();
+
+      list.forEach(function (row) {
+        const sign = SIGN[row.type] || 1;
+        const isCredit = sign > 0;
+
+        $tbody.append(`
+          <tr>
+            <td class="text-nowrap">${esc(formatDate(row.createdAt))}</td>
+            <td class="text-nowrap">${esc(row.referenceNo || "—")}</td>
+            <td>
+              <span class="ms-badge ${isCredit ? "ms-badge-credit" : "ms-badge-debit"}">
+                ${esc(formatType(row.type))}
+              </span>
+            </td>
+            <td class="text-right text-nowrap ${isCredit ? "amount-credit" : "amount-debit"}">
+              ${isCredit ? "+" : "−"}₱${formatAmount(row.amount)}
+            </td>
+            <td class="text-right text-nowrap">₱${formatAmount(row.balanceAfter)}</td>
+            <td>${esc(row.description || "—")}</td>
+          </tr>
+        `);
+      });
+    }
+
+    function renderHistorySummary() {
+      let totalIn = 0;
+      let totalOut = 0;
+
+      historyRows.forEach(function (row) {
+        const amount = Number(row.amount || 0);
+
+        if ((SIGN[row.type] || 1) > 0) totalIn += amount;
+        else totalOut += amount;
+      });
+
+      $("#historyTotalIn").text("₱" + formatAmount(totalIn));
+      $("#historyTotalOut").text("₱" + formatAmount(totalOut));
+    }
+
+    async function openHistory(memberId) {
+      const member = byMember[String(memberId)];
+
+      if (!member) return;
+
+      const requestId = ++historyRequest;
+
+      historyRows = [];
+
+      $("#historyFilter").val("");
+      $("#historyMemberName").text(
+        `${member.memberName || "Member"} (#${member.memberId})`,
+      );
+      $("#historyBalance").text("₱" + formatAmount(member.balance));
+      $("#historyTotalIn").text("₱0.00");
+      $("#historyTotalOut").text("₱0.00");
+      $("#historyCount").text("");
+
+      showHistoryMessage("Loading transactions...", "text-muted");
+
+      $("#historyModal").modal("show");
+
+      try {
+        const data = await queryUtility.Load(
+          "/member-savings/history/" + encodeURIComponent(member.memberId),
+        );
+
+        // Ignore stale responses if another member was opened meanwhile
+        if (requestId !== historyRequest) return;
+
+        historyRows = Array.isArray(data) ? data : [];
+
+        renderHistorySummary();
+        renderHistory();
+      } catch (error) {
+        if (requestId !== historyRequest) return;
+
+        console.error("Load history error:", error);
+
+        showHistoryMessage(
+          errorMessage(error, "Unable to load transaction history."),
+          "text-danger",
+        );
+      }
+    }
+
+    // ==========================
     // EVENTS
     // ==========================
 
-    $(document).on("click", "#btnAdd", function () {
-      openModal(null);
+    $("#msSearch").on("input", function () {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(render, 200);
     });
 
-    $("#savingsTable").on("click", ".btn-edit", function () {
-      const savingsId = String($(this).attr("data-id") || "").trim();
-
-      if (!isValidUUID(savingsId)) {
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: "Invalid Savings ID.",
-        });
-
-        return;
-      }
-
-      const record = savingsById[savingsId];
-
-      if (!record) {
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: "Savings record was not found.",
-        });
-
-        return;
-      }
-
-      openModal(record);
+    $("#savingsTable").on("click", ".btn-transact", function () {
+      openModal($(this).attr("data-id"));
     });
 
-    $("#savingsForm").on("submit", async function (event) {
+    $("#savingsTable").on("click", ".btn-history", function () {
+      openHistory($(this).attr("data-id"));
+    });
+
+    $("#historyFilter").on("change", renderHistory);
+
+    $("#TransactionType, #Amount").on("input change", updatePreview);
+
+    $("#transactForm").on("submit", async function (event) {
       event.preventDefault();
 
-      const savingsId = String($("#SavingsRecordID").val() || "").trim();
-      const isEdit = savingsId !== "";
-      const payload = getFormData();
+      const member = byMember[String($("#MemberID").val())];
 
-      if (isEdit && !isValidUUID(savingsId)) {
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: "Invalid Savings ID.",
-        });
+      if (!member) return;
 
-        return;
-      }
+      const payload = {
+        memberId: String(member.memberId),
+        transactionType: String($("#TransactionType").val() || "").trim(),
+        amount: String($("#Amount").val() || "").trim(),
+        description: String($("#Description").val() || "").trim(),
+      };
 
       if (!validate(payload)) return;
 
+      const after = round2(
+        Number(member.balance) +
+          SIGN[payload.transactionType] * Number(payload.amount),
+      );
+
+      if (after < 0) {
+        $("#Amount").addClass("is-invalid");
+
+        Swal.fire({
+          icon: "error",
+          title: "Insufficient balance",
+          text: `Current balance is ₱${formatAmount(member.balance)}.`,
+        });
+
+        return;
+      }
+
       const confirmation = await Swal.fire({
-        title: isEdit ? "Update Savings Account?" : "Create Savings Account?",
-        text: isEdit
-          ? "Are you sure you want to update this savings account?"
-          : "Are you sure you want to create this savings account?",
+        title: "Record this transaction?",
+        html: `${esc(formatType(payload.transactionType))} of <b>₱${formatAmount(payload.amount)}</b> for <b>${esc(member.memberName || "this member")}</b>.<br>New balance: <b>₱${formatAmount(after)}</b>`,
         icon: "question",
         showCancelButton: true,
-        confirmButtonText: isEdit ? "Yes, update" : "Yes, create",
+        confirmButtonText: "Yes, record it",
         cancelButtonText: "Cancel",
-        confirmButtonColor: "#4e73df",
-        cancelButtonColor: "#858796",
+        confirmButtonColor: "#991b1b",
+        cancelButtonColor: "#6c757d",
       });
 
       if (!confirmation.isConfirmed) return;
 
       Swal.fire({
-        title: isEdit ? "Updating..." : "Creating...",
+        title: "Saving...",
         allowOutsideClick: false,
-        didOpen: function () {
-          Swal.showLoading();
-        },
+        didOpen: () => Swal.showLoading(),
       });
 
       try {
-        if (isEdit) {
-          await queryUtility.Update(
-            "/member-savings/update-savings/" + encodeURIComponent(savingsId),
-            payload,
-          );
-        } else {
-          await queryUtility.Save("/member-savings/create-savings", payload);
-        }
+        const response = await queryUtility.Save(
+          "/member-savings/transact",
+          payload,
+        );
 
-        $("#savingsModal").modal("hide");
+        $("#transactModal").modal("hide");
 
         await loadSavings();
 
         Swal.close();
 
+        const reference = response?.data?.referenceNo;
+
         Toast.fire({
           icon: "success",
-          title: isEdit
-            ? "Savings account updated successfully."
-            : "Savings account created successfully.",
+          title: reference
+            ? `Transaction recorded (${reference})`
+            : "Transaction recorded.",
         });
       } catch (error) {
-        console.error("Create/update savings error:", error);
+        console.error("Transact error:", error);
 
         Swal.fire({
           icon: "error",
-          title: isEdit ? "Update Failed" : "Create Failed",
+          title: "Transaction failed",
           text: errorMessage(error, "Something went wrong. Please try again."),
-        });
-      }
-    });
-
-    $("#savingsTable").on("click", ".btn-delete", async function () {
-      const savingsId = String($(this).attr("data-id") || "").trim();
-
-      if (!isValidUUID(savingsId)) {
-        Swal.fire({
-          icon: "error",
-          title: "Delete Failed",
-          text: "Invalid Savings ID.",
-        });
-
-        return;
-      }
-
-      const confirmation = await Swal.fire({
-        title: "Delete Savings Account?",
-        text: "This action cannot be undone.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#d33",
-      });
-
-      if (!confirmation.isConfirmed) return;
-
-      try {
-        await queryUtility.Delete(
-          "/member-savings/delete-savings/" + encodeURIComponent(savingsId),
-        );
-
-        await loadSavings();
-
-        Toast.fire({
-          icon: "success",
-          title: "Savings account deleted successfully.",
-        });
-      } catch (error) {
-        console.error("Delete savings error:", error);
-
-        Swal.fire({
-          icon: "error",
-          title: "Delete Failed",
-          text: errorMessage(error, "Unable to delete savings account."),
+          confirmButtonColor: "#991b1b",
         });
       }
     });

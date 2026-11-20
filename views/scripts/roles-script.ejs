@@ -1,298 +1,565 @@
 <script>
-$(document).ready(function () {
+  $(document).ready(function () {
+    /*
+     * Permission levels (same values stored in master_role_permission):
+     *   none < view < write < all
+     * Checking a level also checks the ones below it.
+     */
+    const RANK = { none: 0, view: 1, write: 2, all: 3 };
+    const BY_RANK = ["none", "view", "write", "all"];
 
-    let rolesById = {};
+    const PERMISSIONS = [
+      { key: "view", badge: "VIEW", text: "Can view" },
+      { key: "write", badge: "WRITE", text: "Can create & edit" },
+      { key: "all", badge: "ALL", text: "Full access" },
+    ];
 
-    // ==========================
-    // DATE FORMATTER
-    // ==========================
-    function formatDate(date) {
-        if (!date) return "";
-        return new Date(date).toLocaleString();
-    }
-
-    // ==========================
-    // ESCAPE HTML
-    // ==========================
-    const esc = (v) =>
-        String(v ?? "").replace(
-            /[&<>"']/g,
-            (c) =>
-                ({
-                    "&": "&amp;",
-                    "<": "&lt;",
-                    ">": "&gt;",
-                    '"': "&quot;",
-                    "'": "&#39;",
-                })[c],
-        );
+    let roles = [];
+    let routes = [];
+    let selectedRoleId = null;
+    let savedLevels = {}; // routeId -> level (as saved in the database)
+    let currentLevels = {}; // routeId -> level (what is on screen)
 
     // ==========================
-    // TOAST
+    // HELPERS
     // ==========================
+
     const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
     });
 
     const errorMessage = (err, fallback) =>
-        err?.responseJSON?.message || fallback;
+      err?.responseJSON?.message || err?.message || fallback;
 
-    // ==========================
-    // LOAD ROLES
-    // ==========================
-    async function loadRoles() {
+    const esc = (v) =>
+      String(v ?? "").replace(
+        /[&<>"']/g,
+        (c) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[c],
+      );
 
-        const roles = await queryUtility.Load("/roles/load-role");
+    function levelOf(routeId, map) {
+      return map[String(routeId)] || "none";
+    }
 
-        const $tbody = $("#roleTable").empty();
+    function getRole(id) {
+      return roles.find((r) => String(r.id) === String(id));
+    }
 
-        rolesById = {};
-
-        for (const role of roles) {
-
-            rolesById[role.id] = role;
-
-            $tbody.append(`
-                <tr>
-                    <td>${esc(role.id)}</td>
-                    <td>${esc(role.name)}</td>
-                    <td>${esc(formatDate(role.createdDate))}</td>
-                    <td>${esc(formatDate(role.updatedDate))}</td>
-
-                    <td>
-                        <div class="d-flex justify-content-center align-items-center">
-                            <button
-                                type="button"
-                                class="btn btn-secondary btn-sm btn-edit mr-2"
-                                data-id="${esc(role.id)}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-
-                            <button
-                                type="button"
-                                class="btn btn-danger btn-sm btn-delete"
-                                data-id="${esc(role.id)}">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `);
-
-        }
-
+    function changedCount() {
+      return routes.filter(
+        (r) => levelOf(r.id, currentLevels) !== levelOf(r.id, savedLevels),
+      ).length;
     }
 
     // ==========================
-    // OPEN MODAL
+    // RENDER
     // ==========================
-    function openModal(role) {
 
-        const isEdit = !!role;
+    function renderRoleButtons() {
+      const $wrap = $("#roleButtons").empty();
 
-        $("#roleForm")[0].reset();
-        $("#roleForm .form-control").removeClass("is-invalid");
-
-        $("#roleId").val(isEdit ? role.id : "");
-
-        $("#modalTitle").html(
-            isEdit
-                ? '<i class="fas fa-user-edit mr-2"></i>Edit Role'
-                : '<i class="fas fa-user-tag mr-2"></i>Add Role'
+      if (!roles.length) {
+        $wrap.html(
+          `<span class="text-muted">No roles yet. Click "Add Role" to create one.</span>`,
         );
+        return;
+      }
 
-        if (isEdit) {
-            $("#roleName").val(role.name);
+      roles.forEach(function (role) {
+        const active = String(role.id) === String(selectedRoleId);
+
+        $wrap.append(`
+          <button
+            type="button"
+            class="role-btn ${active ? "active" : ""}"
+            data-id="${esc(role.id)}"
+          >
+            ${esc(role.name)}
+            ${
+              active
+                ? `<span class="role-check"><i class="fas fa-check"></i></span>`
+                : ""
+            }
+          </button>
+        `);
+      });
+    }
+
+    function cardHtml(route) {
+      const rows = PERMISSIONS.map(
+        (p) => `
+          <label class="perm-row" data-permission="${p.key}">
+            <span class="perm-info">
+              <span class="perm-badge ${p.key}">${p.badge}</span>
+              <span class="perm-label">${esc(p.text)} ${esc(route.name)}</span>
+            </span>
+
+            <input
+              type="checkbox"
+              class="perm-check"
+              data-route-id="${esc(route.id)}"
+              data-permission="${p.key}"
+            />
+          </label>
+        `,
+      ).join("");
+
+      return `
+        <div class="col-xl-4 col-md-6 mb-4">
+          <div class="perm-card" data-route-id="${esc(route.id)}">
+            <div class="perm-card-header">
+              <span class="perm-card-title">${esc(route.name)}</span>
+
+              <button
+                type="button"
+                class="btn-module-toggle"
+                data-route-id="${esc(route.id)}"
+              >
+                Select All
+              </button>
+            </div>
+
+            <div class="perm-card-body">${rows}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateCard(routeId) {
+      const level = levelOf(routeId, currentLevels);
+      const rank = RANK[level];
+      const $card = $(`.perm-card[data-route-id="${routeId}"]`);
+
+      PERMISSIONS.forEach(function (p) {
+        const checked = rank >= RANK[p.key];
+        const $input = $card.find(`.perm-check[data-permission="${p.key}"]`);
+
+        $input.prop("checked", checked);
+        $input.closest(".perm-row").toggleClass("checked", checked);
+      });
+
+      $card
+        .find(".btn-module-toggle")
+        .text(level === "all" ? "Deselect All" : "Select All");
+
+      $card.toggleClass("changed", level !== levelOf(routeId, savedLevels));
+    }
+
+    function renderModules() {
+      const $grid = $("#moduleGrid").empty();
+
+      if (selectedRoleId === null) {
+        $grid.html(
+          `<div class="col-12 text-center text-muted py-4">Select or add a role to manage its permissions.</div>`,
+        );
+        return;
+      }
+
+      if (!routes.length) {
+        $grid.html(
+          `<div class="col-12 text-center text-muted py-4">No routes found.</div>`,
+        );
+        return;
+      }
+
+      routes.forEach((route) => $grid.append(cardHtml(route)));
+      routes.forEach((route) => updateCard(route.id));
+    }
+
+    function updateActionBar() {
+      const role = getRole(selectedRoleId);
+      const hasRole = !!role;
+      const count = changedCount();
+
+      $("#selectedRoleName").text(role ? role.name : "—");
+
+      $("#btnUpdate")
+        .prop("disabled", !hasRole || count === 0)
+        .html(`<i class="fas fa-save mr-1"></i> Update Permissions (${count})`);
+
+      $("#btnResetAll").prop("disabled", !hasRole || count === 0);
+      $("#btnEditRole, #btnDeleteRole").prop("disabled", !hasRole);
+    }
+
+    // ==========================
+    // LOAD
+    // ==========================
+
+    async function loadRoles() {
+      const data = await queryUtility.Load("/roles/load-role");
+      roles = Array.isArray(data) ? data : [];
+    }
+
+    async function loadRoutes() {
+      const data = await queryUtility.Load("/roles/load-routes");
+      routes = Array.isArray(data) ? data : [];
+    }
+
+    async function loadRolePermissions(roleId) {
+      const rows = await queryUtility.Load(
+        "/roles/load-permission/" + encodeURIComponent(roleId),
+      );
+
+      savedLevels = {};
+
+      (Array.isArray(rows) ? rows : []).forEach(function (row) {
+        const permission = String(row.permission || "").toLowerCase();
+
+        if (!RANK[permission]) return; // ignores unknown values and "none"
+
+        const key = String(row.routeId);
+
+        if (RANK[permission] > RANK[levelOf(key, savedLevels)]) {
+          savedLevels[key] = permission;
         }
+      });
 
-        $("#roleModal").modal("show");
-
+      currentLevels = { ...savedLevels };
     }
 
-    // ==========================
-    // GET FORM DATA
-    // ==========================
-    function getFormData() {
+    async function selectRole(roleId, force = false) {
+      if (!force && String(roleId) === String(selectedRoleId)) return;
 
-        return {
-            Name: $("#roleName").val().trim(),
-        };
-
-    }
-
-    // ==========================
-    // VALIDATE
-    // ==========================
-    function validate(data) {
-
-        const checks = {
-            "#roleName": !!data.Name,
-        };
-
-        let valid = true;
-
-        for (const [selector, ok] of Object.entries(checks)) {
-            $(selector).toggleClass("is-invalid", !ok);
-            if (!ok) valid = false;
-        }
-
-        return valid;
-
-    }
-
-    // ==========================
-    // ADD BUTTON
-    // ==========================
-    $("#btnAdd").on("click", () => openModal(null));
-
-    // ==========================
-    // EDIT BUTTON
-    // ==========================
-    $("#roleTable").on("click", ".btn-edit", function () {
-
-        const role = rolesById[$(this).data("id")];
-
-        if (role) openModal(role);
-
-    });
-
-    // ==========================
-    // SAVE
-    // ==========================
-    $("#roleForm").on("submit", async function (e) {
-
-        e.preventDefault();
-
-        const id = $("#roleId").val();
-        const isEdit = id !== "";
-
-        const payload = getFormData();
-
-        if (!validate(payload)) return;
-
-        const confirm = await Swal.fire({
-            title: isEdit ? "Save changes?" : "Add this Role?",
-            text: isEdit
-                ? `Update "${payload.Name}"?`
-                : `Add "${payload.Name}" to the role list?`,
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonText: isEdit ? "Yes, save" : "Yes, add",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#991b1b",
-            cancelButtonColor: "#6c757d",
+      if (!force && changedCount() > 0) {
+        const confirmation = await Swal.fire({
+          title: "Discard unsaved changes?",
+          text: "You have unsaved permission changes for this role.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, discard",
+          cancelButtonText: "Keep editing",
+          confirmButtonColor: "#991b1b",
+          cancelButtonColor: "#6c757d",
         });
 
-        if (!confirm.isConfirmed) return;
+        if (!confirmation.isConfirmed) return;
+      }
+
+      selectedRoleId = roleId;
+      renderRoleButtons();
+
+      try {
+        await loadRolePermissions(roleId);
+      } catch (err) {
+        console.error("Load permissions error:", err);
+
+        savedLevels = {};
+        currentLevels = {};
 
         Swal.fire({
-            title: "Saving...",
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading(),
+          icon: "error",
+          title: "Error",
+          text: errorMessage(err, "Unable to load permissions."),
+          confirmButtonColor: "#991b1b",
+        });
+      }
+
+      renderModules();
+      updateActionBar();
+    }
+
+    // ==========================
+    // PERMISSION EVENTS
+    // ==========================
+
+    $("#moduleGrid").on("change", ".perm-check", function () {
+      const routeId = String($(this).data("route-id"));
+      const rank = RANK[$(this).data("permission")];
+
+      // checking sets that level; unchecking drops to the level below it
+      currentLevels[routeId] = BY_RANK[this.checked ? rank : rank - 1];
+
+      updateCard(routeId);
+      updateActionBar();
+    });
+
+    $("#moduleGrid").on("click", ".btn-module-toggle", function () {
+      const routeId = String($(this).data("route-id"));
+
+      currentLevels[routeId] =
+        levelOf(routeId, currentLevels) === "all" ? "none" : "all";
+
+      updateCard(routeId);
+      updateActionBar();
+    });
+
+    $("#btnResetAll").on("click", function () {
+      currentLevels = { ...savedLevels };
+
+      renderModules();
+      updateActionBar();
+    });
+
+    $("#btnUpdate").on("click", async function () {
+      const role = getRole(selectedRoleId);
+      const count = changedCount();
+
+      if (!role || count === 0) return;
+
+      const confirmation = await Swal.fire({
+        title: "Update permissions?",
+        text: `Save ${count} change${count > 1 ? "s" : ""} for "${role.name}"?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, update",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#991b1b",
+        cancelButtonColor: "#6c757d",
+      });
+
+      if (!confirmation.isConfirmed) return;
+
+      const permissions = routes
+        .filter((r) => levelOf(r.id, currentLevels) !== "none")
+        .map((r) => ({
+          routeId: r.id,
+          permission: levelOf(r.id, currentLevels),
+        }));
+
+      Swal.fire({
+        title: "Saving...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        await queryUtility.Update(
+          "/roles/save-permissions/" + encodeURIComponent(role.id),
+          { Permissions: JSON.stringify(permissions) },
+        );
+
+        await Swal.fire({
+          icon: "success",
+          title: "Permissions updated",
+          text: "Reloading the page...",
+          timer: 1200,
+          showConfirmButton: false,
+          allowOutsideClick: false,
         });
 
-        try {
+        // Reload so the sidebar is rebuilt from the new permissions
+        window.location.reload();
+      } catch (err) {
+        console.error("Save permissions error:", err);
 
-            if (isEdit) {
-
-                await queryUtility.Update(
-                    `/roles/update-role/${encodeURIComponent(id)}`,
-                    payload
-                );
-
-            } else {
-
-                await queryUtility.Save(
-                    "/roles/create-role",
-                    payload
-                );
-
-            }
-
-            $("#roleModal").modal("hide");
-
-            await loadRoles();
-
-            Swal.close();
-
-            Toast.fire({
-                icon: "success",
-                title: isEdit
-                    ? "Role updated successfully"
-                    : "Role added successfully",
-            });
-
-        } catch (err) {
-
-            Swal.fire({
-                icon: "error",
-                title: isEdit ? "Update failed" : "Create failed",
-                text: errorMessage(err, "Something went wrong. Please try again."),
-                confirmButtonColor: "#991b1b",
-            });
-
-        }
-
+        Swal.fire({
+          icon: "error",
+          title: "Update failed",
+          text: errorMessage(err, "Something went wrong. Please try again."),
+          confirmButtonColor: "#991b1b",
+        });
+      }
     });
 
     // ==========================
-    // DELETE
+    // ROLE EVENTS
     // ==========================
-    $("#roleTable").on("click", ".btn-delete", async function () {
 
-        const id = $(this).data("id");
+    $("#roleButtons").on("click", ".role-btn", function () {
+      selectRole($(this).data("id"));
+    });
 
-        const role = rolesById[id];
+    function openRoleModal(role) {
+      const isEdit = !!role;
 
-        if (!role) return;
+      $("#roleForm")[0].reset();
+      $("#roleForm .form-control").removeClass("is-invalid");
 
-        const confirm = await Swal.fire({
-            title: "Delete this role?",
-            text: `"${role.name}" will be permanently removed.`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, delete",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#dc3545",
-            cancelButtonColor: "#6c757d",
-        });
+      $("#roleId").val(isEdit ? role.id : "");
 
-        if (!confirm.isConfirmed) return;
+      $("#modalTitle").html(
+        isEdit
+          ? '<i class="fas fa-user-edit mr-2"></i>Edit Role'
+          : '<i class="fas fa-user-tag mr-2"></i>Add Role',
+      );
 
-        try {
+      if (isEdit) {
+        $("#roleName").val(role.name);
+      }
 
-            await queryUtility.Delete(
-                `/roles/delete-role/${encodeURIComponent(id)}`
-            );
+      $("#roleModal").modal("show");
+    }
 
-            await loadRoles();
+    $("#btnAddRole").on("click", () => openRoleModal(null));
 
-            Toast.fire({
-                icon: "success",
-                title: "Role deleted successfully",
-            });
+    $("#btnEditRole").on("click", function () {
+      const role = getRole(selectedRoleId);
 
-        } catch (err) {
+      if (role) openRoleModal(role);
+    });
 
-            Swal.fire({
-                icon: "error",
-                title: "Delete failed",
-                text: errorMessage(err, "Something went wrong. Please try again."),
-                confirmButtonColor: "#991b1b",
-            });
+    $("#roleForm").on("submit", async function (e) {
+      e.preventDefault();
 
+      const id = String($("#roleId").val() || "");
+      const isEdit = id !== "";
+      const payload = { Name: String($("#roleName").val() || "").trim() };
+
+      $("#roleName").toggleClass("is-invalid", !payload.Name);
+
+      if (!payload.Name) return;
+
+      const confirmation = await Swal.fire({
+        title: isEdit ? "Save changes?" : "Add this role?",
+        text: isEdit
+          ? `Rename this role to "${payload.Name}"?`
+          : `Add "${payload.Name}" to the role list?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: isEdit ? "Yes, save" : "Yes, add",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#991b1b",
+        cancelButtonColor: "#6c757d",
+      });
+
+      if (!confirmation.isConfirmed) return;
+
+      Swal.fire({
+        title: "Saving...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        if (isEdit) {
+          await queryUtility.Update(
+            "/roles/update-role/" + encodeURIComponent(id),
+            payload,
+          );
+        } else {
+          await queryUtility.Save("/roles/create-role", payload);
         }
 
+        $("#roleModal").modal("hide");
+
+        await loadRoles();
+
+        Swal.close();
+
+        Toast.fire({
+          icon: "success",
+          title: isEdit
+            ? "Role updated successfully"
+            : "Role added successfully",
+        });
+
+        if (isEdit) {
+          renderRoleButtons();
+          updateActionBar();
+        } else {
+          const created = roles.find(
+            (r) => String(r.name).toLowerCase() === payload.Name.toLowerCase(),
+          );
+
+          if (created) {
+            await selectRole(created.id);
+          } else {
+            renderRoleButtons();
+          }
+        }
+      } catch (err) {
+        console.error("Save role error:", err);
+
+        Swal.fire({
+          icon: "error",
+          title: isEdit ? "Update failed" : "Create failed",
+          text: errorMessage(err, "Something went wrong. Please try again."),
+          confirmButtonColor: "#991b1b",
+        });
+      }
+    });
+
+    $("#btnDeleteRole").on("click", async function () {
+      const role = getRole(selectedRoleId);
+
+      if (!role) return;
+
+      const confirmation = await Swal.fire({
+        title: "Delete this role?",
+        text: `"${role.name}" and all of its permissions will be permanently removed.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+      });
+
+      if (!confirmation.isConfirmed) return;
+
+      try {
+        await queryUtility.Delete(
+          "/roles/delete-role/" + encodeURIComponent(role.id),
+        );
+
+        selectedRoleId = null;
+        savedLevels = {};
+        currentLevels = {};
+
+        await loadRoles();
+
+        if (roles.length) {
+          await selectRole(roles[0].id, true);
+        } else {
+          renderRoleButtons();
+          renderModules();
+          updateActionBar();
+        }
+
+        Toast.fire({
+          icon: "success",
+          title: "Role deleted successfully",
+        });
+      } catch (err) {
+        console.error("Delete role error:", err);
+
+        Swal.fire({
+          icon: "error",
+          title: "Delete failed",
+          text: errorMessage(err, "Something went wrong. Please try again."),
+          confirmButtonColor: "#991b1b",
+        });
+      }
     });
 
     // ==========================
     // INITIAL LOAD
     // ==========================
-    loadRoles();
 
-});
+    async function init() {
+      try {
+        await loadRoles();
+        await loadRoutes();
+
+        if (roles.length) {
+          await selectRole(roles[0].id, true);
+        } else {
+          renderRoleButtons();
+          renderModules();
+          updateActionBar();
+        }
+      } catch (err) {
+        console.error("Init error:", err);
+
+        $("#moduleGrid").html(
+          `<div class="col-12 text-center text-danger py-4">${esc(
+            errorMessage(err, "Unable to load roles and permissions."),
+          )}</div>`,
+        );
+      }
+    }
+
+    init();
+  });
 </script>

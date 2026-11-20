@@ -1,214 +1,547 @@
-/* ==========================================================
-   MEMBER SAVINGS PAGE
-========================================================== */
 
 /* ==========================================================
-   PAGE TITLE
+   TRANSACTION HISTORY MODAL
 ========================================================== */
 
-.member-savings-title{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:24px;
-
-    color:var(--text);
-    font-size:30px;
-    font-weight:700;
+#historyModal {
+    padding-right: 0 !important;
 }
 
-.member-savings-title i{
-    color:var(--primary);
+#historyModal .modal-dialog {
+    width: calc(100% - 32px);
+    max-width: 1100px;
+    margin: 1.75rem auto;
+}
+
+#historyModal .modal-content {
+    background: var(--card, #171717);
+    color: var(--text, #f9fafb);
+    border: 1px solid var(--border, rgba(255,255,255,.10));
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
 }
 
 /* ==========================================================
-   MEMBER SAVINGS CARD
+   MODAL HEADER
 ========================================================== */
 
-.member-savings-table{
-    background:var(--card);
+#historyModal .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
+    padding: 20px 26px;
 
-    border:1px solid var(--border);
-    border-radius:18px;
-
-    overflow:hidden;
-
-    box-shadow:0 12px 35px rgba(0,0,0,.15);
-}
-
-.member-savings-table .card-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:12px;
-
-    padding:16px 24px;
-
-    border:none;
-
-    background:linear-gradient(
+    background: linear-gradient(
         135deg,
-        var(--primary),
-        var(--primary-hover)
+        var(--primary, #991b1b),
+        var(--primary-hover, #7f1d1d)
     );
+
+    border: none;
+    color: #fff;
 }
 
-.member-savings-table .card-header h5,
-.member-savings-table .card-header h6{
-    margin:0;
+#historyModal .modal-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
 
-    color:#fff;
-
-    font-size:18px;
-    font-weight:700;
+    color: #fff;
+    font-size: 21px;
+    font-weight: 700;
+    margin: 0;
 }
 
-.member-savings-table .card-body{
-    background:transparent;
-    padding:24px;
+#historyModal .modal-title i {
+    font-size: 21px;
+}
+
+#historyModal #historyMemberName {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,.90);
+}
+
+#historyModal .modal-header .close {
+    color: #fff;
+    opacity: .9;
+    text-shadow: none;
+    font-size: 27px;
+    outline: none;
+    transition: .2s ease;
+}
+
+#historyModal .modal-header .close:hover {
+    opacity: 1;
+    transform: scale(1.1);
 }
 
 /* ==========================================================
-   TABLE
+   MODAL BODY
 ========================================================== */
 
-.member-savings-table table{
-    margin-bottom:0;
+#historyModal .modal-body {
+    padding: 26px 28px;
+    background: var(--card, #171717);
 }
 
-.member-savings-table th,
-.member-savings-table td{
-    text-align:center;
-    vertical-align:middle;
-}
-
-/* Member ID */
-.member-savings-table td:first-child{
-    font-weight:600;
-}
-
-/* Member Name */
-.member-savings-table td:nth-child(2){
-    text-align:left;
-}
-
-/* Current Balance */
-.member-savings-table td:nth-child(3){
-    font-weight:600;
-}
-
-/* Transactions */
-.member-savings-table td:nth-child(4){
-    font-weight:600;
-}
-
-/* Last Updated */
-.member-savings-table td:nth-child(5){
-    white-space:nowrap;
-}
-
-/* Action */
-.member-savings-table th:last-child,
-.member-savings-table td:last-child{
-    width:140px;
-    white-space:nowrap;
-}
 /* ==========================================================
-   ADD BUTTON
+   SUMMARY CARDS
 ========================================================== */
 
-.member-savings-table .card-header #btnAdd,
-.member-savings-table .card-header .btn-add{
+#historyModal .history-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
 
-    display:inline-flex !important;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-
-    min-height:44px;
-    padding:0 22px !important;
-
-    background:#6b7280 !important;
-    color:#ffffff !important;
-
-    border:1px solid #6b7280 !important;
-    border-radius:12px !important;
-
-    font-size:14px;
-    font-weight:600;
-    white-space:nowrap;
-
-    box-shadow:0 10px 24px rgba(107,114,128,.30);
-
-    transition:all .25s ease;
+    margin-bottom: 26px;
 }
 
-.member-savings-table .card-header #btnAdd i,
-.member-savings-table .card-header .btn-add i{
-    color:#ffffff !important;
+#historyModal .summary-box {
+    position: relative;
+
+    min-width: 0;
+    padding: 18px 20px;
+
+    background: rgba(255,255,255,.045);
+    border: 1px solid var(--border, rgba(255,255,255,.10));
+    border-left: 4px solid var(--primary, #991b1b);
+
+    border-radius: 12px;
+
+    transition: all .25s ease;
 }
 
-.member-savings-table .card-header #btnAdd:hover,
-.member-savings-table .card-header .btn-add:hover{
-
-    background:#4b5563 !important;
-    border-color:#4b5563 !important;
-
-    color:#ffffff !important;
-
-    transform:translateY(-2px);
-
-    box-shadow:0 16px 34px rgba(75,85,99,.40);
+#historyModal .summary-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.12);
 }
 
-.member-savings-table .card-header #btnAdd:hover i,
-.member-savings-table .card-header .btn-add:hover i{
-    color:#ffffff !important;
+#historyModal .summary-box.in {
+    border-left-color: #16a34a;
 }
 
-.member-savings-table .card-header #btnAdd:focus,
-.member-savings-table .card-header .btn-add:focus,
-.member-savings-table .card-header #btnAdd:active,
-.member-savings-table .card-header .btn-add:active{
-
-    background:#374151 !important;
-    border-color:#374151 !important;
-    color:#ffffff !important;
-
-    box-shadow:none !important;
-
-    transform:scale(.97);
+#historyModal .summary-box.out {
+    border-left-color: #ef4444;
 }
 
-.member-savings-table .card-header #btnAdd:focus i,
-.member-savings-table .card-header .btn-add:focus i,
-.member-savings-table .card-header #btnAdd:active i,
-.member-savings-table .card-header .btn-add:active i{
-    color:#ffffff !important;
+#historyModal .summary-label {
+    margin-bottom: 9px;
+
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+
+    color: var(--text-muted, #9ca3af);
+}
+
+#historyModal .summary-value {
+    font-size: 23px;
+    font-weight: 700;
+    line-height: 1.3;
+
+    color: var(--text, #f9fafb);
+    overflow-wrap: anywhere;
+}
+
+#historyModal #historyTotalIn {
+    color: #22c55e !important;
+}
+
+#historyModal #historyTotalOut {
+    color: #ef4444 !important;
+}
+
+/* ==========================================================
+   HISTORY TOOLBAR
+========================================================== */
+
+#historyModal .history-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+
+    margin-bottom: 15px;
+}
+
+#historyModal #historyCount {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted, #9ca3af);
+}
+
+#historyModal #historyFilter {
+    width: 250px;
+    max-width: 100%;
+    height: 43px;
+
+    padding: 8px 14px;
+
+    background: var(--input-bg, #252525);
+    color: var(--text, #f9fafb);
+
+    border: 1px solid var(--border, rgba(255,255,255,.15));
+    border-radius: 10px;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    outline: none;
+    box-shadow: none;
+}
+
+#historyModal #historyFilter:focus {
+    border-color: var(--primary, #991b1b);
+    box-shadow: 0 0 0 3px rgba(153,27,27,.15);
+}
+
+/* ==========================================================
+   TRANSACTION TABLE CONTAINER
+========================================================== */
+
+#historyModal .history-table-wrap {
+    width: 100%;
+    max-width: 100%;
+
+    max-height: 420px;
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    border: 1px solid var(--border, rgba(255,255,255,.10));
+    border-radius: 12px;
+
+    background: transparent;
+
+    scrollbar-width: thin;
+    scrollbar-color: #991b1b transparent;
+}
+
+#historyModal .history-table-wrap::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+#historyModal .history-table-wrap::-webkit-scrollbar-thumb {
+    background: #991b1b;
+    border-radius: 10px;
+}
+
+#historyModal .history-table-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* ==========================================================
+   TRANSACTION TABLE
+========================================================== */
+
+#historyModal .history-table-wrap table {
+    width: 100%;
+    min-width: 950px;
+
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    color: var(--text, #f9fafb);
+}
+
+#historyModal .history-table-wrap thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    padding: 16px 18px;
+
+    background: var(--primary, #991b1b);
+    color: #fff;
+
+    border: none;
+
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+#historyModal .history-table-wrap thead th:first-child {
+    border-radius: 0;
+}
+
+#historyModal .history-table-wrap tbody td {
+    padding: 17px 18px;
+
+    color: var(--text, #f9fafb);
+
+    border-top: 1px solid var(--border, rgba(255,255,255,.08));
+
+    font-size: 13px;
+    font-weight: 500;
+
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+#historyModal .history-table-wrap tbody tr {
+    background: transparent;
+    transition: background .2s ease;
+}
+
+#historyModal .history-table-wrap tbody tr:hover {
+    background: rgba(153,27,27,.08);
+}
+
+/* Description column */
+#historyModal .history-table-wrap tbody td:last-child {
+    white-space: normal;
+    min-width: 180px;
+    max-width: 260px;
+}
+
+/* ==========================================================
+   TRANSACTION TYPE BADGES
+========================================================== */
+
+#historyModal .ms-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px 12px;
+
+    border-radius: 30px;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+
+    white-space: nowrap;
+}
+
+#historyModal .ms-badge-credit {
+    background: rgba(22,163,74,.13);
+    color: #22c55e;
+    border: 1px solid rgba(22,163,74,.25);
+}
+
+#historyModal .ms-badge-debit {
+    background: rgba(220,38,38,.13);
+    color: #ef4444;
+    border: 1px solid rgba(220,38,38,.25);
+}
+
+/* ==========================================================
+   AMOUNT COLORS
+========================================================== */
+
+#historyModal .amount-credit {
+    color: #22c55e !important;
+    font-weight: 700;
+}
+
+#historyModal .amount-debit {
+    color: #ef4444 !important;
+    font-weight: 700;
+}
+
+/* ==========================================================
+   EMPTY / LOADING TABLE
+========================================================== */
+
+#historyModal .history-table-wrap .text-muted {
+    color: var(--text-muted, #9ca3af) !important;
+}
+
+#historyModal .history-table-wrap tbody td[colspan] {
+    padding: 35px 15px;
+    text-align: center;
+}
+
+/* ==========================================================
+   MODAL FOOTER
+========================================================== */
+
+#historyModal .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    padding: 16px 26px;
+
+    background: var(--card, #171717);
+    border-top: 1px solid var(--border, rgba(255,255,255,.10));
+}
+
+#historyModal .modal-footer .btn {
+    min-width: 125px;
+    min-height: 43px;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+    font-weight: 700;
 }
 
 /* ==========================================================
    LIGHT MODE
 ========================================================== */
 
-html:not(.dark) .member-savings-table{
-    background:rgba(255,255,255,.18);
-    border:1px solid rgba(255,255,255,.20);
+html:not(.dark) #historyModal .modal-content {
+    background: #ffffff;
+    color: #1f2937;
+    border-color: #e5e7eb;
+}
+
+html:not(.dark) #historyModal .modal-body,
+html:not(.dark) #historyModal .modal-footer {
+    background: #ffffff;
+}
+
+html:not(.dark) #historyModal .summary-box {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+}
+
+html:not(.dark) #historyModal .summary-label {
+    color: #6b7280;
+}
+
+html:not(.dark) #historyModal .summary-value {
+    color: #1f2937;
+}
+
+html:not(.dark) #historyModal #historyFilter {
+    background: #ffffff;
+    color: #374151;
+    border-color: #d1d5db;
+}
+
+html:not(.dark) #historyModal .history-table-wrap {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+html:not(.dark) #historyModal .history-table-wrap tbody td {
+    color: #374151;
+    border-color: #e5e7eb;
+}
+
+html:not(.dark) #historyModal .history-table-wrap tbody tr:hover {
+    background: #fff5f5;
+}
+
+html:not(.dark) #historyModal .modal-footer {
+    border-color: #e5e7eb;
 }
 
 /* ==========================================================
    DARK MODE
 ========================================================== */
 
-html.dark .member-savings-table{
-    background:rgba(22,22,22,.38);
-    border-color:rgba(255,255,255,.08);
+html.dark #historyModal .modal-content {
+    background: #171717;
+    border-color: rgba(255,255,255,.08);
 }
 
-html.dark .member-savings-table .card-body{
-    background:transparent;
+html.dark #historyModal .modal-body,
+html.dark #historyModal .modal-footer {
+    background: #171717;
+}
+
+html.dark #historyModal .summary-box {
+    background: rgba(255,255,255,.035);
+    border-color: rgba(255,255,255,.08);
+}
+
+html.dark #historyModal .history-table-wrap {
+    background: #171717;
+    border-color: rgba(255,255,255,.08);
+}
+
+html.dark #historyModal .history-table-wrap tbody td {
+    color: #e5e7eb;
+    border-color: rgba(255,255,255,.08);
+}
+
+/* ==========================================================
+   RESPONSIVE DESIGN
+========================================================== */
+
+@media (max-width: 767px) {
+
+    #historyModal .modal-dialog {
+        width: calc(100% - 20px);
+        margin: 10px auto;
+    }
+
+    #historyModal .modal-header {
+        padding: 16px 18px;
+    }
+
+    #historyModal .modal-title {
+        font-size: 17px;
+        gap: 7px;
+    }
+
+    #historyModal #historyMemberName {
+        font-size: 12px;
+    }
+
+    #historyModal .modal-body {
+        padding: 18px;
+    }
+
+    #historyModal .history-summary {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    #historyModal .summary-box {
+        padding: 14px 16px;
+    }
+
+    #historyModal .summary-value {
+        font-size: 20px;
+    }
+
+    #historyModal .history-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    #historyModal #historyFilter {
+        width: 100%;
+    }
+
+    #historyModal .history-table-wrap {
+        max-height: 350px;
+    }
+
+    #historyModal .modal-footer {
+        padding: 14px 18px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+
+    #historyModal .modal-dialog {
+        max-width: 95%;
+    }
+
+    #historyModal .history-summary {
+        gap: 10px;
+    }
+
+    #historyModal .summary-box {
+        padding: 15px;
+    }
 }

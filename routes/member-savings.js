@@ -5,52 +5,69 @@ const crypto = require("crypto");
 const { Query } = require("../database/config/db.js");
 
 /*
- * !! CHANGE THESE 3 to match your members table !!
- * (If the name is split into first/last, use an expression such as
- *  "CONCAT(mm_firstname, ' ', mm_lastname)" for MEMBER_NAME.)
- */
-const MEMBER_TABLE = "master_members";
-const MEMBER_ID = "mm_id";
-const MEMBER_NAME = "mm_fullname";
-
-/*
- * member_savings: ms_id (UUID), ms_member_id (INT, one row per member),
- *                 ms_current_balance DECIMAL(15,2), ms_update_at DATETIME
+ * Member savings accounts are created automatically with the member
+ * (see routes/members.js). Money moves through POST /transact, which
+ * updates the balance and writes the ledger entry together.
  */
 
-const UUID_REGEX =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-// ==========================
-// HELPERS
-// ==========================
+const allowedTypes = [
+    "DEPOSIT",
+    "WITHDRAWAL",
+    "INTEREST_PAYOUT",
+    "PENALTY",
+    "ADJUSTMENT",
+    "TRANSFER"
+];
 
 const round2 = (n) => Math.round(Number(n) * 100) / 100;
 
-function isValidUUID(value) {
-    return UUID_REGEX.test(String(value || "").trim());
+function getSignedAmount(type, amount) {
+    switch (type) {
+        case "DEPOSIT":
+        case "INTEREST_PAYOUT":
+        case "ADJUSTMENT":
+        case "TRANSFER":
+            return Number(amount);
+
+        case "WITHDRAWAL":
+        case "PENALTY":
+            return -Number(amount);
+
+        default:
+            throw new Error("Invalid transaction type.");
+    }
 }
 
-function validateSavings(body) {
+function validateTransaction(body) {
     const memberId = Number(body.memberId);
-    const balance = Number(body.balance === "" ? 0 : body.balance);
+    const type = String(body.transactionType || "").trim();
+    const amount = Number(body.amount);
+    const description = String(body.description || "").trim();
 
     if (!Number.isInteger(memberId) || memberId <= 0) {
         return { error: "Valid member is required." };
     }
 
-    if (!Number.isFinite(balance) || balance < 0) {
-        return { error: "Balance must be zero or greater." };
+    if (!allowedTypes.includes(type)) {
+        return { error: "Invalid transaction type." };
     }
 
-    if (round2(balance) !== balance) {
-        return { error: "Balance can only have up to 2 decimal places." };
+    if (!Number.isFinite(amount) || amount <= 0) {
+        return { error: "Amount must be greater than zero." };
     }
 
-    return { value: { memberId, balance } };
+    if (round2(amount) !== amount) {
+        return { error: "Amount can only have up to 2 decimal places." };
+    }
+
+    if (description.length > 1000) {
+        return { error: "Description cannot exceed 1,000 characters." };
+    }
+
+    return { value: { memberId, type, amount, description } };
 }
 
-// Same format as the Savings Ledger: P + YYYYMM + - + 4 digits
+// Format: P + YYYYMM + - + 4 digits  (e.g. P202611-0001)
 async function generateReferenceNo() {
     const now = new Date();
     const prefix =
@@ -84,26 +101,56 @@ async function generateReferenceNo() {
     return prefix + String(next).padStart(4, "0");
 }
 
-async function countTransactions(memberId) {
+async function getBalance(memberId) {
     const rows = await Query(
-        `SELECT COUNT(*) AS total
-         FROM savings_ledger
-         WHERE sl_savings_id = ?`,
+        `SELECT ms_current_balance
+         FROM member_savings
+         WHERE ms_member_id = ?`,
         [memberId]
     );
 
-    return Number(rows[0].total || 0);
+    return rows.length ? Number(rows[0].ms_current_balance) : null;
 }
 
-async function memberExists(memberId) {
-    const rows = await Query(
-        `SELECT ${MEMBER_ID} AS id
-         FROM ${MEMBER_TABLE}
-         WHERE ${MEMBER_ID} = ?`,
-        [memberId]
-    );
+// The reference number is the primary key, so retry if two users collide
+async function insertLedger(entry) {
+    for (let attempt = 0; attempt < 5; attempt++) {
+        const referenceNo = await generateReferenceNo();
 
-    return rows.length > 0;
+        try {
+            await Query(
+                `INSERT INTO savings_ledger (
+                    sl_id,
+                    sl_savings_id,
+                    sl_transaction_type,
+                    sl_amount,
+                    sl_balance_after,
+                    sl_reference_no,
+                    sl_description,
+                    sl_create_by,
+                    sl_create_date
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    crypto.randomUUID(),
+                    entry.memberId,
+                    entry.type,
+                    entry.amount,
+                    entry.balanceAfter,
+                    referenceNo,
+                    entry.description || null,
+                    entry.createdBy,
+                    new Date()
+                ]
+            );
+
+            return referenceNo;
+        } catch (err) {
+            if (err.code !== "ER_DUP_ENTRY") throw err;
+        }
+    }
+
+    throw new Error("Unable to generate a unique reference number.");
 }
 
 // ==========================
@@ -114,78 +161,42 @@ router.get("/", function (req, res) {
     res.render("layout/main-layout", {
         body: "../pages/membersavings-page.ejs",
         title: "Member Savings",
-        pageStyle: "member-savings.css",
+        pageStyle: "savings-ledger.css",
         pageScript: "../scripts/membersavings-script.ejs",
         roleName: req.session.roleName
     });
 });
 
 // ==========================
-// LOAD MEMBERS (dropdown)
-// ==========================
-
-router.get("/load-members", async function (req, res) {
-    try {
-        const data = await Query(
-            `SELECT
-                m.${MEMBER_ID} AS id,
-                ${MEMBER_NAME} AS name,
-                EXISTS (
-                    SELECT 1
-                    FROM member_savings ms
-                    WHERE ms.ms_member_id = m.${MEMBER_ID}
-                ) AS hasSavings
-             FROM ${MEMBER_TABLE} m
-             ORDER BY name ASC`
-        );
-
-        res.json(
-            data.map(function (row) {
-                return {
-                    id: row.id,
-                    name: row.name,
-                    hasSavings: Number(row.hasSavings) === 1
-                };
-            })
-        );
-    } catch (err) {
-        console.error("Load Members:", err);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to load members."
-        });
-    }
-});
-
-// ==========================
 // LOAD MEMBER SAVINGS
+// (every member is listed, even one without an account yet)
 // ==========================
 
 router.get("/load-savings", async function (req, res) {
     try {
         const data = await Query(
             `SELECT
-                ms.ms_id                 AS id,
-                ms.ms_member_id          AS memberId,
-                ${MEMBER_NAME}           AS memberName,
-                ms.ms_current_balance    AS balance,
-                ms.ms_update_at          AS updatedAt,
+                mm.mm_id                          AS memberId,
+                mm.mm_employee_id                 AS employeeId,
+                mm.mm_fullname                    AS memberName,
+                COALESCE(ms.ms_current_balance, 0) AS balance,
+                ms.ms_update_at                   AS updatedAt,
                 (
                     SELECT COUNT(*)
                     FROM savings_ledger sl
-                    WHERE sl.sl_savings_id = ms.ms_member_id
+                    WHERE sl.sl_savings_id = mm.mm_id
                 ) AS transactionCount
-             FROM member_savings ms
-             LEFT JOIN ${MEMBER_TABLE} m
-                    ON m.${MEMBER_ID} = ms.ms_member_id
-             ORDER BY ms.ms_update_at DESC, ms.ms_member_id ASC`
+             FROM master_members mm
+             LEFT JOIN member_savings ms
+                    ON ms.ms_member_id = mm.mm_id
+             ORDER BY mm.mm_fullname ASC`
         );
 
         res.json(
             data.map(function (row) {
                 return {
                     ...row,
+                    balance: Number(row.balance || 0),
                     transactionCount: Number(row.transactionCount || 0)
                 };
             })
@@ -201,18 +212,72 @@ router.get("/load-savings", async function (req, res) {
 });
 
 // ==========================
-// CREATE
+// MEMBER TRANSACTION HISTORY
+// (all ledger entries of one member, newest first)
 // ==========================
 
-router.post("/create-savings", async function (req, res) {
-    let savingsId = null;
+router.get("/history/:memberId", async function (req, res) {
+    try {
+        const memberId = Number(req.params.memberId);
+
+        if (!Number.isInteger(memberId) || memberId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid member is required."
+            });
+        }
+
+        const rows = await Query(
+            `SELECT
+                sl_id               AS id,
+                sl_reference_no     AS referenceNo,
+                sl_transaction_type AS type,
+                sl_amount           AS amount,
+                sl_balance_after    AS balanceAfter,
+                sl_description      AS description,
+                sl_create_date      AS createdAt
+             FROM savings_ledger
+             WHERE sl_savings_id = ?
+             ORDER BY sl_create_date DESC, sl_reference_no DESC`,
+            [memberId]
+        );
+
+        res.json(
+            rows.map(function (row) {
+                return {
+                    ...row,
+                    amount: Number(row.amount || 0),
+                    balanceAfter: Number(row.balanceAfter || 0)
+                };
+            })
+        );
+    } catch (err) {
+        console.error("Load Member History:", err);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to load transaction history."
+        });
+    }
+});
+
+// ==========================
+// TRANSACT (balance + ledger entry)
+// ==========================
+
+router.post("/transact", async function (req, res) {
+    let applied = false;
+    let memberId = null;
+    let signed = 0;
 
     try {
-        const { error, value } = validateSavings(req.body);
+        const { error, value } = validateTransaction(req.body);
 
         if (error) {
             return res.status(400).json({ success: false, message: error });
         }
+
+        memberId = value.memberId;
 
         // Must match your actual session property.
         const createdBy = Number(req.session.userId);
@@ -224,278 +289,102 @@ router.post("/create-savings", async function (req, res) {
             });
         }
 
-        if (!(await memberExists(value.memberId))) {
+        const user = await Query(
+            `SELECT mu_id FROM master_users WHERE mu_id = ?`,
+            [createdBy]
+        );
+
+        if (!user.length) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid created-by user."
+            });
+        }
+
+        const member = await Query(
+            `SELECT mm_id FROM master_members WHERE mm_id = ?`,
+            [memberId]
+        );
+
+        if (!member.length) {
             return res.status(400).json({
                 success: false,
                 message: "Member not found."
             });
         }
 
-        const duplicate = await Query(
-            `SELECT ms_id FROM member_savings WHERE ms_member_id = ?`,
-            [value.memberId]
+        // Create the account on the first transaction if it doesn't exist yet
+        if ((await getBalance(memberId)) === null) {
+            await Query(
+                `INSERT INTO member_savings (
+                    ms_id, ms_member_id, ms_current_balance, ms_update_at
+                 ) VALUES (?, ?, 0, ?)`,
+                [crypto.randomUUID(), memberId, new Date()]
+            );
+        }
+
+        signed = getSignedAmount(value.type, value.amount);
+
+        // Atomic: the balance can never go below zero
+        const update = await Query(
+            `UPDATE member_savings
+             SET ms_current_balance = ms_current_balance + ?,
+                 ms_update_at = ?
+             WHERE ms_member_id = ?
+               AND ms_current_balance + ? >= 0`,
+            [signed, new Date(), memberId, signed]
         );
 
-        if (duplicate.length) {
+        if (!update.affectedRows) {
+            const balance = (await getBalance(memberId)) ?? 0;
+
             return res.status(400).json({
                 success: false,
-                message: "This member already has a savings account."
+                message:
+                    "Insufficient balance. Current balance is ₱" +
+                    balance.toFixed(2) + "."
             });
         }
 
-        savingsId = crypto.randomUUID();
-        const now = new Date();
+        applied = true;
 
-        await Query(
-            `INSERT INTO member_savings (
-                ms_id,
-                ms_member_id,
-                ms_current_balance,
-                ms_update_at
-            )
-            VALUES (?, ?, ?, ?)`,
-            [savingsId, value.memberId, value.balance, now]
-        );
+        const balanceAfter = round2(await getBalance(memberId));
 
-        // Record the opening balance in the ledger so both stay in sync
-        if (value.balance > 0) {
-            await Query(
-                `INSERT INTO savings_ledger (
-                    sl_id,
-                    sl_savings_id,
-                    sl_transaction_type,
-                    sl_amount,
-                    sl_balance_after,
-                    sl_reference_no,
-                    sl_description,
-                    sl_create_by,
-                    sl_create_date
-                )
-                VALUES (?, ?, 'DEPOSIT', ?, ?, ?, ?, ?, ?)`,
-                [
-                    crypto.randomUUID(),
-                    value.memberId,
-                    value.balance,
-                    value.balance,
-                    await generateReferenceNo(),
-                    "Opening balance",
-                    createdBy,
-                    now
-                ]
-            );
-        }
+        const referenceNo = await insertLedger({
+            memberId,
+            type: value.type,
+            amount: value.amount,
+            balanceAfter,
+            description: value.description,
+            createdBy
+        });
 
         res.status(201).json({
             success: true,
-            message: "Member savings created successfully.",
-            data: { id: savingsId }
+            message: "Transaction recorded.",
+            data: { referenceNo, balanceAfter }
         });
     } catch (err) {
-        console.error("Create Member Savings:", err);
+        console.error("Transact:", err);
 
-        // Undo the savings row if the ledger insert failed
-        if (savingsId) {
-            try {
-                await Query(`DELETE FROM member_savings WHERE ms_id = ?`, [
-                    savingsId
-                ]);
-            } catch (cleanupErr) {
-                console.error("Create cleanup:", cleanupErr);
-            }
-        }
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to create member savings."
-        });
-    }
-});
-
-// ==========================
-// UPDATE
-// ==========================
-
-router.put("/update-savings/:id", async function (req, res) {
-    let ledgerMoved = false;
-    let oldMemberId = null;
-    let newMemberId = null;
-
-    try {
-        const id = String(req.params.id || "").trim();
-
-        if (!isValidUUID(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid Savings ID."
-            });
-        }
-
-        const { error, value } = validateSavings(req.body);
-
-        if (error) {
-            return res.status(400).json({ success: false, message: error });
-        }
-
-        const existing = await Query(
-            `SELECT ms_id, ms_member_id, ms_current_balance
-             FROM member_savings
-             WHERE ms_id = ?`,
-            [id]
-        );
-
-        if (!existing.length) {
-            return res.status(404).json({
-                success: false,
-                message: "Member savings not found."
-            });
-        }
-
-        oldMemberId = Number(existing[0].ms_member_id);
-        newMemberId = value.memberId;
-
-        const currentBalance = Number(existing[0].ms_current_balance);
-        const hasTransactions = (await countTransactions(oldMemberId)) > 0;
-
-        // With ledger history, the balance can only change in the Savings Ledger
-        if (hasTransactions && round2(value.balance) !== round2(currentBalance)) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "This account has ledger transactions. Use the Savings Ledger to change the balance."
-            });
-        }
-
-        if (!(await memberExists(newMemberId))) {
-            return res.status(400).json({
-                success: false,
-                message: "Member not found."
-            });
-        }
-
-        const duplicate = await Query(
-            `SELECT ms_id
-             FROM member_savings
-             WHERE ms_member_id = ? AND ms_id <> ?`,
-            [newMemberId, id]
-        );
-
-        if (duplicate.length) {
-            return res.status(400).json({
-                success: false,
-                message: "This member already has a savings account."
-            });
-        }
-
-        const memberChanged = newMemberId !== oldMemberId;
-
-        if (memberChanged && hasTransactions) {
-            // The new member must not have leftover ledger rows
-            if ((await countTransactions(newMemberId)) > 0) {
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "The selected member already has ledger transactions."
-                });
-            }
-
-            // Move the ledger history to the new member
-            await Query(
-                `UPDATE savings_ledger
-                 SET sl_savings_id = ?
-                 WHERE sl_savings_id = ?`,
-                [newMemberId, oldMemberId]
-            );
-
-            ledgerMoved = true;
-        }
-
-        await Query(
-            `UPDATE member_savings
-             SET
-                ms_member_id = ?,
-                ms_current_balance = ?,
-                ms_update_at = ?
-             WHERE ms_id = ?`,
-            [newMemberId, value.balance, new Date(), id]
-        );
-
-        res.json({
-            success: true,
-            message: "Member savings updated successfully."
-        });
-    } catch (err) {
-        console.error("Update Member Savings:", err);
-
-        // Put the ledger rows back if the savings update failed
-        if (ledgerMoved) {
+        // Undo the balance change if the ledger entry couldn't be saved
+        if (applied) {
             try {
                 await Query(
-                    `UPDATE savings_ledger
-                     SET sl_savings_id = ?
-                     WHERE sl_savings_id = ?`,
-                    [oldMemberId, newMemberId]
+                    `UPDATE member_savings
+                     SET ms_current_balance = ms_current_balance - ?,
+                         ms_update_at = ?
+                     WHERE ms_member_id = ?`,
+                    [signed, new Date(), memberId]
                 );
             } catch (rollbackErr) {
-                console.error("Update rollback:", rollbackErr);
+                console.error("Transact rollback:", rollbackErr);
             }
         }
 
         res.status(500).json({
             success: false,
-            message: "Unable to update member savings."
-        });
-    }
-});
-
-// ==========================
-// DELETE
-// ==========================
-
-router.delete("/delete-savings/:id", async function (req, res) {
-    try {
-        const id = String(req.params.id || "").trim();
-
-        if (!isValidUUID(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid Savings ID."
-            });
-        }
-
-        const existing = await Query(
-            `SELECT ms_id, ms_member_id
-             FROM member_savings
-             WHERE ms_id = ?`,
-            [id]
-        );
-
-        if (!existing.length) {
-            return res.status(404).json({
-                success: false,
-                message: "Member savings not found."
-            });
-        }
-
-        if ((await countTransactions(Number(existing[0].ms_member_id))) > 0) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Cannot delete: this account has ledger transactions."
-            });
-        }
-
-        await Query(`DELETE FROM member_savings WHERE ms_id = ?`, [id]);
-
-        res.json({
-            success: true,
-            message: "Member savings deleted successfully."
-        });
-    } catch (err) {
-        console.error("Delete Member Savings:", err);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to delete member savings."
+            message: "Unable to record the transaction."
         });
     }
 });

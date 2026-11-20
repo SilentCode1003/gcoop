@@ -45,11 +45,31 @@ const auth = async (req, res, next) => {
       });
     }
 
-        // Permissions saved at login by routes/auth.js (re-normalized to be safe)
+    // Read the permissions fresh from the database on every request,
+    // so a permission change applies immediately (no re-login needed).
+    // mu_role may hold the role id or the role name; both are matched.
+    const rows = await Query(
+      `SELECT rt.mr_name AS name, p.mrp_permission AS permission
+       FROM master_role_permission p
+       INNER JOIN master_roles ro ON ro.mr_id = p.mrp_role_id
+       INNER JOIN master_routes rt ON rt.mr_id = p.mrp_route_id
+       WHERE ro.mr_id = ? OR ro.mr_name = ?`,
+      [user.mu_role, user.mu_role]
+    );
+
     const permissions = {};
-    for (const [key, value] of Object.entries(req.session.permissions ?? {})) {
-      permissions[normalize(key)] = value;
+    for (const row of rows) {
+      const key = normalize(row.name);
+      const level = String(row.permission ?? "").toLowerCase();
+
+      // keep the highest level if a route appears twice
+      if ((LEVELS[level] ?? 0) > (LEVELS[permissions[key]] ?? 0)) {
+        permissions[key] = level;
+      }
     }
+
+    // keep the session copy in sync for any code that still reads it
+    req.session.permissions = permissions;
 
     // can("members") or can("members", "write")
     const can = (route, need = "view") =>

@@ -20,7 +20,7 @@
 
   <hr class="sidebar-divider my-0" />
 
-  <!-- Dashboard -->
+  <!-- Dashboard (always visible) -->
   <li
     class="nav-item <%= title === 'Dashboard' ? 'active' : '' %>"
     id="menuDashboard"
@@ -31,12 +31,18 @@
     </a>
   </li>
 
+  <% const showMasterFiles =
+    can("Members") || can("Users") || can("Roles") || can("Routes"); %>
+
+  <% if (showMasterFiles) { %>
   <hr class="sidebar-divider" />
 
   <!-- Master Files -->
   <div class="sidebar-heading">Master Files</div>
+  <% } %>
 
   <!-- Members -->
+  <% if (can("Members")) { %>
   <li
     class="nav-item <%= title === 'Members' ? 'active' : '' %>"
     id="menuMembers"
@@ -46,8 +52,10 @@
       <span>Members</span>
     </a>
   </li>
+  <% } %>
 
   <!-- Users -->
+  <% if (can("Users")) { %>
   <li
     class="nav-item <%= title === 'User Accounts' ? 'active' : '' %>"
     id="menuUsers"
@@ -57,16 +65,23 @@
       <span>Users</span>
     </a>
   </li>
+  <% } %>
 
-  <!-- Roles -->
-  <li class="nav-item <%= title === 'Roles' ? 'active' : '' %>" id="menuRoles">
+  <!-- Roles & Permissions -->
+  <% if (can("Roles")) { %>
+  <li
+    class="nav-item <%= title === 'Roles & Permissions' ? 'active' : '' %>"
+    id="menuRoles"
+  >
     <a class="nav-link" href="/roles">
       <i class="fas fa-user-shield"></i>
-      <span>Roles</span>
+      <span>Roles &amp; Permissions</span>
     </a>
   </li>
+  <% } %>
 
   <!-- Routes -->
+  <% if (can("Routes")) { %>
   <li
     class="nav-item <%= title === 'Routes' ? 'active' : '' %>"
     id="menuRoutes"
@@ -76,24 +91,21 @@
       <span>Routes</span>
     </a>
   </li>
+  <% } %>
 
-  <!-- Permissions -->
-  <li
-    class="nav-item <%= title === 'Permissions' ? 'active' : '' %>"
-    id="menuPermissions"
-  >
-    <a class="nav-link" href="/permissions">
-      <i class="fas fa-lock"></i>
-      <span>Permissions</span>
-    </a>
-  </li>
+  <% const showLoanManagement =
+    can("Loan Rates") || can("Denominations") ||
+    can("Member Savings") || can("Savings Ledger"); %>
 
+  <% if (showLoanManagement) { %>
   <hr class="sidebar-divider" />
 
   <!-- Loan Management -->
   <div class="sidebar-heading">Loan Management</div>
+  <% } %>
 
   <!-- Loan Rates -->
+  <% if (can("Loan Rates")) { %>
   <li
     class="nav-item <%= title === 'Loan Rates' ? 'active' : '' %>"
     id="menuLoanRates"
@@ -103,8 +115,10 @@
       <span>Loan Rates</span>
     </a>
   </li>
+  <% } %>
 
   <!-- Denominations -->
+  <% if (can("Denominations")) { %>
   <li
     class="nav-item <%= title === 'Denominations' ? 'active' : '' %>"
     id="menuDenominations"
@@ -114,20 +128,24 @@
       <span>Denominations</span>
     </a>
   </li>
+  <% } %>
 
   <!-- Member Savings -->
+  <% if (can("Member Savings")) { %>
   <li
     class="nav-item <%= title === 'Member Savings' ? 'active' : '' %>"
     id="menuMemberSavings"
   >
     <a class="nav-link" href="/member-savings">
-     <i class="fas fa-piggy-bank"></i>
+      <i class="fas fa-piggy-bank"></i>
       <span>Member Savings</span>
     </a>
   </li>
+  <% } %>
 
   <!-- Savings Ledger -->
- <li
+  <% if (can("Savings Ledger")) { %>
+  <li
     class="nav-item <%= title === 'Savings Ledger' ? 'active' : '' %>"
     id="menuSavingsLedger"
   >
@@ -136,6 +154,7 @@
       <span>Savings Ledger</span>
     </a>
   </li>
+  <% } %>
 
   <hr class="sidebar-divider d-none d-md-block" />
 
